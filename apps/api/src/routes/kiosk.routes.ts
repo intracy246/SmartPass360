@@ -130,71 +130,6 @@ kioskRouter.post("/", requireBuilding, async (request, response, next) => {
   }
 });
 
-kioskRouter.patch("/:kioskId", requireBuilding, async (request, response, next) => {
-  try {
-    const user = response.locals.authUser as AuthUser;
-    const parsed = kioskUpdateSchema.safeParse(request.body);
-    if (!parsed.success) {
-      return response.status(400).json({
-        error: {
-          code: "VALIDATION_ERROR",
-          message: "Invalid kiosk data.",
-          details: parsed.error.flatten()
-        }
-      });
-    }
-
-    const existing = await prisma.kiosk.findFirst({
-      where: { id: request.params.kioskId, siteId: user.siteId! }
-    });
-
-    if (!existing) {
-      return response.status(404).json({
-        error: { code: "KIOSK_NOT_FOUND", message: "Kiosk not found in this building." }
-      });
-    }
-
-    const updated = await prisma.kiosk.update({
-      where: { id: existing.id },
-      data: {
-        name: parsed.data.name,
-        code: parsed.data.code.toUpperCase(),
-        location: parsed.data.location ?? null,
-        isActive: parsed.data.isActive ?? existing.isActive
-      },
-      include: { site: true }
-    });
-
-    return response.status(200).json({ success: true, data: updated });
-  } catch (error) {
-    return next(error);
-  }
-});
-
-kioskRouter.delete("/:kioskId", requireBuilding, async (request, response, next) => {
-  try {
-    const user = response.locals.authUser as AuthUser;
-    const existing = await prisma.kiosk.findFirst({
-      where: { id: request.params.kioskId, siteId: user.siteId! }
-    });
-
-    if (!existing) {
-      return response.status(404).json({
-        error: { code: "KIOSK_NOT_FOUND", message: "Kiosk not found in this building." }
-      });
-    }
-
-    await prisma.kiosk.delete({ where: { id: existing.id } });
-
-    return response.status(200).json({
-      success: true,
-      data: { id: existing.id }
-    });
-  } catch (error) {
-    return next(error);
-  }
-});
-
 kioskRouter.post("/activate", async (request, response, next) => {
   try {
     const parsed = activateSchema.safeParse(request.body);
@@ -259,6 +194,71 @@ kioskRouter.post("/activate", async (request, response, next) => {
         site: kiosk.site,
         organizations: kiosk.site.organizations.map((item) => item.organization)
       }
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+kioskRouter.patch("/:kioskId", requireBuilding, async (request, response, next) => {
+  try {
+    const user = response.locals.authUser as AuthUser;
+    const parsed = kioskUpdateSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return response.status(400).json({
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Invalid kiosk data.",
+          details: parsed.error.flatten()
+        }
+      });
+    }
+
+    const existing = await prisma.kiosk.findFirst({
+      where: { id: request.params.kioskId, siteId: user.siteId! }
+    });
+
+    if (!existing) {
+      return response.status(404).json({
+        error: { code: "KIOSK_NOT_FOUND", message: "Kiosk not found in this building." }
+      });
+    }
+
+    const updated = await prisma.kiosk.update({
+      where: { id: existing.id },
+      data: {
+        name: parsed.data.name,
+        code: parsed.data.code.toUpperCase(),
+        location: parsed.data.location ?? null,
+        isActive: parsed.data.isActive ?? existing.isActive
+      },
+      include: { site: true }
+    });
+
+    return response.status(200).json({ success: true, data: updated });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+kioskRouter.delete("/:kioskId", requireBuilding, async (request, response, next) => {
+  try {
+    const user = response.locals.authUser as AuthUser;
+    const existing = await prisma.kiosk.findFirst({
+      where: { id: request.params.kioskId, siteId: user.siteId! }
+    });
+
+    if (!existing) {
+      return response.status(404).json({
+        error: { code: "KIOSK_NOT_FOUND", message: "Kiosk not found in this building." }
+      });
+    }
+
+    await prisma.kiosk.delete({ where: { id: existing.id } });
+
+    return response.status(200).json({
+      success: true,
+      data: { id: existing.id }
     });
   } catch (error) {
     return next(error);
