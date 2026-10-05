@@ -227,7 +227,10 @@ organizationRouter.post(
             city:
               parsed.data.city,
             country:
-              parsed.data.country
+              parsed.data.country,
+            siteOrganizations: {
+              create: { siteId: user.siteId! }
+            }
           }
         });
 
