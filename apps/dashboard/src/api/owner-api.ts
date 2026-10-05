@@ -19,6 +19,20 @@ export type OwnerBuilding = {
     organizations: number;
     kiosks: number;
   };
+  organizations?: Array<{
+    id: string;
+    name: string;
+    code: string;
+    shortName?: string | null;
+    organizationType: string;
+    email?: string | null;
+    phone?: string | null;
+    website?: string | null;
+    address?: string | null;
+    city?: string | null;
+    country?: string | null;
+    isActive: boolean;
+  }>;
 };
 
 export function getOwnerBuildings() {
