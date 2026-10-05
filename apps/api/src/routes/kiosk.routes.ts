@@ -3,21 +3,13 @@ import { Router } from "express";
 import { z } from "zod";
 
 import { prisma } from "../lib/prisma";
+import { requireBuilding, type AuthUser } from "../middleware/auth.middleware";
 
 export const kioskRouter = Router();
 
 function createActivationCode() {
   return crypto.randomBytes(5).toString("hex").toUpperCase();
 }
-
-const siteCreateSchema = z.object({
-  name: z.string().trim().min(2).max(160),
-  code: z.string().trim().min(2).max(40),
-  address: z.string().trim().optional(),
-  city: z.string().trim().optional(),
-  country: z.string().trim().optional(),
-  organizationIds: z.array(z.string().uuid()).default([])
-});
 
 const siteUpdateSchema = z.object({
   name: z.string().trim().min(2).max(160),
@@ -35,88 +27,19 @@ const activateSchema = z.object({
   deviceId: z.string().trim().min(3).max(160)
 });
 
-kioskRouter.get("/sites", async (_request, response, next) => {
+kioskRouter.patch("/sites/:siteId/settings", requireBuilding, async (request, response, next) => {
   try {
-    const sites = await prisma.site.findMany({
-      where: { isActive: true },
-      orderBy: { name: "asc" },
-      include: {
-        organizations: {
-          where: { isActive: true },
-          include: {
-            organization: true
-          }
-        },
-        kiosks: {
-          orderBy: { name: "asc" }
-        }
-      }
-    });
+    const user = response.locals.authUser as AuthUser;
 
-    return response.status(200).json({
-      success: true,
-      data: sites.map((site) => ({
-        ...site,
-        organizations: site.organizations.map((item) => item.organization)
-      }))
-    });
-  } catch (error) {
-    return next(error);
-  }
-});
-
-kioskRouter.post("/sites", async (request, response, next) => {
-  try {
-    const parsed = siteCreateSchema.safeParse(request.body);
-
-    if (!parsed.success) {
-      return response.status(400).json({
+    if (request.params.siteId !== user.siteId) {
+      return response.status(403).json({
         error: {
-          code: "VALIDATION_ERROR",
-          message: "Invalid site data.",
-          details: parsed.error.flatten()
+          code: "FORBIDDEN",
+          message: "You can update only your building."
         }
       });
     }
 
-    const code = parsed.data.code.toUpperCase();
-
-    const site = await prisma.site.create({
-      data: {
-        name: parsed.data.name,
-        code,
-        address: parsed.data.address || undefined,
-        city: parsed.data.city || undefined,
-        country: parsed.data.country || undefined,
-        organizations: {
-          create: parsed.data.organizationIds.map((organizationId) => ({
-            organizationId
-          }))
-        }
-      },
-      include: {
-        organizations: {
-          include: {
-            organization: true
-          }
-        }
-      }
-    });
-
-    return response.status(201).json({
-      success: true,
-      data: {
-        ...site,
-        organizations: site.organizations.map((item) => item.organization)
-      }
-    });
-  } catch (error) {
-    return next(error);
-  }
-});
-
-kioskRouter.patch("/sites/:siteId/settings", async (request, response, next) => {
-  try {
     const parsed = siteUpdateSchema.safeParse(request.body);
 
     if (!parsed.success) {
@@ -130,7 +53,7 @@ kioskRouter.patch("/sites/:siteId/settings", async (request, response, next) => 
     }
 
     const site = await prisma.site.update({
-      where: { id: request.params.siteId },
+      where: { id: user.siteId! },
       data: {
         name: parsed.data.name,
         logoUrl: parsed.data.logoUrl ?? null
@@ -146,9 +69,12 @@ kioskRouter.patch("/sites/:siteId/settings", async (request, response, next) => 
   }
 });
 
-kioskRouter.get("/", async (_request, response, next) => {
+kioskRouter.get("/", requireBuilding, async (_request, response, next) => {
   try {
+    const user = response.locals.authUser as AuthUser;
+
     const kiosks = await prisma.kiosk.findMany({
+      where: { siteId: user.siteId! },
       orderBy: { createdAt: "desc" },
       include: { site: true }
     });
@@ -162,8 +88,9 @@ kioskRouter.get("/", async (_request, response, next) => {
   }
 });
 
-kioskRouter.post("/", async (request, response, next) => {
+kioskRouter.post("/", requireBuilding, async (request, response, next) => {
   try {
+    const user = response.locals.authUser as AuthUser;
     const parsed = kioskCreateSchema.safeParse(request.body);
 
     if (!parsed.success) {
@@ -176,35 +103,15 @@ kioskRouter.post("/", async (request, response, next) => {
       });
     }
 
-    const sites = await prisma.site.findMany({
-      where: { isActive: true },
-      select: { id: true },
-      take: 2
-    });
-
-    if (sites.length !== 1) {
-      return response.status(409).json({
-        error: {
-          code: "BUILDING_CONFIGURATION_REQUIRED",
-          message:
-            sites.length === 0
-              ? "This SmartPass360 installation has no active building configured."
-              : "This SmartPass360 installation must have exactly one active building."
-        }
-      });
-    }
-
     const kiosk = await prisma.kiosk.create({
       data: {
-        siteId: sites[0].id,
+        siteId: user.siteId!,
         name: parsed.data.name,
         code: parsed.data.code.toUpperCase(),
         location: parsed.data.location || undefined,
         activationCode: createActivationCode()
       },
-      include: {
-        site: true
-      }
+      include: { site: true }
     });
 
     return response.status(201).json({
@@ -239,16 +146,14 @@ kioskRouter.post("/activate", async (request, response, next) => {
           include: {
             organizations: {
               where: { isActive: true },
-              include: {
-                organization: true
-              }
+              include: { organization: true }
             }
           }
         }
       }
     });
 
-    if (!kiosk || !kiosk.isActive || !kiosk.site.isActive) {
+    if (!kiosk || !kiosk.isActive || !kiosk.site.isActive || kiosk.site.status !== "ACTIVE") {
       return response.status(404).json({
         error: {
           code: "KIOSK_NOT_AVAILABLE",
@@ -288,16 +193,14 @@ kioskRouter.get("/:kioskId/config", async (request, response, next) => {
           include: {
             organizations: {
               where: { isActive: true },
-              include: {
-                organization: true
-              }
+              include: { organization: true }
             }
           }
         }
       }
     });
 
-    if (!kiosk || !kiosk.isActive || !kiosk.site.isActive) {
+    if (!kiosk || !kiosk.isActive || !kiosk.site.isActive || kiosk.site.status !== "ACTIVE") {
       return response.status(404).json({
         error: {
           code: "KIOSK_NOT_AVAILABLE",

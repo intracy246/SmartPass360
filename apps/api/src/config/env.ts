@@ -20,7 +20,22 @@ const environmentSchema = z.object({
 
   DATABASE_URL: z
     .string()
-    .min(1, "DATABASE_URL is required")
+    .min(1, "DATABASE_URL is required"),
+
+  AUTH_JWT_SECRET: z
+    .string()
+    .min(32)
+    .default("smartpass360-development-secret-change-this"),
+
+  OWNER_USERNAME: z
+    .string()
+    .min(3)
+    .default("smartcycle"),
+
+  OWNER_PASSWORD: z
+    .string()
+    .min(8)
+    .default("ChangeMe123!")
 });
 
 const parsedEnvironment = environmentSchema.safeParse(process.env);

@@ -1,4 +1,5 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { clearSession } from "../../auth/session";
 
 import "./Sidebar.css";
 
@@ -51,6 +52,8 @@ const navigationItems = [
 ];
 
 export function Sidebar() {
+  const navigate = useNavigate();
+
   return (
     <aside className="sidebar">
       <div className="sidebar__brand">
@@ -95,6 +98,23 @@ export function Sidebar() {
           <strong>System connected</strong>
           <span>SmartPass360 API</span>
         </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            clearSession();
+            navigate("/login", { replace: true });
+          }}
+          style={{
+            marginLeft: "auto",
+            border: 0,
+            background: "transparent",
+            color: "#8fa0b8",
+            cursor: "pointer"
+          }}
+        >
+          Sign out
+        </button>
       </div>
     </aside>
   );

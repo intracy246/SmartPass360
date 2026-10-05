@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import {
   Navigate,
   Route,
@@ -11,6 +12,10 @@ import { PassesPage } from "../pages/passes/PassesPage";
 import { AccessControlPage } from "../pages/access/AccessControlPage";
 import { OrganizationsPage } from "../pages/organizations/OrganizationsPage";
 import { SettingsPage } from "../pages/settings/SettingsPage";
+import { LoginPage } from "../pages/auth/LoginPage";
+import { ChangePasswordPage } from "../pages/auth/ChangePasswordPage";
+import { OwnerDashboardPage } from "../pages/owner/OwnerDashboardPage";
+import { getStoredUser, getToken } from "../auth/session";
 import { KiosksPage } from "../pages/kiosks/KiosksPage";
 
 function EmptyModule({
@@ -34,10 +39,30 @@ function EmptyModule({
   );
 }
 
+function RequireBuilding({ children }: { children: ReactNode }) {
+  const token = getToken();
+  const user = getStoredUser();
+  if (!token || !user) return <Navigate to="/login" replace />;
+  if (user.scope === "OWNER") return <Navigate to="/owner" replace />;
+  if (user.mustChangePassword) return <Navigate to="/change-password" replace />;
+  return <>{children}</>;
+}
+
+function RequireOwner({ children }: { children: ReactNode }) {
+  const token = getToken();
+  const user = getStoredUser();
+  if (!token || !user) return <Navigate to="/login" replace />;
+  if (user.scope !== "OWNER") return <Navigate to="/" replace />;
+  return <>{children}</>;
+}
+
 export function AppRouter() {
   return (
     <Routes>
-      <Route element={<DashboardLayout />}>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/change-password" element={<ChangePasswordPage />} />
+      <Route path="/owner" element={<RequireOwner><OwnerDashboardPage /></RequireOwner>} />
+      <Route element={<RequireBuilding><DashboardLayout /></RequireBuilding>}>
         <Route index element={<DashboardPage />} />
 
         <Route

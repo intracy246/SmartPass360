@@ -7,6 +7,8 @@ export type VisitorIdentificationType =
   | "NONE";
 
 export type KioskRegistrationPayload = {
+  kioskId: string;
+
   organizationId: string;
 
   fullName: string;
@@ -21,11 +23,11 @@ export type KioskRegistrationPayload = {
 
   vehicleRegistrationNumber?: string;
 
-  departmentOrOffice: string;
+  departmentOrOffice?: string;
 
   hostName?: string;
 
-  purposeOfVisit: string;
+  purposeOfVisit?: string;
 
   photoDataUrl?: string;
 

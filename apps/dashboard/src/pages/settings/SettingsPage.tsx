@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { ApiError } from "../../api/api-client";
 import {
-  getBuildings,
+  getCurrentBuilding,
   updateBuildingSettings
 } from "../../api/building-api";
 
@@ -48,15 +48,10 @@ async function compressLogo(file: File): Promise<string> {
 export function SettingsPage() {
   const buildingsQuery = useQuery({
     queryKey: ["building-settings"],
-    queryFn: getBuildings
+    queryFn: getCurrentBuilding
   });
 
-  const buildings = buildingsQuery.data?.data ?? [];
-  const [selectedId, setSelectedId] = useState("");
-  const selected = useMemo(
-    () => buildings.find((building) => building.id === selectedId) ?? buildings[0],
-    [buildings, selectedId]
-  );
+  const selected = buildingsQuery.data?.data;
 
   const [name, setName] = useState("");
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
@@ -64,7 +59,6 @@ export function SettingsPage() {
 
   useEffect(() => {
     if (!selected) return;
-    setSelectedId(selected.id);
     setName(selected.name);
     setLogoUrl(selected.logoUrl ?? null);
     setMessage(null);
@@ -124,21 +118,8 @@ export function SettingsPage() {
 
       {buildingsQuery.isPending && <div className="building-settings__empty">Loading buildings...</div>}
       {buildingsQuery.isError && <div className="building-settings__empty">Building service is unavailable.</div>}
-      {!buildingsQuery.isPending && !buildingsQuery.isError && buildings.length === 0 && (
-        <div className="building-settings__empty">No building has been registered yet.</div>
-      )}
-
       {selected && (
         <form onSubmit={submit} className="building-settings__card">
-          <label>
-            <span>Building</span>
-            <select value={selected.id} onChange={(event) => setSelectedId(event.target.value)}>
-              {buildings.map((building) => (
-                <option key={building.id} value={building.id}>{building.name}</option>
-              ))}
-            </select>
-          </label>
-
           <label>
             <span>Building name</span>
             <input value={name} onChange={(event) => setName(event.target.value)} required />
