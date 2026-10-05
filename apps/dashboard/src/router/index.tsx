@@ -11,6 +11,7 @@ import { PassesPage } from "../pages/passes/PassesPage";
 import { AccessControlPage } from "../pages/access/AccessControlPage";
 import { OrganizationsPage } from "../pages/organizations/OrganizationsPage";
 import { SettingsPage } from "../pages/settings/SettingsPage";
+import { KiosksPage } from "../pages/kiosks/KiosksPage";
 
 function EmptyModule({
   title
@@ -58,6 +59,8 @@ export function AppRouter() {
   path="organizations"
   element={<OrganizationsPage />}
 />
+
+        <Route path="kiosks" element={<KiosksPage />} />
 
         <Route
           path="users"
