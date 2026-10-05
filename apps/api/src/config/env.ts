@@ -7,7 +7,7 @@ const currentFile = fileURLToPath(import.meta.url);
 const currentDir = path.dirname(currentFile);
 const apiEnvPath = path.resolve(currentDir, "../../.env");
 
-dotenv.config({ path: apiEnvPath });
+dotenv.config({ path: apiEnvPath, override: true });
 
 const environmentSchema = z.object({
   NODE_ENV: z
