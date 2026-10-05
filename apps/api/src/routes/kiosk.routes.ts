@@ -160,11 +160,38 @@ kioskRouter.post("/activate", async (request, response, next) => {
       }
     });
 
-    if (!kiosk || !kiosk.isActive || !kiosk.site.isActive || kiosk.site.status !== "ACTIVE") {
+    if (!kiosk) {
       return response.status(404).json({
         error: {
-          code: "KIOSK_NOT_AVAILABLE",
-          message: "Kiosk activation code is invalid or inactive."
+          code: "KIOSK_CODE_INVALID",
+          message: "Activation code was not found."
+        }
+      });
+    }
+
+    if (!kiosk.isActive) {
+      return response.status(409).json({
+        error: {
+          code: "KIOSK_INACTIVE",
+          message: "This kiosk is inactive in the building dashboard."
+        }
+      });
+    }
+
+    if (!kiosk.site.isActive) {
+      return response.status(409).json({
+        error: {
+          code: "BUILDING_DISABLED",
+          message: "This building is disabled."
+        }
+      });
+    }
+
+    if (kiosk.site.status !== "ACTIVE") {
+      return response.status(409).json({
+        error: {
+          code: "BUILDING_NOT_ACTIVE",
+          message: "This building is not active yet. Complete the building's first-login activation before activating kiosks."
         }
       });
     }
