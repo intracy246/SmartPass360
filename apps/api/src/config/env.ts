@@ -22,7 +22,7 @@ const environmentSchema = z.object({
 
   CORS_ORIGIN: z
     .string()
-    .default("http://localhost:5173,http://localhost:5174"),
+    .default("http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174"),
 
   DATABASE_URL: z
     .string()
