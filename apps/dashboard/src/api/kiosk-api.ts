@@ -34,7 +34,6 @@ export function getKiosks() {
 }
 
 export function createKiosk(payload: {
-  siteId: string;
   name: string;
   code: string;
   location?: string;
