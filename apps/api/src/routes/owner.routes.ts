@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import bcrypt from "bcryptjs";
+import { promisify } from "node:util";
 import { Router } from "express";
 import { z } from "zod";
 
@@ -8,6 +8,22 @@ import { prisma } from "../lib/prisma";
 import { requireBuilding, requireOwner, signAuthToken, type AuthUser } from "../middleware/auth.middleware";
 
 export const ownerRouter = Router();
+
+const scrypt = promisify(crypto.scrypt);
+
+async function hashPassword(password: string) {
+  const salt = crypto.randomBytes(16).toString("hex");
+  const derivedKey = (await scrypt(password, salt, 64)) as Buffer;
+  return `${salt}:${derivedKey.toString("hex")}`;
+}
+
+async function verifyPassword(password: string, stored: string) {
+  const [salt, keyHex] = stored.split(":");
+  if (!salt || !keyHex) return false;
+  const derivedKey = (await scrypt(password, salt, 64)) as Buffer;
+  const storedKey = Buffer.from(keyHex, "hex");
+  return storedKey.length === derivedKey.length && crypto.timingSafeEqual(storedKey, derivedKey);
+}
 
 const loginSchema = z.object({
   username: z.string().trim().min(3).max(120),
@@ -55,7 +71,7 @@ ownerRouter.post("/login", async (request, response) => {
     });
   }
 
-  const matches = await bcrypt.compare(password, site.adminPasswordHash);
+  const matches = await verifyPassword(password, site.adminPasswordHash);
   if (!matches) {
     return response.status(401).json({
       error: { code: "INVALID_CREDENTIALS", message: "Invalid username or password." }
@@ -121,7 +137,7 @@ ownerRouter.post("/buildings", requireOwner, async (request, response, next) => 
     }
 
     const data = parsed.data;
-    const passwordHash = await bcrypt.hash(data.temporaryPassword, 12);
+    const passwordHash = await hashPassword(data.temporaryPassword);
 
     const site = await prisma.site.create({
       data: {
@@ -199,12 +215,12 @@ ownerRouter.post("/me/change-password", requireBuilding, async (request, respons
       return response.status(404).json({ error: { code: "BUILDING_NOT_FOUND", message: "Building account not found." } });
     }
 
-    const matches = await bcrypt.compare(parsed.data.currentPassword, site.adminPasswordHash);
+    const matches = await verifyPassword(parsed.data.currentPassword, site.adminPasswordHash);
     if (!matches) {
       return response.status(400).json({ error: { code: "INVALID_PASSWORD", message: "Current password is incorrect." } });
     }
 
-    const hash = await bcrypt.hash(parsed.data.newPassword, 12);
+    const hash = await hashPassword(parsed.data.newPassword);
     const updated = await prisma.site.update({
       where: { id: site.id },
       data: {
