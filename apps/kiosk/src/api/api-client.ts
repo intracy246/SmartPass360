@@ -57,10 +57,15 @@ export async function apiRequest<T>(
   if (!response.ok) {
     const errorBody = responseBody as {
       message?: string;
+      error?: {
+        message?: string;
+        code?: string;
+      };
     } | null;
 
     throw new ApiError(
-      errorBody?.message ??
+      errorBody?.error?.message ??
+        errorBody?.message ??
         "The SmartPass360 service returned an error.",
       response.status,
       responseBody
