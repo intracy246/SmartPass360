@@ -25,7 +25,6 @@ const siteUpdateSchema = z.object({
 });
 
 const kioskCreateSchema = z.object({
-  siteId: z.string().uuid(),
   name: z.string().trim().min(2).max(160),
   code: z.string().trim().min(2).max(40),
   location: z.string().trim().optional()
@@ -177,9 +176,27 @@ kioskRouter.post("/", async (request, response, next) => {
       });
     }
 
+    const sites = await prisma.site.findMany({
+      where: { isActive: true },
+      select: { id: true },
+      take: 2
+    });
+
+    if (sites.length !== 1) {
+      return response.status(409).json({
+        error: {
+          code: "BUILDING_CONFIGURATION_REQUIRED",
+          message:
+            sites.length === 0
+              ? "This SmartPass360 installation has no active building configured."
+              : "This SmartPass360 installation must have exactly one active building."
+        }
+      });
+    }
+
     const kiosk = await prisma.kiosk.create({
       data: {
-        siteId: parsed.data.siteId,
+        siteId: sites[0].id,
         name: parsed.data.name,
         code: parsed.data.code.toUpperCase(),
         location: parsed.data.location || undefined,
