@@ -29,7 +29,11 @@ const querySchema = z.object({
     .int()
     .positive()
     .max(100)
-    .default(20)
+    .default(20),
+
+  active: z
+    .enum(["true", "false"])
+    .optional()
 });
 
 const optionalText = z
@@ -86,10 +90,14 @@ organizationRouter.get(
       const {
         search,
         page,
-        pageSize
+        pageSize,
+        active
       } = parsed.data;
 
       const where = {
+        ...(active !== undefined
+          ? { isActive: active === "true" }
+          : {}),
         ...(search
           ? {
               OR: [

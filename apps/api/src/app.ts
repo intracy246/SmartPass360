@@ -11,6 +11,7 @@ import { healthRouter } from "./routes/health.routes";
 import { accessRouter } from "./routes/access.routes";
 import { permanentPassRouter } from "./routes/permanent-pass.routes";
 import { organizationRouter } from "./routes/organization.routes";
+import { kioskRouter } from "./routes/kiosk.routes";
 
 export const app = express();
 
@@ -65,6 +66,7 @@ app.use("/api/v1/health", healthRouter);
 app.use("/api/v1/access", accessRouter);
 app.use("/api/v1/permanent-passes", permanentPassRouter);
 app.use("/api/v1/organizations", organizationRouter);
+app.use("/api/v1/kiosks", kioskRouter);
 
 app.use(notFoundHandler);
 
