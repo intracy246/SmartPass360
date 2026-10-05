@@ -147,6 +147,22 @@ kioskRouter.patch("/sites/:siteId/settings", async (request, response, next) => 
   }
 });
 
+kioskRouter.get("/", async (_request, response, next) => {
+  try {
+    const kiosks = await prisma.kiosk.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { site: true }
+    });
+
+    return response.status(200).json({
+      success: true,
+      data: kiosks
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 kioskRouter.post("/", async (request, response, next) => {
   try {
     const parsed = kioskCreateSchema.safeParse(request.body);
