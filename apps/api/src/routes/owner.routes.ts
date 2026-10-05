@@ -63,6 +63,12 @@ ownerRouter.post("/login", async (request, response) => {
     });
   }
 
+  if (username === env.OWNER_USERNAME) {
+    return response.status(401).json({
+      error: { code: "INVALID_CREDENTIALS", message: "Invalid username or password." }
+    });
+  }
+
   const site = await prisma.site.findUnique({ where: { adminUsername: username } });
 
   if (!site || !site.adminPasswordHash || !site.isActive || site.status === "SUSPENDED") {
