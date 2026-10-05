@@ -79,3 +79,26 @@ export function deleteOwnerBuilding(siteId: string) {
     method: "DELETE"
   });
 }
+
+
+export function getOwnerBuilding(siteId: string) {
+  return apiRequest<{ success: boolean; data: OwnerBuilding }>(`/auth/buildings/${siteId}`);
+}
+
+export function resetOwnerBuildingCredentials(
+  siteId: string,
+  payload: { adminUsername: string; temporaryPassword: string }
+) {
+  return apiRequest<{
+    success: boolean;
+    data: {
+      id: string;
+      adminUsername: string | null;
+      mustChangePassword: boolean;
+      status: "PENDING" | "ACTIVE" | "SUSPENDED";
+    };
+  }>(`/auth/buildings/${siteId}/reset-credentials`, {
+    method: "POST",
+    body: payload
+  });
+}
