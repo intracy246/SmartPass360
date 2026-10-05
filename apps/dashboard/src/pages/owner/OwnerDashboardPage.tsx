@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { ApiError } from "../../api/api-client";
-import { getOwnerBuildings, provisionBuilding } from "../../api/owner-api";
+import { deleteOwnerBuilding, getOwnerBuildings, provisionBuilding, updateOwnerBuilding, type OwnerBuilding } from "../../api/owner-api";
 import { clearSession } from "../../auth/session";
 import "./OwnerDashboardPage.css";
 
@@ -11,6 +11,8 @@ export function OwnerDashboardPage() {
   const queryClient = useQueryClient();
   const buildingsQuery = useQuery({ queryKey: ["owner-buildings"], queryFn: getOwnerBuildings });
   const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<OwnerBuilding | null>(null);
+  const [deleting, setDeleting] = useState<OwnerBuilding | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "", code: "", address: "", city: "", country: "Tanzania",
@@ -26,6 +28,29 @@ export function OwnerDashboardPage() {
       await queryClient.invalidateQueries({ queryKey: ["owner-buildings"] });
     },
     onError: (error) => setMessage(error instanceof ApiError ? error.message : "Could not register building.")
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ siteId, payload }: { siteId: string; payload: Parameters<typeof updateOwnerBuilding>[1] }) =>
+      updateOwnerBuilding(siteId, payload),
+    onSuccess: async () => {
+      setEditing(null);
+      setMessage("Building updated successfully.");
+      await queryClient.invalidateQueries({ queryKey: ["owner-buildings"] });
+    },
+    onError: (error) =>
+      setMessage(error instanceof ApiError ? error.message : "Could not update building.")
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteOwnerBuilding,
+    onSuccess: async () => {
+      setDeleting(null);
+      setMessage("Building deleted successfully.");
+      await queryClient.invalidateQueries({ queryKey: ["owner-buildings"] });
+    },
+    onError: (error) =>
+      setMessage(error instanceof ApiError ? error.message : "Could not delete building.")
   });
 
   function submit(event: FormEvent) {
@@ -87,10 +112,57 @@ export function OwnerDashboardPage() {
                 <div><dt>Kiosks</dt><dd>{building.counts.kiosks}</dd></div>
                 <div><dt>Password change</dt><dd>{building.mustChangePassword ? "Required" : "Completed"}</dd></div>
               </dl>
+              <div className="owner-building__actions">
+                <button className="secondary" onClick={() => setEditing(building)}>Edit</button>
+                <button className="danger" onClick={() => setDeleting(building)}>Delete</button>
+              </div>
             </article>
           ))}
         </div>
       </section>
+
+      {editing && (
+        <div className="owner-modal">
+          <form className="owner-modal__card" onSubmit={(event) => {
+            event.preventDefault();
+            updateMutation.mutate({
+              siteId: editing.id,
+              payload: {
+                name: editing.name,
+                code: editing.code,
+                address: editing.address ?? null,
+                city: editing.city ?? null,
+                country: editing.country ?? null,
+                adminUsername: editing.adminUsername ?? null,
+                status: editing.status,
+                isActive: editing.isActive
+              }
+            });
+          }}>
+            <div className="owner-modal__title"><div><p>MANAGE CUSTOMER</p><h2>Edit Building</h2></div><button type="button" className="icon" onClick={()=>setEditing(null)}>×</button></div>
+            <div className="owner-form-grid">
+              <label><span>Building name *</span><input required value={editing.name} onChange={(e)=>setEditing({...editing,name:e.target.value})} /></label>
+              <label><span>Building code *</span><input required value={editing.code} onChange={(e)=>setEditing({...editing,code:e.target.value.toUpperCase()})} /></label>
+              <label><span>Admin username</span><input value={editing.adminUsername ?? ""} onChange={(e)=>setEditing({...editing,adminUsername:e.target.value})} /></label>
+              <label><span>Status</span><select value={editing.status} onChange={(e)=>setEditing({...editing,status:e.target.value as OwnerBuilding["status"]})}><option value="PENDING">PENDING</option><option value="ACTIVE">ACTIVE</option><option value="SUSPENDED">SUSPENDED</option></select></label>
+              <label><span>City</span><input value={editing.city ?? ""} onChange={(e)=>setEditing({...editing,city:e.target.value})} /></label>
+              <label><span>Country</span><input value={editing.country ?? ""} onChange={(e)=>setEditing({...editing,country:e.target.value})} /></label>
+              <label className="wide"><span>Address</span><textarea value={editing.address ?? ""} onChange={(e)=>setEditing({...editing,address:e.target.value})} /></label>
+              <label className="owner-checkbox wide"><input type="checkbox" checked={editing.isActive} onChange={(e)=>setEditing({...editing,isActive:e.target.checked})} /><span>Building enabled</span></label>
+            </div>
+            <div className="owner-modal__actions"><button type="button" className="secondary" onClick={()=>setEditing(null)}>Cancel</button><button disabled={updateMutation.isPending}>{updateMutation.isPending?"Saving...":"Save Changes"}</button></div>
+          </form>
+        </div>
+      )}
+
+      {deleting && (
+        <div className="owner-modal">
+          <div className="owner-modal__card owner-confirm">
+            <div><p>DELETE BUILDING</p><h2>Delete {deleting.name}?</h2><span>This action is allowed only when the building has no linked organizations or kiosks. Existing customer data will not be silently cascaded away.</span></div>
+            <div className="owner-modal__actions"><button className="secondary" onClick={()=>setDeleting(null)}>Cancel</button><button className="danger" disabled={deleteMutation.isPending} onClick={()=>deleteMutation.mutate(deleting.id)}>{deleteMutation.isPending?"Deleting...":"Delete Building"}</button></div>
+          </div>
+        </div>
+      )}
 
       {open && (
         <div className="owner-modal">
