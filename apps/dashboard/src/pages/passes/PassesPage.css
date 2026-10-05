@@ -1,0 +1,803 @@
+.passes-page {
+  width: min(100%, 1600px);
+  margin: 0 auto;
+}
+
+.passes-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.passes-page__eyebrow {
+  margin: 0 0 8px;
+  color: #7dcfff;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.passes-page__header h1 {
+  margin: 0;
+  color: #f8f8ff;
+  font-size: clamp(30px, 4vw, 44px);
+  letter-spacing: -0.04em;
+}
+
+.passes-page__header p:not(.passes-page__eyebrow) {
+  max-width: 700px;
+  margin: 12px 0 0;
+  color: #8fa0b8;
+  line-height: 1.7;
+}
+
+.passes-page__actions {
+  display: flex;
+  gap: 12px;
+}
+
+.passes-page > .glass-card + .glass-card {
+  margin-top: 20px;
+}
+
+.passes-filters {
+  display: grid;
+  grid-template-columns:
+    minmax(260px, 1.4fr)
+    minmax(180px, 0.7fr)
+    minmax(180px, 0.7fr)
+    auto;
+  align-items: end;
+  gap: 14px;
+}
+
+.passes-filter {
+  display: grid;
+  gap: 8px;
+}
+
+.passes-filter > span {
+  color: #aab8ca;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.passes-filter input,
+.passes-filter select {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 15px;
+  border: 1px solid rgba(248, 248, 255, 0.11);
+  border-radius: 15px;
+  outline: none;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.065),
+      rgba(255, 255, 255, 0.025)
+    );
+  color: #f8f8ff;
+}
+
+.passes-filter input:focus,
+.passes-filter select:focus {
+  border-color: rgba(34, 211, 238, 0.5);
+  box-shadow:
+    0 0 0 4px rgba(34, 211, 238, 0.07);
+}
+
+.passes-filter input::placeholder {
+  color: #697b93;
+}
+
+.passes-filter option {
+  color: #f8f8ff;
+  background: #0b1b34;
+}
+
+.passes-state {
+  min-height: 320px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.passes-state__icon {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 8px;
+  border: 1px solid rgba(139, 92, 246, 0.22);
+  border-radius: 20px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(139, 92, 246, 0.14),
+      rgba(34, 211, 238, 0.06)
+    );
+  color: #bba4ff;
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.passes-state strong {
+  color: #f8f8ff;
+  font-size: 16px;
+}
+
+.passes-state p {
+  max-width: 440px;
+  margin: 0 0 8px;
+  color: #7f90a7;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.passes-state--error .passes-state__icon {
+  border-color: rgba(255, 100, 124, 0.2);
+  background: rgba(255, 100, 124, 0.08);
+  color: #ff8fa1;
+}
+
+.passes-state__loader {
+  width: 46px;
+  height: 46px;
+  margin-bottom: 10px;
+  border: 4px solid rgba(248, 248, 255, 0.08);
+  border-top-color: #22d3ee;
+  border-radius: 50%;
+  animation: passes-loader-spin 800ms linear infinite;
+}
+
+@keyframes passes-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.passes-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid rgba(248, 248, 255, 0.07);
+  border-radius: 20px;
+}
+
+.passes-table {
+  width: 100%;
+  min-width: 1100px;
+  border-collapse: collapse;
+}
+
+.passes-table th {
+  padding: 15px 16px;
+  border-bottom: 1px solid rgba(248, 248, 255, 0.08);
+  background: rgba(255, 255, 255, 0.025);
+  color: #71839a;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.passes-table td {
+  padding: 16px;
+  border-bottom: 1px solid rgba(248, 248, 255, 0.055);
+  color: #dce5f3;
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+.passes-table tbody tr {
+  transition:
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+.passes-table tbody tr:hover {
+  background: rgba(59, 130, 246, 0.045);
+}
+
+.passes-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.passes-table__pass,
+.passes-table__destination,
+.passes-table__validity {
+  display: grid;
+  gap: 5px;
+}
+
+.passes-table__pass strong,
+.passes-table__destination strong {
+  color: #f8f8ff;
+  font-size: 12px;
+}
+
+.passes-table__pass span,
+.passes-table__destination span,
+.passes-table__validity span {
+  color: #718299;
+  font-size: 10px;
+}
+
+.passes-table__visitor {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.passes-table__avatar {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(248, 248, 255, 0.1);
+  border-radius: 14px;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(59, 130, 246, 0.3),
+      rgba(139, 92, 246, 0.28)
+    );
+  color: #f8f8ff;
+  font-weight: 900;
+}
+
+.passes-table__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.passes-table__visitor > div:last-child {
+  display: grid;
+  gap: 5px;
+}
+
+.passes-table__visitor strong {
+  color: #f8f8ff;
+}
+
+.passes-table__visitor span {
+  color: #718299;
+  font-size: 10px;
+}
+
+.passes-table__source {
+  display: inline-flex;
+  padding: 7px 10px;
+  border: 1px solid rgba(34, 211, 238, 0.12);
+  border-radius: 999px;
+  background: rgba(34, 211, 238, 0.055);
+  color: #8ce7f4;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.passes-table__menu {
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(248, 248, 255, 0.09);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.035);
+  color: #c7d2e2;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.passes-table__menu:hover {
+  border-color: rgba(34, 211, 238, 0.25);
+  background: rgba(34, 211, 238, 0.07);
+}
+
+.passes-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.passes-pagination > span {
+  color: #7f90a7;
+  font-size: 11px;
+}
+
+.passes-pagination > div {
+  display: flex;
+  gap: 10px;
+}
+
+@media (max-width: 1000px) {
+  .passes-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .passes-page__header {
+    flex-direction: column;
+  }
+
+  .passes-page__actions {
+    width: 100%;
+  }
+
+  .passes-page__actions button {
+    flex: 1;
+  }
+
+  .passes-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .passes-pagination {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .passes-pagination > div {
+    width: 100%;
+  }
+
+  .passes-pagination button {
+    flex: 1;
+  }
+}
+
+.passes-tabs {
+  display: inline-flex;
+  gap: 6px;
+  margin-bottom: 20px;
+  padding: 6px;
+  border: 1px solid rgba(248, 248, 255, 0.08);
+  border-radius: 17px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.055),
+      rgba(255, 255, 255, 0.02)
+    );
+}
+
+.passes-tabs__button {
+  min-height: 44px;
+  padding: 0 19px;
+  border: 1px solid transparent;
+  border-radius: 13px;
+  background: transparent;
+  color: #8091a8;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+.passes-tabs__button:hover {
+  color: #dce7f5;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.passes-tabs__button--active {
+  border-color: rgba(34, 211, 238, 0.2);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(34, 211, 238, 0.14),
+      rgba(59, 130, 246, 0.12),
+      rgba(139, 92, 246, 0.11)
+    );
+  color: #f8f8ff;
+  box-shadow:
+    0 10px 24px rgba(34, 211, 238, 0.08);
+}
+
+.passes-tabs__button:active {
+  transform: scale(0.98);
+}
+
+.permanent-pass-status,
+.permanent-pass-location {
+  display: inline-flex;
+  padding: 7px 11px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.permanent-pass-status--active,
+.permanent-pass-location--inside {
+  background: rgba(34, 197, 94, 0.12);
+  color: #72f3a0;
+}
+
+.permanent-pass-status--suspended {
+  background: rgba(250, 204, 21, 0.12);
+  color: #ffe27a;
+}
+
+.permanent-pass-status--expired,
+.permanent-pass-status--revoked {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ff9d9d;
+}
+
+.permanent-pass-location--outside {
+  background: rgba(148, 163, 184, 0.1);
+  color: #b7c5d8;
+}
+
+@media (max-width: 560px) {
+  .passes-tabs {
+    width: 100%;
+  }
+
+  .passes-tabs__button {
+    flex: 1;
+    padding: 0 10px;
+  }
+}
+
+/* ===========================
+   PERMANENT PASS DRAWER
+=========================== */
+
+.permanent-pass-drawer{
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    display:flex;
+    justify-content:flex-end;
+}
+
+.permanent-pass-drawer__backdrop{
+    position:absolute;
+    inset:0;
+    border:none;
+    background:rgba(0,0,0,.55);
+    backdrop-filter:blur(6px);
+    cursor:pointer;
+}
+
+.permanent-pass-drawer__panel{
+    position:relative;
+    width:min(720px,100%);
+    height:100%;
+    overflow:auto;
+    background:#081525;
+    border-left:1px solid rgba(255,255,255,.08);
+    box-shadow:-20px 0 60px rgba(0,0,0,.45);
+    z-index:2;
+    padding:30px;
+}
+
+.permanent-pass-drawer__header{
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+    margin-bottom:30px;
+}
+
+.permanent-pass-drawer__header h2{
+    margin:6px 0;
+    color:#f8f8ff;
+}
+
+.permanent-pass-drawer__header p{
+    margin:0;
+    color:#7dcfff;
+    font-size:11px;
+    font-weight:800;
+    text-transform:uppercase;
+}
+
+.permanent-pass-drawer__header span{
+    color:#8fa0b8;
+    font-size:13px;
+}
+
+.permanent-pass-drawer__close{
+    width:42px;
+    height:42px;
+    border:none;
+    border-radius:12px;
+    background:rgba(255,255,255,.06);
+    color:#fff;
+    cursor:pointer;
+}
+
+.permanent-pass-form{
+    display:grid;
+    gap:24px;
+}
+
+.permanent-pass-form__grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:18px;
+}
+
+.permanent-pass-field{
+    display:grid;
+    gap:8px;
+}
+
+.permanent-pass-field span{
+    color:#cbd5e1;
+    font-size:12px;
+    font-weight:700;
+}
+
+.permanent-pass-field b{
+    color:#ef4444;
+}
+
+.permanent-pass-field input,
+.permanent-pass-field select{
+    min-height:48px;
+    padding:0 14px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.1);
+    background:rgba(255,255,255,.04);
+    color:#fff;
+}
+
+.permanent-pass-field input:focus,
+.permanent-pass-field select:focus{
+    outline:none;
+    border-color:#22d3ee;
+}
+
+.permanent-pass-field__error{
+    color:#ff8b8b;
+    font-size:11px;
+}
+
+.permanent-pass-form__photo-layout{
+    display:flex;
+    gap:20px;
+    align-items:center;
+}
+
+.permanent-pass-form__photo{
+    width:100px;
+    height:100px;
+    border-radius:22px;
+    background:rgba(255,255,255,.05);
+    display:grid;
+    place-items:center;
+    overflow:hidden;
+    color:#fff;
+    font-size:28px;
+    font-weight:900;
+}
+
+.permanent-pass-form__photo img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.permanent-pass-form__photo-actions{
+    display:grid;
+    gap:10px;
+}
+
+.permanent-pass-form__upload{
+    cursor:pointer;
+}
+
+.permanent-pass-form__upload input{
+    display:none;
+}
+
+.permanent-pass-form__remove-photo{
+    border:none;
+    background:#ef4444;
+    color:white;
+    border-radius:10px;
+    padding:10px 14px;
+    cursor:pointer;
+}
+
+.permanent-pass-form__message{
+    padding:14px;
+    border-radius:14px;
+    background:rgba(239,68,68,.12);
+    color:#ffb4b4;
+}
+
+.permanent-pass-form__footer{
+    display:flex;
+    justify-content:flex-end;
+    gap:12px;
+}
+
+@media(max-width:700px){
+
+.permanent-pass-drawer__panel{
+    width:100%;
+}
+
+.permanent-pass-form__grid{
+    grid-template-columns:1fr;
+}
+
+.permanent-pass-form__photo-layout{
+    flex-direction:column;
+    align-items:flex-start;
+}
+
+}
+/* ==========================================
+   SMARTPASS360 — DARK SELECT CONTROLS
+========================================== */
+
+.permanent-pass-field select {
+  color-scheme: dark;
+  background-color: #0d1c30;
+  color: #f8f8ff;
+}
+
+.permanent-pass-field select option {
+  background: #0d1c30;
+  color: #f8f8ff;
+}
+
+.permanent-pass-field select option:checked {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.permanent-pass-field select:disabled {
+  color: #718299;
+  background-color: #0a1728;
+  cursor: not-allowed;
+}
+
+.permanent-pass-result__card {
+  width: min(100%, 390px);
+  margin: 0 auto;
+  padding: 28px;
+  border: 1px solid rgba(125, 207, 255, 0.18);
+  border-radius: 24px;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(139, 92, 246, 0.18),
+      transparent 35%
+    ),
+    linear-gradient(
+      145deg,
+      #10213a,
+      #081525
+    );
+  box-shadow: 0 24px 70px rgba(0,0,0,.35);
+  text-align: center;
+}
+
+.permanent-pass-result__label {
+  margin: 0 0 18px;
+  color: #7dcfff;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .14em;
+}
+
+.permanent-pass-result__photo {
+  width: 82px;
+  height: 82px;
+  margin: 0 auto 15px;
+  display: block;
+  object-fit: cover;
+  border-radius: 20px;
+}
+
+.permanent-pass-result__card h3 {
+  margin: 8px 0;
+  color: #ffffff;
+}
+
+.permanent-pass-result__type {
+  display: block;
+  color: #8fa0b8;
+  font-size: 12px;
+}
+
+.permanent-pass-result__number {
+  display: block;
+  margin: 10px 0 20px;
+  color: #f8f8ff;
+}
+
+.permanent-pass-result__qr {
+  width: 220px;
+  height: 220px;
+  display: block;
+  margin: 0 auto 16px;
+  padding: 12px;
+  border-radius: 18px;
+  background: #ffffff;
+  object-fit: contain;
+}
+
+.permanent-pass-result__card small {
+  display: block;
+  color: #8fa0b8;
+  line-height: 1.6;
+}
+
+.permanent-pass-result__actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  .permanent-pass-result__card,
+  .permanent-pass-result__card * {
+    visibility: visible !important;
+  }
+
+  .permanent-pass-result__card {
+    position: fixed;
+    inset: 20mm auto auto 50%;
+    transform: translateX(-50%);
+    width: 85mm;
+    box-shadow: none;
+    border: 1px solid #222;
+    background: #ffffff !important;
+  }
+
+  .permanent-pass-result__card h3,
+  .permanent-pass-result__number {
+    color: #111111 !important;
+  }
+
+  .permanent-pass-result__label,
+  .permanent-pass-result__type,
+  .permanent-pass-result__card small {
+    color: #444444 !important;
+  }
+
+  .permanent-pass-no-print {
+    display: none !important;
+  }
+}
+
+/* Permanent Pass table actions */
+
+.permanent-pass-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  min-width: 330px;
+}
+
+.permanent-pass-actions button {
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .permanent-pass-actions {
+    min-width: 260px;
+  }
+}

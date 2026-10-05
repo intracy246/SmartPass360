@@ -1,0 +1,1863 @@
+﻿import {
+  useMemo,
+  useState
+} from "react";
+
+import {
+  keepPreviousData,
+  useQuery
+} from "@tanstack/react-query";
+
+import {
+  getPasses
+} from "../../api/pass-api";
+
+import {
+  getPermanentPasses
+} from "../../api/permanent-pass-api";
+
+import {
+  GlassButton
+} from "../../components/Buttons/GlassButton";
+
+import {
+  GlassCard
+} from "../../components/Cards/GlassCard";
+
+import {
+  PassStatusBadge
+} from "../../components/Status/PassStatusBadge";
+
+import {
+  PassDetailsDrawer
+} from "../../components/PassDetails/PassDetailsDrawer";
+
+import {
+  CreatePermanentPassDrawer
+} from "./CreatePermanentPassDrawer";
+
+import type {
+  PassSource,
+  PassStatus,
+  VisitorPass
+} from "../../types/pass";
+
+import type {
+  PermanentPassHolderType,
+  PermanentPassStatus
+} from "../../types/permanent-pass";
+
+import "./PassesPage.css";
+
+type PassTab =
+  | "VISITOR"
+  | "PERMANENT";
+
+function formatDateTime(
+  value?: string | null
+) {
+  if (!value) {
+    return "Ã¢â‚¬â€";
+  }
+
+  const parsedDate = new Date(value);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return value;
+  }
+
+  return parsedDate.toLocaleString(
+    undefined,
+    {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    }
+  );
+}
+
+function formatLabel(value: string) {
+  return value
+    .toLowerCase()
+    .split("_")
+    .map((part) => {
+      return (
+        part.charAt(0).toUpperCase() +
+        part.slice(1)
+      );
+    })
+    .join(" ");
+}
+
+function getInitials(fullName: string) {
+  const names = fullName
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (names.length === 0) {
+    return "P";
+  }
+
+  if (names.length === 1) {
+    return names[0]
+      .charAt(0)
+      .toUpperCase();
+  }
+
+  return (
+    names[0].charAt(0) +
+    names[names.length - 1].charAt(0)
+  ).toUpperCase();
+}
+
+export function PassesPage() {
+  const [activeTab, setActiveTab] =
+    useState<PassTab>("VISITOR");
+
+  /*
+   * Visitor pass state
+   */
+
+  const [
+    visitorSearch,
+    setVisitorSearch
+  ] = useState("");
+
+  const [
+    visitorStatus,
+    setVisitorStatus
+  ] = useState<PassStatus | "">("");
+
+  const [
+    visitorSource,
+    setVisitorSource
+  ] = useState<PassSource | "">("");
+
+  const [
+    visitorPage,
+    setVisitorPage
+  ] = useState(1);
+
+  const [
+    selectedVisitorPass,
+    setSelectedVisitorPass
+  ] = useState<VisitorPass | null>(
+    null
+  );
+
+  /*
+   * Permanent pass state
+   */
+
+  const [
+    permanentSearch,
+    setPermanentSearch
+  ] = useState("");
+
+  const [
+    permanentStatus,
+    setPermanentStatus
+  ] =
+    useState<PermanentPassStatus | "">(
+      ""
+    );
+
+  const [
+    permanentHolderType,
+    setPermanentHolderType
+  ] =
+    useState<
+      PermanentPassHolderType | ""
+    >("");
+
+  const [
+    permanentPage,
+    setPermanentPage
+  ] = useState(1);
+
+  const [
+    isCreatePermanentPassOpen,
+    setIsCreatePermanentPassOpen
+  ] = useState(false);
+
+  /*
+   * Visitor pass API query
+   */
+
+  const visitorQueryParams =
+    useMemo(() => {
+      return {
+        search: visitorSearch,
+        status: visitorStatus,
+        source: visitorSource,
+        page: visitorPage,
+        pageSize: 20
+      };
+    }, [
+      visitorSearch,
+      visitorStatus,
+      visitorSource,
+      visitorPage
+    ]);
+
+  const visitorPassesQuery =
+    useQuery({
+      queryKey: [
+        "passes",
+        visitorQueryParams
+      ],
+
+      queryFn: () =>
+        getPasses(visitorQueryParams),
+
+      placeholderData:
+        keepPreviousData,
+
+      enabled:
+        activeTab === "VISITOR"
+    });
+
+  const visitorPasses =
+    visitorPassesQuery.data?.data ??
+    [];
+
+  const visitorMetadata =
+    visitorPassesQuery.data?.meta;
+
+  /*
+   * Permanent pass API query
+   */
+
+  const permanentQueryParams =
+    useMemo(() => {
+      return {
+        search: permanentSearch,
+        status: permanentStatus,
+        holderType:
+          permanentHolderType,
+        page: permanentPage,
+        pageSize: 20
+      };
+    }, [
+      permanentSearch,
+      permanentStatus,
+      permanentHolderType,
+      permanentPage
+    ]);
+
+  const permanentPassesQuery =
+    useQuery({
+      queryKey: [
+        "permanent-passes",
+        permanentQueryParams
+      ],
+
+      queryFn: () =>
+        getPermanentPasses(
+          permanentQueryParams
+        ),
+
+      placeholderData:
+        keepPreviousData,
+
+      enabled:
+        activeTab === "PERMANENT"
+    });
+
+  const permanentPasses =
+    permanentPassesQuery.data?.data ??
+    [];
+
+  const permanentMetadata =
+    permanentPassesQuery.data?.meta;
+
+  function clearVisitorFilters() {
+    setVisitorSearch("");
+    setVisitorStatus("");
+    setVisitorSource("");
+    setVisitorPage(1);
+  }
+
+  function clearPermanentFilters() {
+    setPermanentSearch("");
+    setPermanentStatus("");
+    setPermanentHolderType("");
+    setPermanentPage(1);
+  }
+
+  function selectTab(tab: PassTab) {
+    setActiveTab(tab);
+
+    if (tab === "VISITOR") {
+      setVisitorPage(1);
+      return;
+    }
+
+    setPermanentPage(1);
+  }
+
+  return (
+    <div className="passes-page">
+      <header className="passes-page__header">
+        <div>
+          <p className="passes-page__eyebrow">
+            {activeTab === "VISITOR"
+              ? "Visitor Credentials"
+              : "Reusable Credentials"}
+          </p>
+
+          <h1>
+            {activeTab === "VISITOR"
+              ? "Visitor Passes"
+              : "Permanent Passes"}
+          </h1>
+
+          <p>
+            {activeTab === "VISITOR"
+              ? "View, validate and manage passes issued from reception, kiosk and pre-registration workflows."
+              : "Register employees and other authorized holders, then generate reusable permanent QR passes."}
+          </p>
+        </div>
+
+        <div className="passes-page__actions">
+          <GlassButton
+            type="button"
+            variant="secondary"
+          >
+            Export
+          </GlassButton>
+
+          {activeTab === "VISITOR" ? (
+            <GlassButton type="button">
+              Issue Pass
+            </GlassButton>
+          ) : (
+            <GlassButton
+              type="button"
+              onClick={() => {
+                setIsCreatePermanentPassOpen(
+                  true
+                );
+              }}
+            >
+              Create Permanent Pass
+            </GlassButton>
+          )}
+        </div>
+      </header>
+
+      <div
+        className="passes-tabs"
+        role="tablist"
+        aria-label="Pass categories"
+      >
+        <button
+          type="button"
+          role="tab"
+          aria-selected={
+            activeTab === "VISITOR"
+          }
+          className={
+            activeTab === "VISITOR"
+              ? "passes-tabs__button passes-tabs__button--active"
+              : "passes-tabs__button"
+          }
+          onClick={() => {
+            selectTab("VISITOR");
+          }}
+        >
+          Visitor Passes
+        </button>
+
+        <button
+          type="button"
+          role="tab"
+          aria-selected={
+            activeTab === "PERMANENT"
+          }
+          className={
+            activeTab === "PERMANENT"
+              ? "passes-tabs__button passes-tabs__button--active"
+              : "passes-tabs__button"
+          }
+          onClick={() => {
+            selectTab("PERMANENT");
+          }}
+        >
+          Permanent Passes
+        </button>
+      </div>
+
+      {activeTab === "VISITOR" && (
+        <>
+          <GlassCard
+            title="Pass search and filters"
+            subtitle="Search results are loaded directly from the SMARTPASS360 API."
+            accent="blue"
+          >
+            <div className="passes-filters">
+              <label className="passes-filter passes-filter--search">
+                <span>Search</span>
+
+                <input
+                  type="search"
+                  value={visitorSearch}
+                  placeholder="Pass number or visitor name"
+                  onChange={(event) => {
+                    setVisitorSearch(
+                      event.target.value
+                    );
+
+                    setVisitorPage(1);
+                  }}
+                />
+              </label>
+
+              <label className="passes-filter">
+                <span>Status</span>
+
+                <select
+                  value={visitorStatus}
+                  onChange={(event) => {
+                    setVisitorStatus(
+                      event.target
+                        .value as
+                        | PassStatus
+                        | ""
+                    );
+
+                    setVisitorPage(1);
+                  }}
+                >
+                  <option value="">
+                    All statuses
+                  </option>
+
+                  <option value="DRAFT">
+                    Draft
+                  </option>
+
+                  <option value="WAITING_APPROVAL">
+                    Waiting approval
+                  </option>
+
+                  <option value="APPROVED">
+                    Approved
+                  </option>
+
+                  <option value="ACTIVE">
+                    Active
+                  </option>
+
+                  <option value="INSIDE">
+                    Inside
+                  </option>
+
+                  <option value="EXITED">
+                    Exited
+                  </option>
+
+                  <option value="EXPIRED">
+                    Expired
+                  </option>
+
+                  <option value="DENIED">
+                    Denied
+                  </option>
+
+                  <option value="REVOKED">
+                    Revoked
+                  </option>
+                </select>
+              </label>
+
+              <label className="passes-filter">
+                <span>Source</span>
+
+                <select
+                  value={visitorSource}
+                  onChange={(event) => {
+                    setVisitorSource(
+                      event.target
+                        .value as
+                        | PassSource
+                        | ""
+                    );
+
+                    setVisitorPage(1);
+                  }}
+                >
+                  <option value="">
+                    All sources
+                  </option>
+
+                  <option value="RECEPTION">
+                    Reception
+                  </option>
+
+                  <option value="KIOSK">
+                    Kiosk
+                  </option>
+
+                  <option value="PRE_REGISTRATION">
+                    Pre-registration
+                  </option>
+                </select>
+              </label>
+
+              <GlassButton
+                type="button"
+                variant="secondary"
+                onClick={
+                  clearVisitorFilters
+                }
+              >
+                Clear Filters
+              </GlassButton>
+            </div>
+          </GlassCard>
+
+          <GlassCard
+            title="Issued visitor passes"
+            subtitle={
+              visitorMetadata
+                ? `${visitorMetadata.total} visitor pass records`
+                : "Visitor pass records from the live API"
+            }
+            accent="violet"
+          >
+            {visitorPassesQuery.isPending && (
+              <div className="passes-state">
+                <div className="passes-state__loader" />
+
+                <strong>
+                  Loading visitor passes
+                </strong>
+
+                <p>
+                  Retrieving visitor passes
+                  from the API.
+                </p>
+              </div>
+            )}
+
+            {visitorPassesQuery.isError && (
+              <div className="passes-state passes-state--error">
+                <div className="passes-state__icon">
+                  !
+                </div>
+
+                <strong>
+                  Pass service unavailable
+                </strong>
+
+                <p>
+                  The visitor passes endpoint
+                  has not returned a valid
+                  response. No sample data is
+                  being displayed.
+                </p>
+
+                <GlassButton
+                  type="button"
+                  variant="secondary"
+                  onClick={() => {
+                    void visitorPassesQuery.refetch();
+                  }}
+                >
+                  Retry
+                </GlassButton>
+              </div>
+            )}
+
+            {visitorPassesQuery.isSuccess &&
+              visitorPasses.length === 0 && (
+                <div className="passes-state">
+                  <div className="passes-state__icon">
+                    Ã¢â€”â€¡
+                  </div>
+
+                  <strong>
+                    No visitor passes found
+                  </strong>
+
+                  <p>
+                    Visitor passes created
+                    through reception or kiosk
+                    will appear here.
+                  </p>
+                </div>
+              )}
+
+            {visitorPassesQuery.isSuccess &&
+              visitorPasses.length > 0 && (
+                <>
+                  <div className="passes-table-wrapper">
+                    <table className="passes-table">
+                      <thead>
+                        <tr>
+                          <th>Pass</th>
+                          <th>Visitor</th>
+                          <th>Destination</th>
+                          <th>Source</th>
+                          <th>Validity</th>
+                          <th>Status</th>
+                          <th />
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {visitorPasses.map(
+                          (pass) => (
+                            <tr key={pass.id}>
+                              <td>
+                                <div className="passes-table__pass">
+                                  <strong>
+                                    {
+                                      pass.passNumber
+                                    }
+                                  </strong>
+
+                                  <span>
+                                    Issued{" "}
+                                    {formatDateTime(
+                                      pass.issuedAt
+                                    )}
+                                  </span>
+                                </div>
+                              </td>
+
+                              <td>
+                                <div className="passes-table__visitor">
+                                  <div className="passes-table__avatar">
+                                    {pass.visitorPhotoUrl ? (
+                                      <img
+                                        src={
+                                          pass.visitorPhotoUrl
+                                        }
+                                        alt={
+                                          pass.visitorName
+                                        }
+                                      />
+                                    ) : (
+                                      pass.visitorName
+                                        .trim()
+                                        .charAt(0)
+                                        .toUpperCase() ||
+                                      "V"
+                                    )}
+                                  </div>
+
+                                  <div>
+                                    <strong>
+                                      {
+                                        pass.visitorName
+                                      }
+                                    </strong>
+
+                                    <span>
+                                      {pass.company ||
+                                        pass.visitorType}
+                                    </span>
+                                  </div>
+                                </div>
+                              </td>
+
+                              <td>
+                                <div className="passes-table__destination">
+                                  <strong>
+                                    {pass.hostName ||
+                                      "No host assigned"}
+                                  </strong>
+
+                                  <span>
+                                    {pass.departmentName ||
+                                      "No department assigned"}
+                                  </span>
+                                </div>
+                              </td>
+
+                              <td>
+                                <span className="passes-table__source">
+                                  {formatLabel(
+                                    pass.source
+                                  )}
+                                </span>
+                              </td>
+
+                              <td>
+                                <div className="passes-table__validity">
+                                  <span>
+                                    {formatDateTime(
+                                      pass.validFrom
+                                    )}
+                                  </span>
+
+                                  <span>
+                                    {formatDateTime(
+                                      pass.validUntil
+                                    )}
+                                  </span>
+                                </div>
+                              </td>
+
+                              <td>
+                                <PassStatusBadge
+                                  status={
+                                    pass.status
+                                  }
+                                />
+                              </td>
+
+                              <td>
+                                <button
+                                  type="button"
+                                  className="passes-table__menu"
+                                  aria-label={`Open ${pass.passNumber}`}
+                                  onClick={() => {
+                                    setSelectedVisitorPass(
+                                      pass
+                                    );
+                                  }}
+                                >
+                                  Ã¢â€¹Â¯
+                                </button>
+                              </td>
+                            </tr>
+                          )
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {visitorMetadata &&
+                    visitorMetadata.totalPages >
+                      1 && (
+                      <div className="passes-pagination">
+                        <span>
+                          Page{" "}
+                          {
+                            visitorMetadata.page
+                          }{" "}
+                          of{" "}
+                          {
+                            visitorMetadata.totalPages
+                          }
+                        </span>
+
+                        <div>
+                          <GlassButton
+                            type="button"
+                            variant="secondary"
+                            disabled={
+                              visitorMetadata.page <=
+                              1
+                            }
+                            onClick={() => {
+                              setVisitorPage(
+                                (current) =>
+                                  Math.max(
+                                    1,
+                                    current - 1
+                                  )
+                              );
+                            }}
+                          >
+                            Previous
+                          </GlassButton>
+
+                          <GlassButton
+                            type="button"
+                            variant="secondary"
+                            disabled={
+                              visitorMetadata.page >=
+                              visitorMetadata.totalPages
+                            }
+                            onClick={() => {
+                              setVisitorPage(
+                                (current) =>
+                                  current + 1
+                              );
+                            }}
+                          >
+                            Next
+                          </GlassButton>
+                        </div>
+                      </div>
+                    )}
+                </>
+              )}
+          </GlassCard>
+
+          <PassDetailsDrawer
+            pass={selectedVisitorPass}
+            onClose={() => {
+              setSelectedVisitorPass(null);
+            }}
+          />
+        </>
+      )}
+
+      {activeTab === "PERMANENT" && (
+        <>
+          <GlassCard
+            title="Permanent pass search and filters"
+            subtitle="Search permanent QR passes directly from the SMARTPASS360 API."
+            accent="blue"
+          >
+            <div className="passes-filters">
+              <label className="passes-filter passes-filter--search">
+                <span>Search</span>
+
+                <input
+                  type="search"
+                  value={permanentSearch}
+                  placeholder="Name, staff number or pass number"
+                  onChange={(event) => {
+                    setPermanentSearch(
+                      event.target.value
+                    );
+
+                    setPermanentPage(1);
+                  }}
+                />
+              </label>
+
+              <label className="passes-filter">
+                <span>Status</span>
+
+                <select
+                  value={permanentStatus}
+                  onChange={(event) => {
+                    setPermanentStatus(
+                      event.target
+                        .value as
+                        | PermanentPassStatus
+                        | ""
+                    );
+
+                    setPermanentPage(1);
+                  }}
+                >
+                  <option value="">
+                    All statuses
+                  </option>
+
+                  <option value="ACTIVE">
+                    Active
+                  </option>
+
+                  <option value="SUSPENDED">
+                    Suspended
+                  </option>
+
+                  <option value="EXPIRED">
+                    Expired
+                  </option>
+
+                  <option value="REVOKED">
+                    Revoked
+                  </option>
+                </select>
+              </label>
+
+              <label className="passes-filter">
+                <span>Holder Type</span>
+
+                <select
+                  value={
+                    permanentHolderType
+                  }
+                  onChange={(event) => {
+                    setPermanentHolderType(
+                      event.target
+                        .value as
+                        | PermanentPassHolderType
+                        | ""
+                    );
+
+                    setPermanentPage(1);
+                  }}
+                >
+                  <option value="">
+                    All holder types
+                  </option>
+
+                  <option value="EMPLOYEE">
+                    Employee
+                  </option>
+
+                  <option value="SECURITY">
+                    Security
+                  </option>
+
+                  <option value="CLEANER">
+                    Cleaner
+                  </option>
+
+                  <option value="CONTRACTOR">
+                    Contractor
+                  </option>
+
+                  <option value="TENANT">
+                    Tenant
+                  </option>
+
+                  <option value="VENDOR">
+                    Vendor
+                  </option>
+
+                  <option value="OTHER">
+                    Other
+                  </option>
+                </select>
+              </label>
+
+              <GlassButton
+                type="button"
+                variant="secondary"
+                onClick={
+                  clearPermanentFilters
+                }
+              >
+                Clear Filters
+              </GlassButton>
+            </div>
+          </GlassCard>
+
+          <GlassCard
+            title="Permanent QR passes"
+            subtitle={
+              permanentMetadata
+                ? `${permanentMetadata.total} permanent pass records`
+                : "Permanent passes from the live API"
+            }
+            accent="violet"
+          >
+            {permanentPassesQuery.isPending && (
+              <div className="passes-state">
+                <div className="passes-state__loader" />
+
+                <strong>
+                  Loading permanent passes
+                </strong>
+
+                <p>
+                  Retrieving permanent QR
+                  passes from the API.
+                </p>
+              </div>
+            )}
+
+            {permanentPassesQuery.isError && (
+              <div className="passes-state passes-state--error">
+                <div className="passes-state__icon">
+                  !
+                </div>
+
+                <strong>
+                  Permanent pass service unavailable
+                </strong>
+
+                <p>
+                  The permanent passes endpoint
+                  has not returned a valid
+                  response. No sample data is
+                  being displayed.
+                </p>
+
+                <GlassButton
+                  type="button"
+                  variant="secondary"
+                  onClick={() => {
+                    void permanentPassesQuery.refetch();
+                  }}
+                >
+                  Retry
+                </GlassButton>
+              </div>
+            )}
+
+            {permanentPassesQuery.isSuccess &&
+              permanentPasses.length ===
+                0 && (
+                <div className="passes-state">
+                  <div className="passes-state__icon">
+                    Ã¢â€”â€¡
+                  </div>
+
+                  <strong>
+                    No permanent passes found
+                  </strong>
+
+                  <p>
+                    Register a permanent pass
+                    holder and generate a
+                    reusable QR credential.
+                  </p>
+
+                  <GlassButton
+                    type="button"
+                    onClick={() => {
+                      setIsCreatePermanentPassOpen(
+                        true
+                      );
+                    }}
+                  >
+                    Create Permanent Pass
+                  </GlassButton>
+                </div>
+              )}
+
+            {permanentPassesQuery.isSuccess &&
+              permanentPasses.length >
+                0 && (
+                <>
+                  <div className="passes-table-wrapper">
+                    <table className="passes-table">
+                      <thead>
+                        <tr>
+                          <th>Holder</th>
+                          <th>Pass Number</th>
+                          <th>Department</th>
+                          <th>Holder Type</th>
+                          <th>Status</th>
+                          <th>Location</th>
+                          <th>Created</th>
+                        <th>Actions</th>
+</tr>
+                      </thead>
+
+                      <tbody>
+                        {permanentPasses.map(
+                          (pass) => (
+                            <tr key={pass.id}>
+                              <td>
+                                <div className="passes-table__visitor">
+                                  <div className="passes-table__avatar">
+                                    {pass.photoUrl ? (
+                                      <img
+                                        src={
+                                          pass.photoUrl
+                                        }
+                                        alt={
+                                          pass.fullName
+                                        }
+                                      />
+                                    ) : (
+                                      getInitials(
+                                        pass.fullName
+                                      )
+                                    )}
+                                  </div>
+
+                                  <div>
+                                    <strong>
+                                      {
+                                        pass.fullName
+                                      }
+                                    </strong>
+
+                                    <span>
+                                      {pass.staffNumber ||
+                                        pass.phone ||
+                                        "No staff number"}
+                                    </span>
+                                  </div>
+                                </div>
+                              </td>
+
+                              <td>
+                                <div className="passes-table__pass">
+                                  <strong>
+                                    {
+                                      pass.passNumber
+                                    }
+                                  </strong>
+
+                                  <span>
+                                    Permanent QR
+                                  </span>
+                                </div>
+                              </td>
+
+                              <td>
+                                <div className="passes-table__destination">
+                                  <strong>
+                                    {pass.department ||
+                                      "No department"}
+                                  </strong>
+
+                                  <span>
+                                    Permanent holder
+                                  </span>
+                                </div>
+                              </td>
+
+                              <td>
+                                <span className="passes-table__source">
+                                  {formatLabel(
+                                    pass.holderType
+                                  )}
+                                </span>
+                              </td>
+
+                              <td>
+                                <span
+                                  className={`permanent-pass-status permanent-pass-status--${pass.status.toLowerCase()}`}
+                                >
+                                  {formatLabel(
+                                    pass.status
+                                  )}
+                                </span>
+                              </td>
+
+                              <td>
+                                <span
+                                  className={
+                                    pass.isCurrentlyInside
+                                      ? "permanent-pass-location permanent-pass-location--inside"
+                                      : "permanent-pass-location permanent-pass-location--outside"
+                                  }
+                                >
+                                  {pass.isCurrentlyInside
+                                    ? "Inside"
+                                    : "Outside"}
+                                </span>
+                              </td>
+
+                              <td>
+                                <div className="passes-table__validity">
+                                  <span>
+                                    {formatDateTime(
+                                      pass.createdAt
+                                    )}
+                                  </span>
+                                </div>
+                              </td>
+                              <td>
+                                <div className="permanent-pass-actions">
+                                  <GlassButton
+                                    type="button"
+                                    variant="secondary"
+                                    onClick={() => {
+                                      const details = [
+                                        `Name: ${pass.fullName}`,
+                                        `Pass: ${pass.passNumber}`,
+                                        `Staff No: ${pass.staffNumber || "N/A"}`,
+                                        `Department: ${pass.department || "N/A"}`,
+                                        `Position: ${pass.position || "N/A"}`,
+                                        `Holder Type: ${formatLabel(pass.holderType)}`,
+                                        `Status: ${formatLabel(pass.status)}`,
+                                        `Phone: ${pass.phone || "N/A"}`,
+                                        `Email: ${pass.email || "N/A"}`,
+                                        `Location: ${pass.isCurrentlyInside ? "Inside" : "Outside"}`,
+                                        `Valid From: ${formatDateTime(pass.validFrom)}`,
+                                        `Expires: ${
+                                          pass.expiresAt
+                                            ? formatDateTime(pass.expiresAt)
+                                            : "No fixed expiry"
+                                        }`
+                                      ].join("\n");
+
+                                      window.alert(details);
+                                    }}
+                                  >
+                                    View
+                                  </GlassButton>
+                                  <GlassButton
+                                    type="button"
+                                    variant="secondary"
+                                    onClick={async () => {
+                                      const fullName =
+                                        window.prompt(
+                                          "Full name:",
+                                          pass.fullName
+                                        );
+
+                                      if (fullName === null) {
+                                        return;
+                                      }
+
+                                      if (
+                                        fullName.trim().length < 2
+                                      ) {
+                                        window.alert(
+                                          "Full name is required."
+                                        );
+                                        return;
+                                      }
+
+                                      const staffNumber =
+                                        window.prompt(
+                                          "Staff number:",
+                                          pass.staffNumber || ""
+                                        );
+
+                                      if (staffNumber === null) {
+                                        return;
+                                      }
+
+                                      const department =
+                                        window.prompt(
+                                          "Department / Office:",
+                                          pass.department || ""
+                                        );
+
+                                      if (department === null) {
+                                        return;
+                                      }
+
+                                      if (
+                                        !department.trim()
+                                      ) {
+                                        window.alert(
+                                          "Department is required."
+                                        );
+                                        return;
+                                      }
+
+                                      const position =
+                                        window.prompt(
+                                          "Position / Job title:",
+                                          pass.position || ""
+                                        );
+
+                                      if (position === null) {
+                                        return;
+                                      }
+
+                                      const holderType =
+                                        window.prompt(
+                                          "Holder type: EMPLOYEE, SECURITY, CLEANER, CONTRACTOR, TENANT, VENDOR or OTHER",
+                                          pass.holderType
+                                        );
+
+                                      if (holderType === null) {
+                                        return;
+                                      }
+
+                                      const normalizedHolderType =
+                                        holderType
+                                          .trim()
+                                          .toUpperCase();
+
+                                      const allowedHolderTypes =
+                                        [
+                                          "EMPLOYEE",
+                                          "SECURITY",
+                                          "CLEANER",
+                                          "CONTRACTOR",
+                                          "TENANT",
+                                          "VENDOR",
+                                          "OTHER"
+                                        ];
+
+                                      if (
+                                        !allowedHolderTypes.includes(
+                                          normalizedHolderType
+                                        )
+                                      ) {
+                                        window.alert(
+                                          "Invalid holder type."
+                                        );
+                                        return;
+                                      }
+
+                                      const phone =
+                                        window.prompt(
+                                          "Phone:",
+                                          pass.phone || ""
+                                        );
+
+                                      if (phone === null) {
+                                        return;
+                                      }
+
+                                      const email =
+                                        window.prompt(
+                                          "Email:",
+                                          pass.email || ""
+                                        );
+
+                                      if (email === null) {
+                                        return;
+                                      }
+
+                                      try {
+                                        const {
+                                          updatePermanentPass
+                                        } =
+                                          await import(
+                                            "../../api/permanent-pass-api"
+                                          );
+
+                                        await updatePermanentPass(
+                                          pass.id,
+                                          {
+                                            fullName:
+                                              fullName.trim(),
+
+                                            staffNumber:
+                                              staffNumber.trim() ||
+                                              null,
+
+                                            department:
+                                              department.trim(),
+
+                                            position:
+                                              position.trim() ||
+                                              null,
+
+                                            holderType:
+                                              normalizedHolderType as
+                                                typeof pass.holderType,
+
+                                            phone:
+                                              phone.trim() ||
+                                              null,
+
+                                            email:
+                                              email.trim() ||
+                                              null
+                                          }
+                                        );
+
+                                        await permanentPassesQuery.refetch();
+
+                                        window.alert(
+                                          "Permanent pass updated successfully."
+                                        );
+                                      }
+                                      catch (error) {
+                                        window.alert(
+                                          error instanceof Error
+                                            ? error.message
+                                            : "Unable to update permanent pass."
+                                        );
+                                      }
+                                    }}
+                                  >
+                                    Edit
+                                  </GlassButton>
+
+
+                                  <GlassButton
+                                    type="button"
+                                    variant="secondary"
+                                    onClick={async () => {
+                                      if (!pass.qrToken) {
+                                        window.alert(
+                                          "This permanent pass has no QR token."
+                                        );
+                                        return;
+                                      }
+
+                                      try {
+                                        const QRCode =
+                                          await import("qrcode");
+
+                                        const payload = pass.qrToken;
+
+                                        const qrDataUrl =
+                                          await QRCode.toDataURL(
+                                            payload,
+                                            {
+                                              width: 520,
+                                              margin: 2,
+                                              errorCorrectionLevel: "H"
+                                            }
+                                          );
+
+                                        const printWindow =
+                                          window.open(
+                                            "",
+                                            "_blank",
+                                            "noopener,noreferrer"
+                                          );
+
+                                        if (!printWindow) {
+                                          window.alert(
+                                            "Unable to open print window. Allow pop-ups and try again."
+                                          );
+                                          return;
+                                        }
+
+                                        const safeName =
+                                          pass.fullName.replace(
+                                            /[<>&"]/g,
+                                            ""
+                                          );
+
+                                        const safePassNumber =
+                                          pass.passNumber.replace(
+                                            /[<>&"]/g,
+                                            ""
+                                          );
+
+                                        printWindow.document.write(`
+                                          <!doctype html>
+                                          <html>
+                                            <head>
+                                              <title>SmartPass360 - ${safePassNumber}</title>
+
+                                              <style>
+                                                body {
+                                                  margin: 0;
+                                                  padding: 40px;
+                                                  font-family: Arial, sans-serif;
+                                                  background: #ffffff;
+                                                  color: #111111;
+                                                }
+
+                                                .card {
+                                                  width: 420px;
+                                                  margin: 0 auto;
+                                                  border: 1px solid #dddddd;
+                                                  border-radius: 20px;
+                                                  padding: 28px;
+                                                  text-align: center;
+                                                }
+
+                                                h1 {
+                                                  margin: 0 0 6px;
+                                                  font-size: 25px;
+                                                }
+
+                                                .subtitle {
+                                                  margin-bottom: 22px;
+                                                  color: #666666;
+                                                }
+
+                                                img {
+                                                  width: 320px;
+                                                  height: 320px;
+                                                  display: block;
+                                                  margin: 0 auto 20px;
+                                                }
+
+                                                .name {
+                                                  font-size: 22px;
+                                                  font-weight: 700;
+                                                  margin-bottom: 8px;
+                                                }
+
+                                                .pass {
+                                                  font-size: 16px;
+                                                  font-weight: 700;
+                                                  margin-bottom: 6px;
+                                                }
+
+                                                .department {
+                                                  color: #555555;
+                                                  margin-bottom: 6px;
+                                                }
+
+                                                .warning {
+                                                  margin-top: 18px;
+                                                  font-size: 12px;
+                                                  color: #777777;
+                                                }
+
+                                                @media print {
+                                                  body {
+                                                    padding: 0;
+                                                  }
+
+                                                  .card {
+                                                    border: none;
+                                                  }
+                                                }
+                                              </style>
+                                            </head>
+
+                                            <body>
+                                              <div class="card">
+                                                <h1>SmartPass360</h1>
+
+                                                <div class="subtitle">
+                                                  Permanent Access Pass
+                                                </div>
+
+                                                <img
+                                                  src="${qrDataUrl}"
+                                                  alt="Permanent QR"
+                                                />
+
+                                                <div class="name">
+                                                  ${safeName}
+                                                </div>
+
+                                                <div class="pass">
+                                                  ${safePassNumber}
+                                                </div>
+
+                                                <div class="department">
+                                                  ${
+                                                    pass.department ||
+                                                    "Permanent Holder"
+                                                  }
+                                                </div>
+
+                                                <div class="warning">
+                                                  Secure SmartPass360 credential.
+                                                  Do not duplicate or share this QR.
+                                                </div>
+                                              </div>
+
+                                              <script>
+                                                window.onload = function () {
+                                                  window.print();
+                                                };
+                                              </script>
+                                            </body>
+                                          </html>
+                                        `);
+
+                                        printWindow.document.close();
+                                      }
+                                      catch (error) {
+                                        window.alert(
+                                          error instanceof Error
+                                            ? error.message
+                                            : "Unable to generate printable QR."
+                                        );
+                                      }
+                                    }}
+                                  >
+                                    Print QR
+                                  </GlassButton>
+
+                                  <GlassButton
+                                    type="button"
+                                    variant="secondary"
+                                    onClick={async () => {
+                                      const reason =
+                                        window.prompt(
+                                          `Reason for replacing ${pass.fullName}'s permanent QR pass:`
+                                        );
+
+                                      if (!reason?.trim()) {
+                                        return;
+                                      }
+
+                                      try {
+                                        const {
+                                          replacePermanentPass
+                                        } =
+                                          await import(
+                                            "../../api/permanent-pass-api"
+                                          );
+
+                           const replacement =
+                             await replacePermanentPass(
+                               pass.id,
+                               {
+                                 reason: reason.trim()
+                               }
+                             );
+
+                           const newPass = replacement.data;
+
+                           if (!newPass.qrToken) {
+                             throw new Error(
+                               "No new QR credential was returned."
+                             );
+                           }
+
+                           const QRCode =
+                             await import("qrcode");
+
+                           const qrPayload = newPass.qrToken;
+
+                           const qrDataUrl =
+                             await QRCode.toDataURL(
+                               qrPayload,
+                               {
+                                 width: 520,
+                                 margin: 2,
+                                 errorCorrectionLevel: "H"
+                               }
+                             );
+
+                           const printWindow =
+                             window.open(
+                               "",
+                               "_blank",
+                               "width=720,height=860"
+                             );
+
+                           if (!printWindow) {
+                             throw new Error(
+                               "Browser blocked the QR window. Allow pop-ups for SmartPass360."
+                             );
+                           }
+
+                           printWindow.document.write(`
+                             <!doctype html>
+                             <html>
+                               <head>
+                                 <title>${newPass.passNumber} - QR</title>
+
+                                 <style>
+                                   body {
+                                     margin: 0;
+                                     min-height: 100vh;
+                                     display: flex;
+                                     justify-content: center;
+                                     align-items: center;
+                                     background: white;
+                                     font-family: Arial, sans-serif;
+                                   }
+
+                                   .card {
+                                     width: 500px;
+                                     text-align: center;
+                                     padding: 30px;
+                                     border: 1px solid #ddd;
+                                     border-radius: 18px;
+                                   }
+
+                                   img {
+                                     width: 400px;
+                                     height: 400px;
+                                   }
+
+                                   h1 {
+                                     margin-bottom: 5px;
+                                   }
+
+                                   .name {
+                                     font-size: 22px;
+                                     font-weight: bold;
+                                     margin-top: 18px;
+                                   }
+
+                                   .number {
+                                     font-weight: bold;
+                                     margin-top: 8px;
+                                   }
+
+                                   button {
+                                     margin-top: 20px;
+                                     padding: 12px 24px;
+                                     font-size: 16px;
+                                     cursor: pointer;
+                                   }
+
+                                   @media print {
+                                     button {
+                                       display: none;
+                                     }
+                                   }
+                                 </style>
+                               </head>
+
+                               <body>
+                                 <div class="card">
+
+                                   <h1>SMARTPASS360</h1>
+
+                                   <p>
+                                     Permanent Access Credential
+                                   </p>
+
+                                   <img
+                                     src="${qrDataUrl}"
+                                     alt="Permanent QR"
+                                   />
+
+                                   <div class="name">
+                                     ${newPass.fullName}
+                                   </div>
+
+                                   <div class="number">
+                                     ${newPass.passNumber}
+                                   </div>
+
+                                   <p>
+                                     New active permanent QR credential
+                                   </p>
+
+                                   <button onclick="window.print()">
+                                     Print QR
+                                   </button>
+
+                                 </div>
+                               </body>
+                             </html>
+                           `);
+
+                           printWindow.document.close();
+
+                           await permanentPassesQuery.refetch();
+                                      }
+                                      catch (error) {
+                                        window.alert(
+                                          error instanceof Error
+                                            ? error.message
+                                            : "Unable to replace permanent QR."
+                                        );
+                                      }
+                                    }}
+                                  >
+                                    Replace QR
+                                  </GlassButton>
+
+                                  {pass.status !== "REVOKED" && (
+                                    <GlassButton
+                                      type="button"
+                                      variant="secondary"
+                                      onClick={async () => {
+                                        const confirmed =
+                                          window.confirm(
+                                            `Revoke ${pass.passNumber} for ${pass.fullName}?`
+                                          );
+
+                                        if (!confirmed) {
+                                          return;
+                                        }
+
+                                        const reason =
+                                          window.prompt(
+                                            "Reason for revocation:"
+                                          );
+
+                                        if (!reason?.trim()) {
+                                          return;
+                                        }
+
+                                        try {
+                                          const {
+                                            updatePermanentPassStatus
+                                          } =
+                                            await import(
+                                              "../../api/permanent-pass-api"
+                                            );
+
+                                          await updatePermanentPassStatus(
+                                            pass.id,
+                                            {
+                                              status: "REVOKED",
+                                              reason: reason.trim()
+                                            }
+                                          );
+
+                                          await permanentPassesQuery.refetch();
+
+                                          window.alert(
+                                            "Permanent pass revoked successfully."
+                                          );
+                                        }
+                                        catch (error) {
+                                          window.alert(
+                                            error instanceof Error
+                                              ? error.message
+                                              : "Unable to revoke permanent pass."
+                                          );
+                                        }
+                                      }}
+                                    >
+                                      Revoke
+                                    </GlassButton>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          )
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {permanentMetadata &&
+                    permanentMetadata.totalPages >
+                      1 && (
+                      <div className="passes-pagination">
+                        <span>
+                          Page{" "}
+                          {
+                            permanentMetadata.page
+                          }{" "}
+                          of{" "}
+                          {
+                            permanentMetadata.totalPages
+                          }
+                        </span>
+
+                        <div>
+                          <GlassButton
+                            type="button"
+                            variant="secondary"
+                            disabled={
+                              permanentMetadata.page <=
+                              1
+                            }
+                            onClick={() => {
+                              setPermanentPage(
+                                (current) =>
+                                  Math.max(
+                                    1,
+                                    current - 1
+                                  )
+                              );
+                            }}
+                          >
+                            Previous
+                          </GlassButton>
+
+                          <GlassButton
+                            type="button"
+                            variant="secondary"
+                            disabled={
+                              permanentMetadata.page >=
+                              permanentMetadata.totalPages
+                            }
+                            onClick={() => {
+                              setPermanentPage(
+                                (current) =>
+                                  current + 1
+                              );
+                            }}
+                          >
+                            Next
+                          </GlassButton>
+                        </div>
+                      </div>
+                    )}
+                </>
+              )}
+          </GlassCard>
+        </>
+      )}
+
+      <CreatePermanentPassDrawer
+        open={
+          isCreatePermanentPassOpen
+        }
+        onClose={() => {
+          setIsCreatePermanentPassOpen(
+            false
+          );
+        }}
+        onCreated={() => {
+          setIsCreatePermanentPassOpen(
+            false
+          );
+
+          void permanentPassesQuery.refetch();
+        }}
+      />
+    </div>
+  );
+}
+
+
+
+
+
+
+

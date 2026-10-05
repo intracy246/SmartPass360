@@ -1,0 +1,60 @@
+.pass-status-badge {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 11px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.pass-status-badge__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 12px currentColor;
+}
+
+.pass-status-badge--draft {
+  border-color: rgba(148, 163, 184, 0.16);
+  background: rgba(148, 163, 184, 0.08);
+  color: #b3c0d2;
+}
+
+.pass-status-badge--waiting_approval {
+  border-color: rgba(248, 201, 99, 0.18);
+  background: rgba(248, 201, 99, 0.08);
+  color: #f8c963;
+}
+
+.pass-status-badge--approved,
+.pass-status-badge--active {
+  border-color: rgba(52, 211, 153, 0.18);
+  background: rgba(52, 211, 153, 0.08);
+  color: #4ee7ad;
+}
+
+.pass-status-badge--inside {
+  border-color: rgba(34, 211, 238, 0.2);
+  background: rgba(34, 211, 238, 0.09);
+  color: #5ce7f7;
+}
+
+.pass-status-badge--exited {
+  border-color: rgba(59, 130, 246, 0.18);
+  background: rgba(59, 130, 246, 0.08);
+  color: #7db7ff;
+}
+
+.pass-status-badge--expired,
+.pass-status-badge--denied,
+.pass-status-badge--revoked {
+  border-color: rgba(255, 100, 124, 0.19);
+  background: rgba(255, 100, 124, 0.08);
+  color: #ff8fa1;
+}

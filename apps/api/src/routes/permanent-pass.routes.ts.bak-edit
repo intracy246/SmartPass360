@@ -1,0 +1,683 @@
+﻿import crypto from "node:crypto";
+import { Router } from "express";
+import { z } from "zod";
+
+import { prisma } from "../lib/prisma";
+
+export const permanentPassRouter = Router();
+
+const holderTypes = [
+  "EMPLOYEE",
+  "SECURITY",
+  "CLEANER",
+  "CONTRACTOR",
+  "TENANT",
+  "VENDOR",
+  "OTHER"
+] as const;
+
+const statuses = [
+  "ACTIVE",
+  "SUSPENDED",
+  "EXPIRED",
+  "REVOKED"
+] as const;
+
+const expiryTypes = [
+  "LIFETIME",
+  "FIXED_DATE"
+] as const;
+
+const createSchema = z
+  .object({
+    organizationId: z.string().uuid(),
+    fullName: z.string().trim().min(2).max(200),
+
+    staffNumber: z.string().trim().max(100).optional(),
+
+    department: z.string().trim().min(1).max(200),
+    position: z.string().trim().max(200).optional(),
+
+    holderType: z.enum(holderTypes),
+
+    phone: z.string().trim().max(50).optional(),
+    email: z.string().trim().email().max(320).optional(),
+
+    photoDataUrl: z.string().max(900_000).optional(),
+
+    validFrom: z.string().min(1),
+    expiryType: z.enum(expiryTypes),
+    expiresAt: z.string().optional()
+  })
+  .superRefine((value, context) => {
+    if (
+      value.expiryType === "FIXED_DATE" &&
+      !value.expiresAt
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["expiresAt"],
+        message: "expiresAt is required for a fixed-date pass"
+      });
+    }
+  });
+
+const querySchema = z.object({
+  search: z.string().trim().optional(),
+  status: z.enum(statuses).optional(),
+  holderType: z.enum(holderTypes).optional(),
+  organizationId: z.string().uuid().optional(),
+
+  page: z.coerce.number().int().positive().default(1),
+
+  pageSize: z.coerce
+    .number()
+    .int()
+    .positive()
+    .max(100)
+    .default(20)
+});
+
+const statusSchema = z.object({
+  status: z.enum(statuses),
+  reason: z.string().trim().max(500).optional()
+});
+
+const replaceSchema = z.object({
+  reason: z.string().trim().min(1).max(500)
+});
+
+function createQrToken() {
+  return crypto.randomBytes(32).toString("base64url");
+}
+
+function hashQrToken(token: string) {
+  return crypto
+    .createHash("sha256")
+    .update(token)
+    .digest("hex");
+}
+
+function createPassNumber() {
+  const timestamp = Date.now()
+    .toString(36)
+    .toUpperCase();
+
+  const random = crypto
+    .randomBytes(4)
+    .toString("hex")
+    .toUpperCase();
+
+  return `SPP-${timestamp}-${random}`;
+}
+
+function parseDate(value: string) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return date;
+}
+
+function serializePermanentPass(
+  pass: any,
+  qrToken?: string
+) {
+  return {
+    id: pass.id,
+
+    organizationId: pass.organizationId,
+    organizationName:
+      pass.organization?.name ?? null,
+
+    passNumber: pass.passNumber,
+
+    qrToken: qrToken ?? null,
+
+    qrCodeUrl: qrToken
+      ? `smartpass360://permanent-pass/${qrToken}`
+      : null,
+
+    fullName: pass.fullName,
+    staffNumber: pass.staffNumber,
+
+    department: pass.department,
+    position: pass.position,
+
+    holderType: pass.holderType,
+    status: pass.status,
+
+    phone: pass.phone,
+    email: pass.email,
+    photoUrl: pass.photoUrl,
+
+    validFrom: pass.validFrom.toISOString(),
+    expiryType: pass.expiryType,
+
+    expiresAt:
+      pass.expiresAt?.toISOString() ?? null,
+
+    isCurrentlyInside:
+      pass.isCurrentlyInside,
+
+    lastActivityType:
+      pass.lastActivityType,
+
+    lastActivityAt:
+      pass.lastActivityAt?.toISOString() ?? null,
+
+    createdAt:
+      pass.createdAt.toISOString(),
+
+    updatedAt:
+      pass.updatedAt.toISOString()
+  };
+}
+
+function validationError(
+  response: any,
+  details: unknown
+) {
+  return response.status(400).json({
+    error: {
+      code: "VALIDATION_ERROR",
+      message: "Invalid request data.",
+      details
+    }
+  });
+}
+
+permanentPassRouter.get(
+  "/",
+  async (request, response, next) => {
+    try {
+      const parsed = querySchema.safeParse(
+        request.query
+      );
+
+      if (!parsed.success) {
+        return validationError(
+          response,
+          parsed.error.flatten()
+        );
+      }
+
+      const {
+        search,
+        status,
+        holderType,
+        organizationId,
+        page,
+        pageSize
+      } = parsed.data;
+
+      const where: any = {};
+
+      if (organizationId) {
+        where.organizationId =
+          organizationId;
+      }
+
+      if (status) {
+        where.status = status;
+      }
+
+      if (holderType) {
+        where.holderType =
+          holderType;
+      }
+
+      if (search) {
+        where.OR = [
+          {
+            fullName: {
+              contains: search,
+              mode: "insensitive"
+            }
+          },
+          {
+            passNumber: {
+              contains: search,
+              mode: "insensitive"
+            }
+          },
+          {
+            staffNumber: {
+              contains: search,
+              mode: "insensitive"
+            }
+          },
+          {
+            department: {
+              contains: search,
+              mode: "insensitive"
+            }
+          }
+        ];
+      }
+
+      const skip =
+        (page - 1) * pageSize;
+
+      const [passes, total] =
+        await prisma.$transaction([
+          prisma.permanentPass.findMany({
+            where,
+            include: {
+              organization: {
+                select: {
+                  name: true
+                }
+              }
+            },
+            orderBy: {
+              createdAt: "desc"
+            },
+            skip,
+            take: pageSize
+          }),
+
+          prisma.permanentPass.count({
+            where
+          })
+        ]);
+
+      return response.status(200).json({
+        data: passes.map((pass) =>
+          serializePermanentPass(pass)
+        ),
+
+        meta: {
+          page,
+          pageSize,
+          total,
+          totalPages:
+            total === 0
+              ? 0
+              : Math.ceil(total / pageSize)
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+permanentPassRouter.get(
+  "/:permanentPassId",
+  async (request, response, next) => {
+    try {
+      const permanentPassId =
+        z.string().uuid().safeParse(
+          request.params.permanentPassId
+        );
+
+      if (!permanentPassId.success) {
+        return validationError(
+          response,
+          permanentPassId.error.flatten()
+        );
+      }
+
+      const pass =
+        await prisma.permanentPass.findUnique({
+          where: {
+            id: permanentPassId.data
+          },
+          include: {
+            organization: {
+              select: {
+                name: true
+              }
+            }
+          }
+        });
+
+      if (!pass) {
+        return response.status(404).json({
+          error: {
+            code: "PERMANENT_PASS_NOT_FOUND",
+            message: "Permanent pass was not found."
+          }
+        });
+      }
+
+      return response.status(200).json(
+        serializePermanentPass(pass)
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+permanentPassRouter.post(
+  "/",
+  async (request, response, next) => {
+    try {
+      const parsed =
+        createSchema.safeParse(request.body);
+
+      if (!parsed.success) {
+        return validationError(
+          response,
+          parsed.error.flatten()
+        );
+      }
+
+      const input = parsed.data;
+
+      const organization =
+        await prisma.organization.findFirst({
+          where: {
+            id: input.organizationId,
+            isActive: true
+          },
+          select: {
+            id: true
+          }
+        });
+
+      if (!organization) {
+        return response.status(404).json({
+          error: {
+            code: "ORGANIZATION_NOT_FOUND",
+            message:
+              "The selected organization does not exist or is inactive."
+          }
+        });
+      }
+
+      const validFrom =
+        parseDate(input.validFrom);
+
+      if (!validFrom) {
+        return validationError(
+          response,
+          {
+            validFrom: [
+              "validFrom must be a valid date."
+            ]
+          }
+        );
+      }
+
+      let expiresAt: Date | null = null;
+
+      if (
+        input.expiryType === "FIXED_DATE" &&
+        input.expiresAt
+      ) {
+        expiresAt =
+          parseDate(input.expiresAt);
+
+        if (!expiresAt) {
+          return validationError(
+            response,
+            {
+              expiresAt: [
+                "expiresAt must be a valid date."
+              ]
+            }
+          );
+        }
+
+        if (
+          expiresAt.getTime() <=
+          validFrom.getTime()
+        ) {
+          return validationError(
+            response,
+            {
+              expiresAt: [
+                "expiresAt must be later than validFrom."
+              ]
+            }
+          );
+        }
+      }
+
+      const qrToken = createQrToken();
+
+      const pass =
+        await prisma.permanentPass.create({
+          data: {
+            organizationId:
+              input.organizationId,
+
+            passNumber:
+              createPassNumber(),
+
+            qrTokenHash:
+              hashQrToken(qrToken),
+
+            fullName:
+              input.fullName,
+
+            staffNumber:
+              input.staffNumber || null,
+
+            department:
+              input.department,
+
+            position:
+              input.position || null,
+
+            holderType:
+              input.holderType,
+
+            phone:
+              input.phone || null,
+
+            email:
+              input.email || null,
+
+            photoUrl:
+              input.photoDataUrl || null,
+
+            validFrom,
+
+            expiryType:
+              input.expiryType,
+
+            expiresAt
+          },
+
+          include: {
+            organization: {
+              select: {
+                name: true
+              }
+            }
+          }
+        });
+
+      return response.status(201).json({
+        data: serializePermanentPass(
+          pass,
+          qrToken
+        ),
+        message:
+          "Permanent pass created successfully."
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+permanentPassRouter.patch(
+  "/:permanentPassId/status",
+  async (request, response, next) => {
+    try {
+      const permanentPassId =
+        z.string().uuid().safeParse(
+          request.params.permanentPassId
+        );
+
+      const parsed =
+        statusSchema.safeParse(request.body);
+
+      if (!permanentPassId.success) {
+        return validationError(
+          response,
+          permanentPassId.error.flatten()
+        );
+      }
+
+      if (!parsed.success) {
+        return validationError(
+          response,
+          parsed.error.flatten()
+        );
+      }
+
+      const existing =
+        await prisma.permanentPass.findUnique({
+          where: {
+            id: permanentPassId.data
+          },
+          select: {
+            id: true
+          }
+        });
+
+      if (!existing) {
+        return response.status(404).json({
+          error: {
+            code: "PERMANENT_PASS_NOT_FOUND",
+            message:
+              "Permanent pass was not found."
+          }
+        });
+      }
+
+      const pass =
+        await prisma.permanentPass.update({
+          where: {
+            id: permanentPassId.data
+          },
+
+          data: {
+            status: parsed.data.status,
+
+            revokedAt:
+              parsed.data.status === "REVOKED"
+                ? new Date()
+                : null,
+
+            revocationReason:
+              parsed.data.status === "REVOKED"
+                ? parsed.data.reason || null
+                : null
+          },
+
+          include: {
+            organization: {
+              select: {
+                name: true
+              }
+            }
+          }
+        });
+
+      return response.status(200).json(
+        serializePermanentPass(pass)
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+permanentPassRouter.post(
+  "/:permanentPassId/replace",
+  async (request, response, next) => {
+    try {
+      const permanentPassId =
+        z.string().uuid().safeParse(
+          request.params.permanentPassId
+        );
+
+      const parsed =
+        replaceSchema.safeParse(request.body);
+
+      if (!permanentPassId.success) {
+        return validationError(
+          response,
+          permanentPassId.error.flatten()
+        );
+      }
+
+      if (!parsed.success) {
+        return validationError(
+          response,
+          parsed.error.flatten()
+        );
+      }
+
+      const existing =
+        await prisma.permanentPass.findUnique({
+          where: {
+            id: permanentPassId.data
+          }
+        });
+
+      if (!existing) {
+        return response.status(404).json({
+          error: {
+            code: "PERMANENT_PASS_NOT_FOUND",
+            message:
+              "Permanent pass was not found."
+          }
+        });
+      }
+
+      if (existing.status === "REVOKED") {
+        return response.status(409).json({
+          error: {
+            code: "PERMANENT_PASS_REVOKED",
+            message:
+              "A revoked permanent pass cannot be replaced."
+          }
+        });
+      }
+
+      const qrToken = createQrToken();
+
+      const pass =
+        await prisma.permanentPass.update({
+          where: {
+            id: permanentPassId.data
+          },
+
+          data: {
+            qrTokenHash:
+              hashQrToken(qrToken)
+          },
+
+          include: {
+            organization: {
+              select: {
+                name: true
+              }
+            }
+          }
+        });
+
+      return response.status(200).json({
+        data: serializePermanentPass(
+          pass,
+          qrToken
+        ),
+
+        message:
+          "Permanent pass QR replaced successfully."
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);

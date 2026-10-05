@@ -1,0 +1,383 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum VisitorType {
+  WALK_IN
+  EXPECTED
+  CONTRACTOR
+  SUPPLIER
+  DELIVERY
+  INTERVIEW_CANDIDATE
+  GOVERNMENT_OFFICIAL
+  VIP
+}
+
+enum VisitStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  PASS_ISSUED
+  READY_FOR_ENTRY
+  INSIDE
+  CHECKED_OUT
+  EXPIRED
+  CANCELLED
+  REVOKED
+  DENIED
+}
+
+enum PassStatus {
+  ACTIVE
+  USED
+  EXPIRED
+  REVOKED
+  CANCELLED
+}
+
+enum GateDirection {
+  ENTRY
+  EXIT
+  BIDIRECTIONAL
+}
+
+enum GateStatus {
+  ONLINE
+  OFFLINE
+  MAINTENANCE
+}
+
+enum AccessDirection {
+  ENTRY
+  EXIT
+}
+
+enum AccessDecision {
+  GRANTED
+  DENIED
+  ERROR
+}
+
+model Organization {
+  id               String   @id @default(uuid()) @db.Uuid
+  name             String
+  code             String   @unique
+  shortName        String?  @map("short_name")
+  organizationType String   @default("OTHER") @map("organization_type")
+  email            String?
+  phone            String?
+  website          String?
+  logoUrl          String?  @map("logo_url")
+  address          String?
+  city             String?
+  country          String?
+  isActive         Boolean  @default(true) @map("is_active")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  departments               Department[]
+  hosts                     Host[]
+  visitors                  Visitor[]
+  visits                    VisitRequest[]
+  passes                    VisitorPass[]
+  gates                     Gate[]
+  accessEvents              AccessEvent[]
+  permanentPasses           PermanentPass[]
+  permanentPassAccessEvents PermanentPassAccessEvent[]
+
+  @@map("organizations")
+}
+
+model Department {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  name           String
+  code           String
+  isActive       Boolean  @default(true) @map("is_active")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  hosts  Host[]
+  visits VisitRequest[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId])
+  @@map("departments")
+}
+
+model Host {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  departmentId   String?  @map("department_id") @db.Uuid
+  fullName       String   @map("full_name")
+  email          String?
+  phone          String?
+  jobTitle       String?  @map("job_title")
+  isActive       Boolean  @default(true) @map("is_active")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  department Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  visits VisitRequest[]
+
+  @@index([organizationId])
+  @@index([departmentId])
+  @@index([fullName])
+  @@map("hosts")
+}
+
+model Visitor {
+  id                String   @id @default(uuid()) @db.Uuid
+  organizationId    String   @map("organization_id") @db.Uuid
+  fullName          String   @map("full_name")
+  idType            String?  @map("id_type")
+  idNumberEncrypted String?  @map("id_number_encrypted")
+  phone             String?
+  email             String?
+  company           String?
+  photoUrl          String?  @map("photo_url")
+  vehicleNumber     String?  @map("vehicle_number")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  visits VisitRequest[]
+
+  @@index([organizationId])
+  @@index([fullName])
+  @@index([phone])
+  @@map("visitors")
+}
+
+model VisitRequest {
+  id                String      @id @default(uuid()) @db.Uuid
+  organizationId    String      @map("organization_id") @db.Uuid
+  visitorId         String      @map("visitor_id") @db.Uuid
+  hostId            String?     @map("host_id") @db.Uuid
+  departmentId      String?     @map("department_id") @db.Uuid
+  visitorType       VisitorType @default(WALK_IN) @map("visitor_type")
+  purpose           String
+  scheduledDate     DateTime?   @map("scheduled_date")
+  expectedEntryTime DateTime?   @map("expected_entry_time")
+  expectedExitTime  DateTime?   @map("expected_exit_time")
+  approvalRequired  Boolean     @default(false) @map("approval_required")
+  status            VisitStatus @default(DRAFT)
+  approvedAt        DateTime?   @map("approved_at")
+  checkedInAt       DateTime?   @map("checked_in_at")
+  checkedOutAt      DateTime?   @map("checked_out_at")
+  createdAt         DateTime    @default(now()) @map("created_at")
+  updatedAt         DateTime    @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  visitor Visitor @relation(fields: [visitorId], references: [id], onDelete: Restrict)
+
+  host Host? @relation(fields: [hostId], references: [id], onDelete: SetNull)
+
+  department Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  pass         VisitorPass?
+  accessEvents AccessEvent[]
+
+  @@index([organizationId])
+  @@index([visitorId])
+  @@index([hostId])
+  @@index([departmentId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("visit_requests")
+}
+
+model VisitorPass {
+  id               String     @id @default(uuid()) @db.Uuid
+  organizationId   String     @map("organization_id") @db.Uuid
+  visitId          String     @unique @map("visit_id") @db.Uuid
+  passNumber       String     @unique @map("pass_number")
+  qrTokenHash      String     @unique @map("qr_token_hash")
+  status           PassStatus @default(ACTIVE)
+  issuedAt         DateTime   @default(now()) @map("issued_at")
+  validFrom        DateTime   @map("valid_from")
+  validUntil       DateTime   @map("valid_until")
+  printedAt        DateTime?  @map("printed_at")
+  printCount       Int        @default(0) @map("print_count")
+  revokedAt        DateTime?  @map("revoked_at")
+  revocationReason String?    @map("revocation_reason")
+  createdAt        DateTime   @default(now()) @map("created_at")
+  updatedAt        DateTime   @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  visit VisitRequest @relation(fields: [visitId], references: [id], onDelete: Cascade)
+
+  accessEvents AccessEvent[]
+
+  @@index([organizationId])
+  @@index([status])
+  @@index([validUntil])
+  @@map("visitor_passes")
+}
+
+model Gate {
+  id             String        @id @default(uuid()) @db.Uuid
+  organizationId String        @map("organization_id") @db.Uuid
+  code           String
+  name           String
+  location       String?
+  direction      GateDirection @default(BIDIRECTIONAL)
+  status         GateStatus    @default(ONLINE)
+  isActive       Boolean       @default(true) @map("is_active")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  accessEvents AccessEvent[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId])
+  @@index([status])
+  @@map("gates")
+}
+
+model AccessEvent {
+  id              String          @id @default(uuid()) @db.Uuid
+  organizationId  String          @map("organization_id") @db.Uuid
+  visitId         String          @map("visit_id") @db.Uuid
+  visitorPassId   String          @map("visitor_pass_id") @db.Uuid
+  gateId          String          @map("gate_id") @db.Uuid
+  direction       AccessDirection
+  decision        AccessDecision
+  denialReason    String?         @map("denial_reason")
+  scannedAt       DateTime        @default(now()) @map("scanned_at")
+  turnstileOpened Boolean         @default(false) @map("turnstile_opened")
+  metadata        Json?
+  createdAt       DateTime        @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  visit VisitRequest @relation(fields: [visitId], references: [id], onDelete: Cascade)
+
+  visitorPass VisitorPass @relation(fields: [visitorPassId], references: [id], onDelete: Cascade)
+
+  gate Gate @relation(fields: [gateId], references: [id], onDelete: Restrict)
+
+  @@index([organizationId])
+  @@index([visitId])
+  @@index([visitorPassId])
+  @@index([gateId])
+  @@index([decision])
+  @@index([scannedAt])
+  @@map("access_events")
+}
+
+enum PermanentPassHolderType {
+  EMPLOYEE
+  SECURITY
+  CLEANER
+  CONTRACTOR
+  TENANT
+  VENDOR
+  OTHER
+}
+
+enum PermanentPassStatus {
+  ACTIVE
+  SUSPENDED
+  EXPIRED
+  REVOKED
+}
+
+enum PermanentPassExpiryType {
+  LIFETIME
+  FIXED_DATE
+}
+
+enum PermanentPassActivityType {
+  ENTRY
+  EXIT
+}
+
+model PermanentPass {
+  id             String @id @default(uuid()) @db.Uuid
+  organizationId String @map("organization_id") @db.Uuid
+  passNumber     String @unique @map("pass_number")
+  qrTokenHash    String @unique @map("qr_token_hash")
+
+  fullName    String                  @map("full_name")
+  staffNumber String?                 @map("staff_number")
+  department  String
+  position    String?
+  holderType  PermanentPassHolderType @map("holder_type")
+
+  phone    String?
+  email    String?
+  photoUrl String? @map("photo_url")
+
+  status PermanentPassStatus @default(ACTIVE)
+
+  validFrom  DateTime                @map("valid_from")
+  expiryType PermanentPassExpiryType @map("expiry_type")
+  expiresAt  DateTime?               @map("expires_at")
+
+  isCurrentlyInside Boolean @default(false) @map("is_currently_inside")
+
+  lastActivityType PermanentPassActivityType? @map("last_activity_type")
+  lastActivityAt   DateTime?                  @map("last_activity_at")
+
+  revokedAt        DateTime? @map("revoked_at")
+  revocationReason String?   @map("revocation_reason")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  accessEvents PermanentPassAccessEvent[]
+
+  @@index([organizationId])
+  @@index([status])
+  @@index([holderType])
+  @@index([fullName])
+  @@index([staffNumber])
+  @@index([expiresAt])
+  @@map("permanent_passes")
+}
+
+model PermanentPassAccessEvent {
+  id              String  @id @default(uuid()) @db.Uuid
+  organizationId  String  @map("organization_id") @db.Uuid
+  permanentPassId String  @map("permanent_pass_id") @db.Uuid
+  gateId          String? @map("gate_id") @db.Uuid
+
+  activityType PermanentPassActivityType @map("activity_type")
+  decision     AccessDecision
+  denialReason String?                   @map("denial_reason")
+
+  occurredAt      DateTime @default(now()) @map("occurred_at")
+  turnstileOpened Boolean  @default(false) @map("turnstile_opened")
+  metadata        Json?
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  permanentPass PermanentPass @relation(fields: [permanentPassId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([permanentPassId])
+  @@index([gateId])
+  @@index([decision])
+  @@index([occurredAt])
+  @@map("permanent_pass_access_events")
+}

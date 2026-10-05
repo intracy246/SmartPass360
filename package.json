@@ -1,0 +1,15 @@
+{
+  "name": "smartpass360",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SMARTPASS360 Visitor Management and QR Access Control System",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev --workspace=@smartpass360/api",
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  }
+}

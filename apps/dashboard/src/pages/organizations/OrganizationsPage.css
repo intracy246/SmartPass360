@@ -1,0 +1,289 @@
+.organizations-page {
+  width: min(100%, 1600px);
+  margin: 0 auto;
+}
+
+.organizations-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.organizations-page__eyebrow {
+  margin: 0 0 8px;
+  color: #7dcfff;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.organizations-page__header h1 {
+  margin: 0;
+  color: #f8f8ff;
+  font-size: clamp(30px, 4vw, 44px);
+  letter-spacing: -0.04em;
+}
+
+.organizations-page__header p:not(
+    .organizations-page__eyebrow
+  ) {
+  max-width: 680px;
+  margin: 12px 0 0;
+  color: #8fa0b8;
+  line-height: 1.7;
+}
+
+.organizations-page__message {
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border: 1px solid rgba(34, 211, 238, 0.15);
+  border-radius: 16px;
+  background: rgba(34, 211, 238, 0.055);
+  color: #a6ecf5;
+  font-size: 12px;
+}
+
+.organizations-page > .glass-card {
+  margin-top: 20px;
+}
+
+.organization-form {
+  display: grid;
+  gap: 20px;
+}
+
+.organization-form__grid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.organization-form__wide {
+  grid-column: 1 / -1;
+}
+
+.organization-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.organizations-toolbar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.organizations-toolbar input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid rgba(248, 248, 255, 0.11);
+  border-radius: 16px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.04);
+  color: #f8f8ff;
+}
+
+.organizations-toolbar input:focus {
+  border-color: rgba(34, 211, 238, 0.5);
+  box-shadow:
+    0 0 0 4px rgba(34, 211, 238, 0.07);
+}
+
+.organizations-toolbar input::placeholder {
+  color: #697b93;
+}
+
+.organizations-state {
+  min-height: 320px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.organizations-state__icon {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  background: rgba(139, 92, 246, 0.09);
+  color: #bba4ff;
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.organizations-state__loader {
+  width: 44px;
+  height: 44px;
+  border: 4px solid rgba(248, 248, 255, 0.08);
+  border-top-color: #22d3ee;
+  border-radius: 50%;
+  animation:
+    organizations-spin 800ms linear infinite;
+}
+
+@keyframes organizations-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.organizations-state strong {
+  color: #f8f8ff;
+}
+
+.organizations-state p {
+  color: #7f90a7;
+  font-size: 12px;
+}
+
+.organizations-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.organization-card {
+  padding: 18px;
+  border: 1px solid rgba(248, 248, 255, 0.08);
+  border-radius: 22px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.055),
+      rgba(255, 255, 255, 0.02)
+    );
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.organization-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(34, 211, 238, 0.18);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.2);
+}
+
+.organization-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.organization-card__logo {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 17px;
+  background:
+    linear-gradient(
+      135deg,
+      #3b82f6,
+      #8b5cf6
+    );
+  color: #f8f8ff;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.organization-card__logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.organization-card__status {
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.organization-card__status--active {
+  background: rgba(52, 211, 153, 0.09);
+  color: #4ee7ad;
+}
+
+.organization-card__status--inactive {
+  background: rgba(255, 100, 124, 0.09);
+  color: #ff8fa1;
+}
+
+.organization-card h3 {
+  margin: 18px 0 6px;
+  color: #f8f8ff;
+  font-size: 16px;
+}
+
+.organization-card > p {
+  margin: 0;
+  color: #7dcfff;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.organization-card__details {
+  display: grid;
+  gap: 6px;
+  margin-top: 16px;
+  color: #7f90a7;
+  font-size: 10px;
+}
+
+.organization-card__button {
+  width: 100%;
+  min-height: 42px;
+  margin-top: 18px;
+  border: 1px solid rgba(248, 248, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
+  color: #dce5f3;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.organization-card__button:hover {
+  border-color: rgba(34, 211, 238, 0.25);
+  background: rgba(34, 211, 238, 0.06);
+}
+
+@media (max-width: 1100px) {
+  .organizations-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .organizations-page__header {
+    flex-direction: column;
+  }
+
+  .organization-form__grid,
+  .organizations-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .organization-form__wide {
+    grid-column: auto;
+  }
+
+  .organization-form__actions,
+  .organizations-toolbar {
+    flex-direction: column;
+  }
+}
