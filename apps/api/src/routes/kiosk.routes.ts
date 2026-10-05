@@ -11,15 +11,6 @@ function createActivationCode() {
   return crypto.randomBytes(5).toString("hex").toUpperCase();
 }
 
-const siteCreateSchema = z.object({
-  name: z.string().trim().min(2).max(160),
-  code: z.string().trim().min(2).max(40),
-  address: z.string().trim().optional(),
-  city: z.string().trim().optional(),
-  country: z.string().trim().optional(),
-  organizationIds: z.array(z.string().uuid()).default([])
-});
-
 const siteUpdateSchema = z.object({
   name: z.string().trim().min(2).max(160),
   logoUrl: z.string().max(1500000).nullable().optional()
@@ -36,9 +27,81 @@ const activateSchema = z.object({
   deviceId: z.string().trim().min(3).max(160)
 });
 
-kioskRouter.get("/sites", async (_request, response, next) => {
+kioskRouter.patch("/sites/:siteId/settings", requireBuilding, async (request, response, next) => {
   try {
     const user = response.locals.authUser as AuthUser;
+
+    if (request.params.siteId !== user.siteId) {
+      return response.status(403).json({
+        error: {
+          code: "FORBIDDEN",
+          message: "You can update only your building."
+        }
+      });
+    }
+
+    const parsed = siteUpdateSchema.safeParse(request.body);
+
+    if (!parsed.success) {
+      return response.status(400).json({
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Invalid building settings.",
+          details: parsed.error.flatten()
+        }
+      });
+    }
+
+    const site = await prisma.site.update({
+      where: { id: user.siteId! },
+      data: {
+        name: parsed.data.name,
+        logoUrl: parsed.data.logoUrl ?? null
+      }
+    });
+
+    return response.status(200).json({
+      success: true,
+      data: site
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+kioskRouter.get("/", requireBuilding, async (_request, response, next) => {
+  try {
+    const user = response.locals.authUser as AuthUser;
+
+    const kiosks = await prisma.kiosk.findMany({
+      where: { siteId: user.siteId! },
+      orderBy: { createdAt: "desc" },
+      include: { site: true }
+    });
+
+    return response.status(200).json({
+      success: true,
+      data: kiosks
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+kioskRouter.post("/", requireBuilding, async (request, response, next) => {
+  try {
+    const user = response.locals.authUser as AuthUser;
+    const parsed = kioskCreateSchema.safeParse(request.body);
+
+    if (!parsed.success) {
+      return response.status(400).json({
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Invalid kiosk data.",
+          details: parsed.error.flatten()
+        }
+      });
+    }
 
     const kiosk = await prisma.kiosk.create({
       data: {
@@ -48,9 +111,7 @@ kioskRouter.get("/sites", async (_request, response, next) => {
         location: parsed.data.location || undefined,
         activationCode: createActivationCode()
       },
-      include: {
-        site: true
-      }
+      include: { site: true }
     });
 
     return response.status(201).json({
@@ -85,16 +146,14 @@ kioskRouter.post("/activate", async (request, response, next) => {
           include: {
             organizations: {
               where: { isActive: true },
-              include: {
-                organization: true
-              }
+              include: { organization: true }
             }
           }
         }
       }
     });
 
-    if (!kiosk || !kiosk.isActive || !kiosk.site.isActive) {
+    if (!kiosk || !kiosk.isActive || !kiosk.site.isActive || kiosk.site.status !== "ACTIVE") {
       return response.status(404).json({
         error: {
           code: "KIOSK_NOT_AVAILABLE",
@@ -134,16 +193,14 @@ kioskRouter.get("/:kioskId/config", async (request, response, next) => {
           include: {
             organizations: {
               where: { isActive: true },
-              include: {
-                organization: true
-              }
+              include: { organization: true }
             }
           }
         }
       }
     });
 
-    if (!kiosk || !kiosk.isActive || !kiosk.site.isActive) {
+    if (!kiosk || !kiosk.isActive || !kiosk.site.isActive || kiosk.site.status !== "ACTIVE") {
       return response.status(404).json({
         error: {
           code: "KIOSK_NOT_AVAILABLE",
