@@ -64,38 +64,38 @@ const copy = {
     registerVisit: "Register your visit",
     intro: "Enter your details below. Reception will review your registration and issue your visitor pass.",
     registrationNotCompleted: "Registration not completed",
-    orgUnavailable: "{t.orgUnavailable}",
-    retryConnection: "{t.retryConnection}",
+    orgUnavailable: "Organization service unavailable",
+    retryConnection: "Retry connection",
     yourInformation: "Your information",
     yourInformationHelp: "Enter the visitor's identification details.",
     fullName: "Full name",
-    fullNamePlaceholder: t.fullNamePlaceholder,
+    fullNamePlaceholder: "Enter your full name",
     phoneNumber: "Phone number",
     identificationType: "Identification type",
-    noIdentification: "{t.noIdentification}",
-    nationalId: "{t.nationalId}",
-    passport: "{t.passport}",
-    drivingLicence: "{t.drivingLicence}",
-    voterId: "{t.voterId}",
-    otherIdentification: "{t.otherIdentification}",
+    noIdentification: "No identification",
+    nationalId: "National ID",
+    passport: "Passport",
+    drivingLicence: "Driving licence",
+    voterId: "Voter ID",
+    otherIdentification: "Other identification",
     identificationNumber: "Identification number",
-    notRequired: t.notRequired,
-    enterIdentificationNumber: t.enterIdentificationNumber,
+    notRequired: "Not required",
+    enterIdentificationNumber: "Enter identification number",
     company: "Company",
-    companyPlaceholder: t.companyPlaceholder,
+    companyPlaceholder: "Optional company name",
     vehicleRegistration: "Vehicle registration",
-    vehiclePlaceholder: t.vehiclePlaceholder,
+    vehiclePlaceholder: "Optional vehicle number",
     visitInformation: "Visit information",
     visitInformationHelp: "Tell reception who and where you are visiting.",
     organization: "Organization",
-    loadingOrganizations: t.loadingOrganizations,
-    selectOrganization: t.selectOrganization,
+    loadingOrganizations: "Loading organizations...",
+    selectOrganization: "Select organization",
     departmentOffice: "Department or office",
-    departmentPlaceholder: t.departmentPlaceholder,
+    departmentPlaceholder: "Example: ICT Department",
     host: "Person you are visiting",
-    hostPlaceholder: t.hostPlaceholder,
+    hostPlaceholder: "Optional host name",
     purpose: "Purpose of visit",
-    purposePlaceholder: t.purposePlaceholder,
+    purposePlaceholder: "Describe the reason for your visit",
     clearForm: "Clear Form",
     submitting: "Submitting...",
     submitRegistration: "Submit Registration",
@@ -389,13 +389,13 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
             role="alert"
           >
             <strong>
-              Organization service unavailable
+              {t.orgUnavailable}
             </strong>
 
             <span>
               {kioskConfigQuery.error.message}
             </span>
-            <button type="button" onClick={() => void kioskConfigQuery.refetch()}>Retry connection</button>
+            <button type="button" onClick={() => void kioskConfigQuery.refetch()}>{t.retryConnection}</button>
           </div>
         )}
 
@@ -423,7 +423,7 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
                   value: form.fullName,
                   autoComplete: "name",
                   placeholder:
-                    "Enter your full name",
+                    t.fullNamePlaceholder,
 
                   onChange: (event) =>
                     updateField(
@@ -466,27 +466,27 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
                 }}
               >
                 <option value="NONE">
-                  No identification
+                  {t.noIdentification}
                 </option>
 
                 <option value="NATIONAL_ID">
-                  National ID
+                  {t.nationalId}
                 </option>
 
                 <option value="PASSPORT">
-                  Passport
+                  {t.passport}
                 </option>
 
                 <option value="DRIVING_LICENCE">
-                  Driving licence
+                  {t.drivingLicence}
                 </option>
 
                 <option value="VOTER_ID">
-                  Voter ID
+                  {t.voterId}
                 </option>
 
                 <option value="OTHER">
-                  Other identification
+                  {t.otherIdentification}
                 </option>
               </KioskField>
 
@@ -503,8 +503,8 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
                   placeholder:
                     form.identificationType ===
                     "NONE"
-                      ? "Not required"
-                      : "Enter identification number",
+                      ? t.notRequired
+                      : t.enterIdentificationNumber,
 
                   onChange: (event) =>
                     updateField(
@@ -519,7 +519,7 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
                 inputProps={{
                   value: form.companyName,
                   placeholder:
-                    "Optional company name",
+                    t.companyPlaceholder,
 
                   onChange: (event) =>
                     updateField(
@@ -536,7 +536,7 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
                     form.vehicleRegistrationNumber,
 
                   placeholder:
-                    "Optional vehicle number",
+                    t.vehiclePlaceholder,
 
                   onChange: (event) =>
                     updateField(
@@ -578,7 +578,7 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
                 }}
               >
                 <option value="">
-                  {kioskConfigQuery.isPending ? "Loading organizations..." : "Select organization"}
+                  {kioskConfigQuery.isPending ? t.loadingOrganizations : t.selectOrganization}
                 </option>
 
                 {organizations.map(
@@ -600,7 +600,7 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
                     form.departmentOrOffice,
 
                   placeholder:
-                    "Example: ICT Department",
+                    t.departmentPlaceholder,
 
                   onChange: (event) =>
                     updateField(
@@ -615,7 +615,7 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
                 inputProps={{
                   value: form.hostName,
                   placeholder:
-                    "Optional host name",
+                    t.hostPlaceholder,
 
                   onChange: (event) =>
                     updateField(
@@ -634,7 +634,7 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
                       form.purposeOfVisit,
 
                     placeholder:
-                      "Describe the reason for your visit",
+                      t.purposePlaceholder,
 
                     onChange: (event) =>
                       updateField(
