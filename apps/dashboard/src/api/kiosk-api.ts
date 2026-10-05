@@ -43,3 +43,25 @@ export function createKiosk(payload: {
     body: payload
   });
 }
+
+
+export function updateKiosk(
+  kioskId: string,
+  payload: {
+    name: string;
+    code: string;
+    location?: string | null;
+    isActive?: boolean;
+  }
+) {
+  return apiRequest<KioskResponse>(`/kiosks/${kioskId}`, {
+    method: "PATCH",
+    body: payload
+  });
+}
+
+export function deleteKiosk(kioskId: string) {
+  return apiRequest<{ success: boolean; data: { id: string } }>(`/kiosks/${kioskId}`, {
+    method: "DELETE"
+  });
+}
