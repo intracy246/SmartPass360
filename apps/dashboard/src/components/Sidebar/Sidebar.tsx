@@ -29,6 +29,11 @@ const navigationItems = [
     symbol: "▦"
   },
   {
+    label: "Kiosks",
+    path: "/kiosks",
+    symbol: "▣"
+  },
+  {
     label: "Users",
     path: "/users",
     symbol: "◉"
