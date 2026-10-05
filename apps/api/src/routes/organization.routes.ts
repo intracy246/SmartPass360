@@ -2,6 +2,7 @@
 import { z } from "zod";
 
 import { prisma } from "../lib/prisma";
+import { requireBuilding, type AuthUser } from "../middleware/auth.middleware";
 
 export const organizationRouter = Router();
 
@@ -72,6 +73,7 @@ const createSchema = z.object({
 
 organizationRouter.get(
   "/",
+  requireBuilding,
   async (request, response, next) => {
     try {
       const parsed =
@@ -94,7 +96,10 @@ organizationRouter.get(
         active
       } = parsed.data;
 
+      const user = response.locals.authUser as AuthUser;
+
       const where = {
+        siteOrganizations: { some: { siteId: user.siteId!, isActive: true } },
         ...(active !== undefined
           ? { isActive: active === "true" }
           : {}),
@@ -164,6 +169,7 @@ organizationRouter.get(
 
 organizationRouter.post(
   "/",
+  requireBuilding,
   async (request, response, next) => {
     try {
       const parsed =
@@ -198,6 +204,8 @@ organizationRouter.post(
           }
         });
       }
+
+      const user = response.locals.authUser as AuthUser;
 
       const organization =
         await prisma.organization.create({
