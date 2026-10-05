@@ -3,7 +3,8 @@ import { apiRequest } from "./api-client";
 import type {
   KioskRegistrationPayload,
   KioskRegistrationResult,
-  OrganizationOptionResponse
+  OrganizationOptionResponse,
+  KioskBuildingConfigResponse
 } from "../types/kiosk";
 
 export function getKioskOrganizations() {
@@ -21,5 +22,11 @@ export function registerVisitorFromKiosk(
       method: "POST",
       body: payload
     }
+  );
+}
+
+export function getRegisteredKioskConfig(kioskId: string) {
+  return apiRequest<KioskBuildingConfigResponse>(
+    `/kiosks/${kioskId}/config`
   );
 }
