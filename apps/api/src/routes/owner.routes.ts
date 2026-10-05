@@ -45,6 +45,11 @@ const changePasswordSchema = z.object({
   newPassword: z.string().min(8).max(200)
 });
 
+const resetBuildingCredentialsSchema = z.object({
+  adminUsername: z.string().trim().min(3).max(120),
+  temporaryPassword: z.string().min(8).max(200)
+});
+
 const updateBuildingSchema = z.object({
   name: z.string().trim().min(2).max(160),
   code: z.string().trim().min(2).max(40),
@@ -138,6 +143,85 @@ ownerRouter.get("/buildings", requireOwner, async (_request, response, next) => 
           kiosks: site.kiosks.length
         }
       }))
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+ownerRouter.get("/buildings/:siteId", requireOwner, async (request, response, next) => {
+  try {
+    const site = await prisma.site.findUnique({
+      where: { id: request.params.siteId },
+      include: {
+        organizations: {
+          where: { isActive: true },
+          include: { organization: true }
+        },
+        kiosks: true
+      }
+    });
+
+    if (!site) {
+      return response.status(404).json({
+        error: { code: "BUILDING_NOT_FOUND", message: "Building not found." }
+      });
+    }
+
+    return response.status(200).json({
+      success: true,
+      data: {
+        ...site,
+        adminPasswordHash: undefined,
+        organizations: site.organizations.map((item) => item.organization),
+        counts: {
+          organizations: site.organizations.length,
+          kiosks: site.kiosks.length
+        }
+      }
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+ownerRouter.post("/buildings/:siteId/reset-credentials", requireOwner, async (request, response, next) => {
+  try {
+    const parsed = resetBuildingCredentialsSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return response.status(400).json({
+        error: { code: "VALIDATION_ERROR", message: "Invalid credential data.", details: parsed.error.flatten() }
+      });
+    }
+
+    const existing = await prisma.site.findUnique({ where: { id: request.params.siteId } });
+    if (!existing) {
+      return response.status(404).json({
+        error: { code: "BUILDING_NOT_FOUND", message: "Building not found." }
+      });
+    }
+
+    const passwordHash = await hashPassword(parsed.data.temporaryPassword);
+
+    const updated = await prisma.site.update({
+      where: { id: existing.id },
+      data: {
+        adminUsername: parsed.data.adminUsername,
+        adminPasswordHash: passwordHash,
+        mustChangePassword: true,
+        status: "PENDING",
+        activatedAt: null
+      }
+    });
+
+    return response.status(200).json({
+      success: true,
+      data: {
+        id: updated.id,
+        adminUsername: updated.adminUsername,
+        mustChangePassword: updated.mustChangePassword,
+        status: updated.status
+      }
     });
   } catch (error) {
     return next(error);
