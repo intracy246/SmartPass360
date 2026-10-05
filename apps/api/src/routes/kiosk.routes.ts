@@ -162,11 +162,20 @@ kioskRouter.post("/activate", async (request, response, next) => {
       });
     }
 
+    if (kiosk.deviceId && kiosk.deviceId !== parsed.data.deviceId) {
+      return response.status(409).json({
+        error: {
+          code: "KIOSK_ALREADY_ACTIVATED",
+          message: "This kiosk has already been activated on another device."
+        }
+      });
+    }
+
     const updated = await prisma.kiosk.update({
       where: { id: kiosk.id },
       data: {
         deviceId: parsed.data.deviceId,
-        activatedAt: new Date(),
+        activatedAt: kiosk.activatedAt ?? new Date(),
         lastSeenAt: new Date()
       }
     });
@@ -186,6 +195,20 @@ kioskRouter.post("/activate", async (request, response, next) => {
 
 kioskRouter.get("/:kioskId/config", async (request, response, next) => {
   try {
+    const deviceId =
+      typeof request.headers["x-kiosk-device-id"] === "string"
+        ? request.headers["x-kiosk-device-id"]
+        : undefined;
+
+    if (!deviceId) {
+      return response.status(401).json({
+        error: {
+          code: "KIOSK_DEVICE_REQUIRED",
+          message: "Kiosk device identity is required."
+        }
+      });
+    }
+
     const kiosk = await prisma.kiosk.findUnique({
       where: { id: request.params.kioskId },
       include: {
@@ -200,11 +223,18 @@ kioskRouter.get("/:kioskId/config", async (request, response, next) => {
       }
     });
 
-    if (!kiosk || !kiosk.isActive || !kiosk.site.isActive || kiosk.site.status !== "ACTIVE") {
+    if (
+      !kiosk ||
+      !kiosk.isActive ||
+      !kiosk.site.isActive ||
+      kiosk.site.status !== "ACTIVE" ||
+      !kiosk.deviceId ||
+      kiosk.deviceId !== deviceId
+    ) {
       return response.status(404).json({
         error: {
           code: "KIOSK_NOT_AVAILABLE",
-          message: "Kiosk is unavailable."
+          message: "Kiosk is unavailable or this device is not activated."
         }
       });
     }
@@ -226,3 +256,4 @@ kioskRouter.get("/:kioskId/config", async (request, response, next) => {
     return next(error);
   }
 });
+
