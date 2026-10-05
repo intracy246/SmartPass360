@@ -4,7 +4,34 @@ import { getKioskVisitStatus, issueKioskPass } from "../api/kiosk-api";
 import type { KioskRegistrationResult } from "../types/kiosk";
 import { IssuedVisitorTicket } from "./IssuedVisitorTicket";
 
-export function KioskVisitCompletion({ registration, onFinish }: { registration: KioskRegistrationResult["data"]; onFinish: () => void }) {
+export function KioskVisitCompletion({ registration, onFinish, language }: { registration: KioskRegistrationResult["data"]; onFinish: () => void; language: "en" | "sw" }) {
+  const text = language === "sw" ? {
+    closed: "Ziara imefungwa",
+    passReady: "Pasi yako ya mgeni iko tayari",
+    approved: "Ziara imeidhinishwa",
+    wait: "Tafadhali subiri idhini ya mapokezi",
+    reference: "Namba ya rejea ya mgeni",
+    review: "Mapokezi/Ulinzi watakagua ziara yako. Pasi yako ya kuingia itachapishwa baada ya kuidhinishwa.",
+    printed: "Pasi yako imechapishwa na Mapokezi/Ulinzi. Tafadhali chukua kadi yako mapokezi. Skrini itarudi mwanzo baada ya sekunde 5.",
+    returning: "Tafadhali chukua kadi yako mapokezi. Skrini itarudi mwanzo baada ya sekunde 5.",
+    retry: "Jaribu tena",
+    registerAnother: "Sajili mgeni mwingine",
+    finish: "Maliza sasa",
+    status: "Hali"
+  } : {
+    closed: "Visit closed",
+    passReady: "Your visitor pass is ready",
+    approved: "Visit approved",
+    wait: "Please wait for reception approval",
+    reference: "Visitor reference",
+    review: "Reception/Security will review your visit. Your access pass will print after approval.",
+    printed: "Your pass has been printed by Reception/Security. Please collect your card at reception. Returning to the registration screen in 5 seconds.",
+    returning: "Please collect your card at reception. Returning to the registration screen in 5 seconds.",
+    retry: "Retry",
+    registerAnother: "Register another visitor",
+    finish: "Finish now",
+    status: "Status"
+  };
   const status = useQuery({
     queryKey: ["kiosk-visit", registration.visitId],
     queryFn: () => getKioskVisitStatus(registration.visitId, registration.receiptToken),
@@ -27,13 +54,13 @@ export function KioskVisitCompletion({ registration, onFinish }: { registration:
 
   const closed = ["CHECKED_OUT", "REJECTED", "REVOKED", "CANCELLED", "EXPIRED"].includes(state ?? "");
   return <main className="kiosk-screen"><section className="kiosk-complete">
-    <h1>{closed ? "Visit closed" : pass.data ? "Your visitor pass is ready" : state === "PASS_ISSUED" ? "Visit approved" : "Please wait for reception approval"}</h1>
-    <p>Visitor reference: <strong>{registration.referenceNumber}</strong></p>
-    {!pass.data && !closed && state !== "PASS_ISSUED" && <p>Reception/Security will review your visit. Your access pass will print after approval.</p>}
-    {!pass.data && state === "PASS_ISSUED" && <p>Your pass has been printed by Reception/Security. Returning to the registration screen in 5 seconds…</p>}
-    {state && <p>Status: {state.replaceAll("_", " ")}</p>}
-    {(status.error || (pass.error && state !== "PASS_ISSUED")) && <p role="alert">{(status.error || pass.error)?.message} <button type="button" onClick={() => { void status.refetch(); if (pass.isError && state === "APPROVED") void pass.refetch(); }}>Retry</button></p>}
-    {pass.data && !closed && <><IssuedVisitorTicket pass={pass.data.data} /><p>Returning to the registration screen in 5 seconds…</p></>}
-    {(pass.data || closed || state === "PASS_ISSUED") && <button className="kiosk-secondary-button" type="button" onClick={onFinish}>{closed ? "Register another visitor" : "Finish now"}</button>}
+    <h1>{closed ? text.closed : pass.data ? text.passReady : state === "PASS_ISSUED" ? text.approved : text.wait}</h1>
+    <p>{text.reference}: <strong>{registration.referenceNumber}</strong></p>
+    {!pass.data && !closed && state !== "PASS_ISSUED" && <p>{text.review}</p>}
+    {!pass.data && state === "PASS_ISSUED" && <p>{text.printed}</p>}
+    {state && <p>{text.status}: {state.replaceAll("_", " ")}</p>}
+    {(status.error || (pass.error && state !== "PASS_ISSUED")) && <p role="alert">{(status.error || pass.error)?.message} <button type="button" onClick={() => { void status.refetch(); if (pass.isError && state === "APPROVED") void pass.refetch(); }}>{text.retry}</button></p>}
+    {pass.data && !closed && <><IssuedVisitorTicket pass={pass.data.data} /><p>{text.returning}</p></>}
+    {(pass.data || closed || state === "PASS_ISSUED") && <button className="kiosk-secondary-button" type="button" onClick={onFinish}>{closed ? text.registerAnother : text.finish}</button>}
   </section></main>;
 }
