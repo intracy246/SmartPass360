@@ -15,6 +15,9 @@ import { SettingsPage } from "../pages/settings/SettingsPage";
 import { LoginPage } from "../pages/auth/LoginPage";
 import { ChangePasswordPage } from "../pages/auth/ChangePasswordPage";
 import { OwnerDashboardPage } from "../pages/owner/OwnerDashboardPage";
+import { OwnerLayout } from "../layouts/OwnerLayout";
+import { OwnerBuildingsPage } from "../pages/owner/OwnerBuildingsPage";
+import { OwnerOrganizationsPage } from "../pages/owner/OwnerOrganizationsPage";
 import { getStoredUser, getToken } from "../auth/session";
 import { KiosksPage } from "../pages/kiosks/KiosksPage";
 
@@ -61,7 +64,11 @@ export function AppRouter() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/change-password" element={<ChangePasswordPage />} />
-      <Route path="/owner" element={<RequireOwner><OwnerDashboardPage /></RequireOwner>} />
+      <Route element={<RequireOwner><OwnerLayout /></RequireOwner>}>
+        <Route path="/owner" element={<OwnerDashboardPage />} />
+        <Route path="/owner/buildings" element={<OwnerBuildingsPage />} />
+        <Route path="/owner/organizations" element={<OwnerOrganizationsPage />} />
+      </Route>
       <Route element={<RequireBuilding><DashboardLayout /></RequireBuilding>}>
         <Route index element={<DashboardPage />} />
 
