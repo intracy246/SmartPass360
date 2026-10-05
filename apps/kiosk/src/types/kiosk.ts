@@ -59,3 +59,22 @@ export type OrganizationOptionResponse = {
   success: boolean;
   data: OrganizationOption[];
 };
+
+export type KioskBuildingConfigResponse = {
+  success: boolean;
+  data: {
+    kiosk: {
+      id: string;
+      name: string;
+      code: string;
+      location?: string | null;
+    };
+    site: {
+      id: string;
+      name: string;
+      code: string;
+      logoUrl?: string | null;
+    };
+    organizations: OrganizationOption[];
+  };
+};
