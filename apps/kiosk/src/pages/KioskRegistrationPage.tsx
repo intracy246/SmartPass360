@@ -75,6 +75,8 @@ export function KioskRegistrationPage() {
     retry: 1
   });
 
+  const building = kioskConfigQuery.data?.data.site;
+
   const organizationsQuery = useQuery({
     queryKey: ["kiosk-organizations"],
     queryFn: getKioskOrganizations,
@@ -163,14 +165,6 @@ export function KioskRegistrationPage() {
       return;
     }
 
-    if (!form.hostName.trim()) {
-      setErrorMessage(
-        "Please enter the name of the person you are visiting."
-      );
-
-      return;
-    }
-
     if (!form.departmentOrOffice.trim()) {
       setErrorMessage(
         "Please enter the department or office."
@@ -206,7 +200,7 @@ export function KioskRegistrationPage() {
       departmentOrOffice:
         form.departmentOrOffice.trim(),
 
-      hostName: form.hostName.trim(),
+      hostName: form.hostName.trim() || undefined,
 
       purposeOfVisit:
         form.purposeOfVisit.trim(),
