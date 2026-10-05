@@ -48,8 +48,10 @@ export default function App() {
     } catch (error) {
       if (error instanceof ApiError) {
         setErrorMessage(error.message);
+      } else if (error instanceof TypeError) {
+        setErrorMessage("Cannot reach SmartPass360 API. Confirm the API is running on port 4000, then restart this kiosk app.");
       } else {
-        setErrorMessage("Activation service is unavailable. Please contact the building administrator.");
+        setErrorMessage(error instanceof Error ? error.message : "Kiosk activation failed.");
       }
     } finally {
       setIsActivating(false);
