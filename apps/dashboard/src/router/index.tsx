@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import {
   Navigate,
   Route,
@@ -38,7 +39,7 @@ function EmptyModule({
   );
 }
 
-function RequireBuilding({ children }: { children: React.ReactNode }) {
+function RequireBuilding({ children }: { children: ReactNode }) {
   const token = getToken();
   const user = getStoredUser();
   if (!token || !user) return <Navigate to="/login" replace />;
@@ -47,7 +48,7 @@ function RequireBuilding({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-function RequireOwner({ children }: { children: React.ReactNode }) {
+function RequireOwner({ children }: { children: ReactNode }) {
   const token = getToken();
   const user = getStoredUser();
   if (!token || !user) return <Navigate to="/login" replace />;
