@@ -1,6 +1,6 @@
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ??
-  "http://localhost:4000/api/v1";
+  "/api/v1";
 
 export class ApiError extends Error {
   status: number;
@@ -57,10 +57,15 @@ export async function apiRequest<T>(
   if (!response.ok) {
     const errorBody = responseBody as {
       message?: string;
+      error?: {
+        message?: string;
+        code?: string;
+      };
     } | null;
 
     throw new ApiError(
-      errorBody?.message ??
+      errorBody?.error?.message ??
+        errorBody?.message ??
         "The SmartPass360 service returned an error.",
       response.status,
       responseBody
