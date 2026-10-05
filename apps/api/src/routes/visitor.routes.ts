@@ -219,6 +219,84 @@ visitorRouter.post<{ visitId: string }>("/:visitId/approve", requireBuilding, as
   } catch (error) { return next(error); }
 });
 
+
+visitorRouter.post<{ visitId: string }>("/:visitId/approve-and-issue", requireBuilding, async (request, response, next) => {
+  try {
+    const user = response.locals.authUser as AuthUser;
+    if (!z.string().uuid().safeParse(request.params.visitId).success) {
+      return response.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Invalid visit ID." } });
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM visit_requests WHERE id = ${request.params.visitId}::uuid FOR UPDATE`;
+
+      const visit = await tx.visitRequest.findFirst({
+        where: { id: request.params.visitId, siteId: user.siteId! },
+        include: visitInclude
+      });
+
+      if (!visit || !await activeMembership(user.siteId!, visit.organizationId)) return null;
+
+      if (visit.status === "PENDING_APPROVAL") {
+        await tx.visitRequest.update({
+          where: { id: visit.id },
+          data: { status: "APPROVED", approvedAt: new Date() }
+        });
+      } else if (!["APPROVED", "PASS_ISSUED"].includes(visit.status)) {
+        return { conflict: true as const };
+      }
+
+      const existingPass = await tx.visitorPass.findUnique({ where: { visitId: visit.id } });
+      const token = crypto.randomBytes(32).toString("base64url");
+      const now = new Date();
+      const pass = existingPass ?? await tx.visitorPass.create({
+        data: {
+          organizationId: visit.organizationId,
+          visitId: visit.id,
+          passNumber: `VP-${crypto.randomBytes(8).toString("hex").toUpperCase()}`,
+          qrTokenHash: hashToken(token),
+          validFrom: now,
+          validUntil: new Date(now.getTime() + 8 * 60 * 60 * 1000)
+        }
+      });
+
+      if (!existingPass) {
+        await tx.visitRequest.update({ where: { id: visit.id }, data: { status: "PASS_ISSUED" } });
+      }
+
+      return {
+        passNumber: pass.passNumber,
+        qrToken: existingPass ? null : token,
+        fullName: visit.visitor.fullName,
+        organizationName: visit.organization.name,
+        issuedAt: pass.issuedAt,
+        validUntil: pass.validUntil
+      };
+    });
+
+    if (!result) return response.status(404).json({ error: { code: "VISIT_NOT_AVAILABLE", message: "Visit not available in this building." } });
+    if ("conflict" in result) return response.status(409).json({ error: { code: "VISIT_NOT_APPROVABLE", message: "This visit cannot be approved." } });
+    if (!result.qrToken) return response.status(409).json({ error: { code: "PASS_ALREADY_ISSUED", message: "This pass was already issued from the kiosk flow." } });
+
+    const QRCode = (await import("qrcode")).default;
+    const qrValue = await QRCode.toDataURL(`smartpass360://visitor-pass/${result.qrToken}`, { width: 300, margin: 4, errorCorrectionLevel: "M" });
+
+    return response.json({
+      success: true,
+      data: {
+        pass: {
+          passNumber: result.passNumber,
+          qrValue,
+          fullName: result.fullName,
+          organizationName: result.organizationName,
+          issuedAt: result.issuedAt,
+          validUntil: result.validUntil
+        }
+      }
+    });
+  } catch (error) { return next(error); }
+});
+
 const receiptSchema = z.object({ kioskId: z.string().uuid(), receiptToken: z.string().regex(/^[A-Za-z0-9_-]{43}$/) });
 
 // Receipt proves possession of this registration, in addition to kiosk device auth.
