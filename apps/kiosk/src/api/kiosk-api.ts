@@ -7,6 +7,13 @@ import type {
   KioskBuildingConfigResponse
 } from "../types/kiosk";
 
+export function activateKiosk(payload: { activationCode: string; deviceId: string }) {
+  return apiRequest<KioskBuildingConfigResponse>("/kiosks/activate", {
+    method: "POST",
+    body: payload
+  });
+}
+
 export function getKioskOrganizations() {
   return apiRequest<OrganizationOptionResponse>(
     "/organizations?active=true&pageSize=100"
