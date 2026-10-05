@@ -158,10 +158,8 @@ const copy = {
 } as const;
 
 export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInvalid: (message: string) => void }) {
-  const [language, setLanguage] = useState<KioskLanguage>(() => {
-    return window.sessionStorage.getItem("smartpass360.kioskLanguage") === "sw" ? "sw" : "en";
-  });
-  const t = copy[language];
+  const [language, setLanguage] = useState<KioskLanguage | null>(null);
+  const t = copy[language ?? "en"];
 
   const [form, setForm] =
     useState<RegistrationForm>(initialForm);
@@ -324,13 +322,69 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
 
   function startAnotherRegistration() {
     window.sessionStorage.removeItem("smartpass360.pendingVisit");
+    window.sessionStorage.removeItem("smartpass360.kioskLanguage");
     setCompletedRegistration(null);
+    setLanguage(null);
     setErrorMessage(null);
     setForm(initialForm);
   }
 
-  if (completedRegistration) {
+  if (completedRegistration && language) {
     return <KioskVisitCompletion registration={completedRegistration} onFinish={startAnotherRegistration} language={language} />;
+  }
+
+  if (!language) {
+    return (
+      <main className="kiosk-screen kiosk-language-screen">
+        <div className="kiosk-language-welcome">
+          <div className="kiosk-brand kiosk-language-welcome__brand">
+            <div className="kiosk-brand__mark">
+              {building?.logoUrl ? (
+                <img src={building.logoUrl} alt={building.name} />
+              ) : (
+                "S"
+              )}
+            </div>
+            <div>
+              <strong>SMARTPASS360</strong>
+              <span>{building?.name ?? "Visitor Self Registration"}</span>
+            </div>
+          </div>
+
+          <div className="kiosk-language-welcome__copy">
+            <p>WELCOME · KARIBU</p>
+            <h1>Choose your language</h1>
+            <span>Chagua lugha yako ili kuendelea na usajili wa mgeni.</span>
+          </div>
+
+          <div className="kiosk-language-choice" role="group" aria-label="Choose kiosk language">
+            <button
+              type="button"
+              className="kiosk-language-choice__button"
+              onClick={() => {
+                setLanguage("en");
+                window.sessionStorage.setItem("smartpass360.kioskLanguage", "en");
+              }}
+            >
+              <strong>English</strong>
+              <span>Continue in English</span>
+            </button>
+
+            <button
+              type="button"
+              className="kiosk-language-choice__button"
+              onClick={() => {
+                setLanguage("sw");
+                window.sessionStorage.setItem("smartpass360.kioskLanguage", "sw");
+              }}
+            >
+              <strong>Kiswahili</strong>
+              <span>Endelea kwa Kiswahili</span>
+            </button>
+          </div>
+        </div>
+      </main>
+    );
   }
 
   return (
@@ -352,15 +406,16 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
             </div>
           </div>
 
-          <div className="kiosk-language">
-            <button type="button" aria-pressed={language === "en"} onClick={() => { setLanguage("en"); window.sessionStorage.setItem("smartpass360.kioskLanguage", "en"); }}>
-              {t.languageEnglish}
-            </button>
-
-            <button type="button" aria-pressed={language === "sw"} onClick={() => { setLanguage("sw"); window.sessionStorage.setItem("smartpass360.kioskLanguage", "sw"); }}>
-              {t.languageSwahili}
-            </button>
-          </div>
+          <button
+            type="button"
+            className="kiosk-language-change"
+            onClick={() => {
+              setLanguage(null);
+              window.sessionStorage.removeItem("smartpass360.kioskLanguage");
+            }}
+          >
+            {language === "sw" ? "Badili lugha" : "Change language"}
+          </button>
         </header>
 
         <section className="kiosk-intro">
