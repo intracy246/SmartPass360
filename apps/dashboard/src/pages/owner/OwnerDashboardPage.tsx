@@ -1,13 +1,10 @@
 import { useState, type FormEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
 import { ApiError } from "../../api/api-client";
 import { deleteOwnerBuilding, getOwnerBuildings, provisionBuilding, updateOwnerBuilding, type OwnerBuilding } from "../../api/owner-api";
-import { clearSession } from "../../auth/session";
 import "./OwnerDashboardPage.css";
 
 export function OwnerDashboardPage() {
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const buildingsQuery = useQuery({ queryKey: ["owner-buildings"], queryFn: getOwnerBuildings });
   const [open, setOpen] = useState(false);
@@ -81,7 +78,6 @@ export function OwnerDashboardPage() {
           <span>Provision customer buildings and monitor SmartPass360 deployments.</span>
         </div>
         <div className="owner-actions">
-          <button className="secondary" onClick={()=>{clearSession();navigate("/login",{replace:true});}}>Sign out</button>
           <button onClick={()=>setOpen(true)}>+ Register Building</button>
         </div>
       </header>
