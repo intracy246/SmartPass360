@@ -3,7 +3,7 @@ const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
 const API_BASE_URL =
   configuredApiBaseUrl && configuredApiBaseUrl.length > 0
     ? configuredApiBaseUrl.replace(/\/$/, "")
-    : "http://127.0.0.1:4000/api/v1";
+    : "/api/v1";
 
 export class ApiError extends Error {
   status: number;

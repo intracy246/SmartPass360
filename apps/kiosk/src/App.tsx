@@ -49,7 +49,7 @@ export default function App() {
       if (error instanceof ApiError) {
         setErrorMessage(error.message);
       } else if (error instanceof TypeError) {
-        setErrorMessage("Cannot reach SmartPass360 API at http://127.0.0.1:4000. Confirm the API is running, then try again.");
+        setErrorMessage("Cannot reach SmartPass360 API through the kiosk server. Confirm the API is running on port 4000 and restart the kiosk app.");
       } else {
         setErrorMessage(error instanceof Error ? error.message : "Kiosk activation failed.");
       }
