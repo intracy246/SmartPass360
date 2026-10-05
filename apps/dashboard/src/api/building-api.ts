@@ -8,12 +8,8 @@ export type BuildingSettings = {
   address?: string | null;
   city?: string | null;
   country?: string | null;
+  status: "PENDING" | "ACTIVE" | "SUSPENDED";
   isActive: boolean;
-};
-
-type BuildingListResponse = {
-  success: boolean;
-  data: BuildingSettings[];
 };
 
 type BuildingResponse = {
@@ -21,8 +17,8 @@ type BuildingResponse = {
   data: BuildingSettings;
 };
 
-export function getBuildings() {
-  return apiRequest<BuildingListResponse>("/kiosks/sites");
+export function getCurrentBuilding() {
+  return apiRequest<BuildingResponse>("/auth/me/building");
 }
 
 export function updateBuildingSettings(
