@@ -11,6 +11,7 @@ import {
 
 import {
   getKioskOrganizations,
+  getRegisteredKioskConfig,
   registerVisitorFromKiosk
 } from "../api/kiosk-api";
 
@@ -63,6 +64,16 @@ export function KioskRegistrationPage() {
       referenceNumber: string;
       registeredAt: string;
     } | null>(null);
+
+  const registeredKioskId =
+    window.localStorage.getItem("smartpass360.kioskId");
+
+  const kioskConfigQuery = useQuery({
+    queryKey: ["kiosk-config", registeredKioskId],
+    queryFn: () => getRegisteredKioskConfig(registeredKioskId!),
+    enabled: Boolean(registeredKioskId),
+    retry: 1
+  });
 
   const organizationsQuery = useQuery({
     queryKey: ["kiosk-organizations"],
@@ -257,12 +268,16 @@ export function KioskRegistrationPage() {
         <header className="kiosk-header">
           <div className="kiosk-brand">
             <div className="kiosk-brand__mark">
-              S
+              {building?.logoUrl ? (
+                <img src={building.logoUrl} alt={building.name} />
+              ) : (
+                "S"
+              )}
             </div>
 
             <div>
               <strong>SMARTPASS360</strong>
-              <span>Visitor Self Registration</span>
+              <span>{building?.name ?? "Visitor Self Registration"}</span>
             </div>
           </div>
 
@@ -535,11 +550,10 @@ export function KioskRegistrationPage() {
 
               <KioskField
                 label="Person you are visiting"
-                required
                 inputProps={{
                   value: form.hostName,
                   placeholder:
-                    "Enter host's full name",
+                    "Optional host name",
 
                   onChange: (event) =>
                     updateField(
