@@ -13,6 +13,7 @@ import { permanentPassRouter } from "./routes/permanent-pass.routes";
 import { organizationRouter } from "./routes/organization.routes";
 import { kioskRouter } from "./routes/kiosk.routes";
 import { ownerRouter } from "./routes/owner.routes";
+import { visitorRouter } from "./routes/visitor.routes";
 
 export const app = express();
 
@@ -69,6 +70,7 @@ app.use("/api/v1/permanent-passes", permanentPassRouter);
 app.use("/api/v1/organizations", organizationRouter);
 app.use("/api/v1/kiosks", kioskRouter);
 app.use("/api/v1/auth", ownerRouter);
+app.use("/api/v1/visitors", visitorRouter);
 
 app.use(notFoundHandler);
 
