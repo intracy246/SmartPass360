@@ -238,7 +238,9 @@ model VisitRequest {
   hostId            String?     @map("host_id") @db.Uuid
   departmentId      String?     @map("department_id") @db.Uuid
   visitorType       VisitorType @default(WALK_IN) @map("visitor_type")
-  purpose           String
+  purpose           String      @default("")
+  destinationOffice String?     @map("destination_office")
+  hostNameSnapshot  String?     @map("host_name_snapshot")
   scheduledDate     DateTime?   @map("scheduled_date")
   expectedEntryTime DateTime?   @map("expected_entry_time")
   expectedExitTime  DateTime?   @map("expected_exit_time")
