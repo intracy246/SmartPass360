@@ -35,6 +35,9 @@ export async function apiRequest<T>(
       ...options,
       headers: {
         "Content-Type": "application/json",
+        ...(window.localStorage.getItem("smartpass360.token")
+          ? { Authorization: `Bearer ${window.localStorage.getItem("smartpass360.token")}` }
+          : {}),
         ...options.headers
       },
       body:
