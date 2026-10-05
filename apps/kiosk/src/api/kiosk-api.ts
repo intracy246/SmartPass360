@@ -33,7 +33,12 @@ export function registerVisitorFromKiosk(
 }
 
 export function getRegisteredKioskConfig(kioskId: string) {
+  const deviceId = window.localStorage.getItem("smartpass360.deviceId");
+
   return apiRequest<KioskBuildingConfigResponse>(
-    `/kiosks/${kioskId}/config`
+    `/kiosks/${kioskId}/config`,
+    {
+      headers: deviceId ? { "x-kiosk-device-id": deviceId } : undefined
+    }
   );
 }
