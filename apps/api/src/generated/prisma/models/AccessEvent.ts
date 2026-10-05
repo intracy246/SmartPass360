@@ -26,6 +26,8 @@ export type AggregateAccessEvent = {
 
 export type AccessEventMinAggregateOutputType = {
   id: string | null
+  siteId: string | null
+  requestId: string | null
   organizationId: string | null
   visitId: string | null
   visitorPassId: string | null
@@ -40,6 +42,8 @@ export type AccessEventMinAggregateOutputType = {
 
 export type AccessEventMaxAggregateOutputType = {
   id: string | null
+  siteId: string | null
+  requestId: string | null
   organizationId: string | null
   visitId: string | null
   visitorPassId: string | null
@@ -54,6 +58,8 @@ export type AccessEventMaxAggregateOutputType = {
 
 export type AccessEventCountAggregateOutputType = {
   id: number
+  siteId: number
+  requestId: number
   organizationId: number
   visitId: number
   visitorPassId: number
@@ -71,6 +77,8 @@ export type AccessEventCountAggregateOutputType = {
 
 export type AccessEventMinAggregateInputType = {
   id?: true
+  siteId?: true
+  requestId?: true
   organizationId?: true
   visitId?: true
   visitorPassId?: true
@@ -85,6 +93,8 @@ export type AccessEventMinAggregateInputType = {
 
 export type AccessEventMaxAggregateInputType = {
   id?: true
+  siteId?: true
+  requestId?: true
   organizationId?: true
   visitId?: true
   visitorPassId?: true
@@ -99,6 +109,8 @@ export type AccessEventMaxAggregateInputType = {
 
 export type AccessEventCountAggregateInputType = {
   id?: true
+  siteId?: true
+  requestId?: true
   organizationId?: true
   visitId?: true
   visitorPassId?: true
@@ -187,10 +199,12 @@ export type AccessEventGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
 
 export type AccessEventGroupByOutputType = {
   id: string
-  organizationId: string
-  visitId: string
-  visitorPassId: string
-  gateId: string
+  siteId: string | null
+  requestId: string | null
+  organizationId: string | null
+  visitId: string | null
+  visitorPassId: string | null
+  gateId: string | null
   direction: $Enums.AccessDirection
   decision: $Enums.AccessDecision
   denialReason: string | null
@@ -223,10 +237,12 @@ export type AccessEventWhereInput = {
   OR?: Prisma.AccessEventWhereInput[]
   NOT?: Prisma.AccessEventWhereInput | Prisma.AccessEventWhereInput[]
   id?: Prisma.UuidFilter<"AccessEvent"> | string
-  organizationId?: Prisma.UuidFilter<"AccessEvent"> | string
-  visitId?: Prisma.UuidFilter<"AccessEvent"> | string
-  visitorPassId?: Prisma.UuidFilter<"AccessEvent"> | string
-  gateId?: Prisma.UuidFilter<"AccessEvent"> | string
+  siteId?: Prisma.UuidNullableFilter<"AccessEvent"> | string | null
+  requestId?: Prisma.UuidNullableFilter<"AccessEvent"> | string | null
+  organizationId?: Prisma.UuidNullableFilter<"AccessEvent"> | string | null
+  visitId?: Prisma.UuidNullableFilter<"AccessEvent"> | string | null
+  visitorPassId?: Prisma.UuidNullableFilter<"AccessEvent"> | string | null
+  gateId?: Prisma.UuidNullableFilter<"AccessEvent"> | string | null
   direction?: Prisma.EnumAccessDirectionFilter<"AccessEvent"> | $Enums.AccessDirection
   decision?: Prisma.EnumAccessDecisionFilter<"AccessEvent"> | $Enums.AccessDecision
   denialReason?: Prisma.StringNullableFilter<"AccessEvent"> | string | null
@@ -234,18 +250,21 @@ export type AccessEventWhereInput = {
   turnstileOpened?: Prisma.BoolFilter<"AccessEvent"> | boolean
   metadata?: Prisma.JsonNullableFilter<"AccessEvent">
   createdAt?: Prisma.DateTimeFilter<"AccessEvent"> | Date | string
-  organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
-  visit?: Prisma.XOR<Prisma.VisitRequestScalarRelationFilter, Prisma.VisitRequestWhereInput>
-  visitorPass?: Prisma.XOR<Prisma.VisitorPassScalarRelationFilter, Prisma.VisitorPassWhereInput>
-  gate?: Prisma.XOR<Prisma.GateScalarRelationFilter, Prisma.GateWhereInput>
+  site?: Prisma.XOR<Prisma.SiteNullableScalarRelationFilter, Prisma.SiteWhereInput> | null
+  organization?: Prisma.XOR<Prisma.OrganizationNullableScalarRelationFilter, Prisma.OrganizationWhereInput> | null
+  visit?: Prisma.XOR<Prisma.VisitRequestNullableScalarRelationFilter, Prisma.VisitRequestWhereInput> | null
+  visitorPass?: Prisma.XOR<Prisma.VisitorPassNullableScalarRelationFilter, Prisma.VisitorPassWhereInput> | null
+  gate?: Prisma.XOR<Prisma.GateNullableScalarRelationFilter, Prisma.GateWhereInput> | null
 }
 
 export type AccessEventOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  organizationId?: Prisma.SortOrder
-  visitId?: Prisma.SortOrder
-  visitorPassId?: Prisma.SortOrder
-  gateId?: Prisma.SortOrder
+  siteId?: Prisma.SortOrderInput | Prisma.SortOrder
+  requestId?: Prisma.SortOrderInput | Prisma.SortOrder
+  organizationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  visitId?: Prisma.SortOrderInput | Prisma.SortOrder
+  visitorPassId?: Prisma.SortOrderInput | Prisma.SortOrder
+  gateId?: Prisma.SortOrderInput | Prisma.SortOrder
   direction?: Prisma.SortOrder
   decision?: Prisma.SortOrder
   denialReason?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -253,6 +272,7 @@ export type AccessEventOrderByWithRelationInput = {
   turnstileOpened?: Prisma.SortOrder
   metadata?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  site?: Prisma.SiteOrderByWithRelationInput
   organization?: Prisma.OrganizationOrderByWithRelationInput
   visit?: Prisma.VisitRequestOrderByWithRelationInput
   visitorPass?: Prisma.VisitorPassOrderByWithRelationInput
@@ -261,13 +281,16 @@ export type AccessEventOrderByWithRelationInput = {
 
 export type AccessEventWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  siteId_requestId?: Prisma.AccessEventSiteIdRequestIdCompoundUniqueInput
   AND?: Prisma.AccessEventWhereInput | Prisma.AccessEventWhereInput[]
   OR?: Prisma.AccessEventWhereInput[]
   NOT?: Prisma.AccessEventWhereInput | Prisma.AccessEventWhereInput[]
-  organizationId?: Prisma.UuidFilter<"AccessEvent"> | string
-  visitId?: Prisma.UuidFilter<"AccessEvent"> | string
-  visitorPassId?: Prisma.UuidFilter<"AccessEvent"> | string
-  gateId?: Prisma.UuidFilter<"AccessEvent"> | string
+  siteId?: Prisma.UuidNullableFilter<"AccessEvent"> | string | null
+  requestId?: Prisma.UuidNullableFilter<"AccessEvent"> | string | null
+  organizationId?: Prisma.UuidNullableFilter<"AccessEvent"> | string | null
+  visitId?: Prisma.UuidNullableFilter<"AccessEvent"> | string | null
+  visitorPassId?: Prisma.UuidNullableFilter<"AccessEvent"> | string | null
+  gateId?: Prisma.UuidNullableFilter<"AccessEvent"> | string | null
   direction?: Prisma.EnumAccessDirectionFilter<"AccessEvent"> | $Enums.AccessDirection
   decision?: Prisma.EnumAccessDecisionFilter<"AccessEvent"> | $Enums.AccessDecision
   denialReason?: Prisma.StringNullableFilter<"AccessEvent"> | string | null
@@ -275,18 +298,21 @@ export type AccessEventWhereUniqueInput = Prisma.AtLeast<{
   turnstileOpened?: Prisma.BoolFilter<"AccessEvent"> | boolean
   metadata?: Prisma.JsonNullableFilter<"AccessEvent">
   createdAt?: Prisma.DateTimeFilter<"AccessEvent"> | Date | string
-  organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
-  visit?: Prisma.XOR<Prisma.VisitRequestScalarRelationFilter, Prisma.VisitRequestWhereInput>
-  visitorPass?: Prisma.XOR<Prisma.VisitorPassScalarRelationFilter, Prisma.VisitorPassWhereInput>
-  gate?: Prisma.XOR<Prisma.GateScalarRelationFilter, Prisma.GateWhereInput>
-}, "id">
+  site?: Prisma.XOR<Prisma.SiteNullableScalarRelationFilter, Prisma.SiteWhereInput> | null
+  organization?: Prisma.XOR<Prisma.OrganizationNullableScalarRelationFilter, Prisma.OrganizationWhereInput> | null
+  visit?: Prisma.XOR<Prisma.VisitRequestNullableScalarRelationFilter, Prisma.VisitRequestWhereInput> | null
+  visitorPass?: Prisma.XOR<Prisma.VisitorPassNullableScalarRelationFilter, Prisma.VisitorPassWhereInput> | null
+  gate?: Prisma.XOR<Prisma.GateNullableScalarRelationFilter, Prisma.GateWhereInput> | null
+}, "id" | "siteId_requestId">
 
 export type AccessEventOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  organizationId?: Prisma.SortOrder
-  visitId?: Prisma.SortOrder
-  visitorPassId?: Prisma.SortOrder
-  gateId?: Prisma.SortOrder
+  siteId?: Prisma.SortOrderInput | Prisma.SortOrder
+  requestId?: Prisma.SortOrderInput | Prisma.SortOrder
+  organizationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  visitId?: Prisma.SortOrderInput | Prisma.SortOrder
+  visitorPassId?: Prisma.SortOrderInput | Prisma.SortOrder
+  gateId?: Prisma.SortOrderInput | Prisma.SortOrder
   direction?: Prisma.SortOrder
   decision?: Prisma.SortOrder
   denialReason?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -304,10 +330,12 @@ export type AccessEventScalarWhereWithAggregatesInput = {
   OR?: Prisma.AccessEventScalarWhereWithAggregatesInput[]
   NOT?: Prisma.AccessEventScalarWhereWithAggregatesInput | Prisma.AccessEventScalarWhereWithAggregatesInput[]
   id?: Prisma.UuidWithAggregatesFilter<"AccessEvent"> | string
-  organizationId?: Prisma.UuidWithAggregatesFilter<"AccessEvent"> | string
-  visitId?: Prisma.UuidWithAggregatesFilter<"AccessEvent"> | string
-  visitorPassId?: Prisma.UuidWithAggregatesFilter<"AccessEvent"> | string
-  gateId?: Prisma.UuidWithAggregatesFilter<"AccessEvent"> | string
+  siteId?: Prisma.UuidNullableWithAggregatesFilter<"AccessEvent"> | string | null
+  requestId?: Prisma.UuidNullableWithAggregatesFilter<"AccessEvent"> | string | null
+  organizationId?: Prisma.UuidNullableWithAggregatesFilter<"AccessEvent"> | string | null
+  visitId?: Prisma.UuidNullableWithAggregatesFilter<"AccessEvent"> | string | null
+  visitorPassId?: Prisma.UuidNullableWithAggregatesFilter<"AccessEvent"> | string | null
+  gateId?: Prisma.UuidNullableWithAggregatesFilter<"AccessEvent"> | string | null
   direction?: Prisma.EnumAccessDirectionWithAggregatesFilter<"AccessEvent"> | $Enums.AccessDirection
   decision?: Prisma.EnumAccessDecisionWithAggregatesFilter<"AccessEvent"> | $Enums.AccessDecision
   denialReason?: Prisma.StringNullableWithAggregatesFilter<"AccessEvent"> | string | null
@@ -319,6 +347,7 @@ export type AccessEventScalarWhereWithAggregatesInput = {
 
 export type AccessEventCreateInput = {
   id?: string
+  requestId?: string | null
   direction: $Enums.AccessDirection
   decision: $Enums.AccessDecision
   denialReason?: string | null
@@ -326,18 +355,21 @@ export type AccessEventCreateInput = {
   turnstileOpened?: boolean
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
-  organization: Prisma.OrganizationCreateNestedOneWithoutAccessEventsInput
-  visit: Prisma.VisitRequestCreateNestedOneWithoutAccessEventsInput
-  visitorPass: Prisma.VisitorPassCreateNestedOneWithoutAccessEventsInput
-  gate: Prisma.GateCreateNestedOneWithoutAccessEventsInput
+  site?: Prisma.SiteCreateNestedOneWithoutAccessEventsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutAccessEventsInput
+  visit?: Prisma.VisitRequestCreateNestedOneWithoutAccessEventsInput
+  visitorPass?: Prisma.VisitorPassCreateNestedOneWithoutAccessEventsInput
+  gate?: Prisma.GateCreateNestedOneWithoutAccessEventsInput
 }
 
 export type AccessEventUncheckedCreateInput = {
   id?: string
-  organizationId: string
-  visitId: string
-  visitorPassId: string
-  gateId: string
+  siteId?: string | null
+  requestId?: string | null
+  organizationId?: string | null
+  visitId?: string | null
+  visitorPassId?: string | null
+  gateId?: string | null
   direction: $Enums.AccessDirection
   decision: $Enums.AccessDecision
   denialReason?: string | null
@@ -349,6 +381,7 @@ export type AccessEventUncheckedCreateInput = {
 
 export type AccessEventUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direction?: Prisma.EnumAccessDirectionFieldUpdateOperationsInput | $Enums.AccessDirection
   decision?: Prisma.EnumAccessDecisionFieldUpdateOperationsInput | $Enums.AccessDecision
   denialReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -356,18 +389,21 @@ export type AccessEventUpdateInput = {
   turnstileOpened?: Prisma.BoolFieldUpdateOperationsInput | boolean
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  organization?: Prisma.OrganizationUpdateOneRequiredWithoutAccessEventsNestedInput
-  visit?: Prisma.VisitRequestUpdateOneRequiredWithoutAccessEventsNestedInput
-  visitorPass?: Prisma.VisitorPassUpdateOneRequiredWithoutAccessEventsNestedInput
-  gate?: Prisma.GateUpdateOneRequiredWithoutAccessEventsNestedInput
+  site?: Prisma.SiteUpdateOneWithoutAccessEventsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutAccessEventsNestedInput
+  visit?: Prisma.VisitRequestUpdateOneWithoutAccessEventsNestedInput
+  visitorPass?: Prisma.VisitorPassUpdateOneWithoutAccessEventsNestedInput
+  gate?: Prisma.GateUpdateOneWithoutAccessEventsNestedInput
 }
 
 export type AccessEventUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
-  visitId?: Prisma.StringFieldUpdateOperationsInput | string
-  visitorPassId?: Prisma.StringFieldUpdateOperationsInput | string
-  gateId?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitorPassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direction?: Prisma.EnumAccessDirectionFieldUpdateOperationsInput | $Enums.AccessDirection
   decision?: Prisma.EnumAccessDecisionFieldUpdateOperationsInput | $Enums.AccessDecision
   denialReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -379,10 +415,12 @@ export type AccessEventUncheckedUpdateInput = {
 
 export type AccessEventCreateManyInput = {
   id?: string
-  organizationId: string
-  visitId: string
-  visitorPassId: string
-  gateId: string
+  siteId?: string | null
+  requestId?: string | null
+  organizationId?: string | null
+  visitId?: string | null
+  visitorPassId?: string | null
+  gateId?: string | null
   direction: $Enums.AccessDirection
   decision: $Enums.AccessDecision
   denialReason?: string | null
@@ -394,6 +432,7 @@ export type AccessEventCreateManyInput = {
 
 export type AccessEventUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direction?: Prisma.EnumAccessDirectionFieldUpdateOperationsInput | $Enums.AccessDirection
   decision?: Prisma.EnumAccessDecisionFieldUpdateOperationsInput | $Enums.AccessDecision
   denialReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -405,10 +444,12 @@ export type AccessEventUpdateManyMutationInput = {
 
 export type AccessEventUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
-  visitId?: Prisma.StringFieldUpdateOperationsInput | string
-  visitorPassId?: Prisma.StringFieldUpdateOperationsInput | string
-  gateId?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitorPassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direction?: Prisma.EnumAccessDirectionFieldUpdateOperationsInput | $Enums.AccessDirection
   decision?: Prisma.EnumAccessDecisionFieldUpdateOperationsInput | $Enums.AccessDecision
   denialReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -428,8 +469,15 @@ export type AccessEventOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type AccessEventSiteIdRequestIdCompoundUniqueInput = {
+  siteId: string
+  requestId: string
+}
+
 export type AccessEventCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  siteId?: Prisma.SortOrder
+  requestId?: Prisma.SortOrder
   organizationId?: Prisma.SortOrder
   visitId?: Prisma.SortOrder
   visitorPassId?: Prisma.SortOrder
@@ -445,6 +493,8 @@ export type AccessEventCountOrderByAggregateInput = {
 
 export type AccessEventMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  siteId?: Prisma.SortOrder
+  requestId?: Prisma.SortOrder
   organizationId?: Prisma.SortOrder
   visitId?: Prisma.SortOrder
   visitorPassId?: Prisma.SortOrder
@@ -459,6 +509,8 @@ export type AccessEventMaxOrderByAggregateInput = {
 
 export type AccessEventMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  siteId?: Prisma.SortOrder
+  requestId?: Prisma.SortOrder
   organizationId?: Prisma.SortOrder
   visitId?: Prisma.SortOrder
   visitorPassId?: Prisma.SortOrder
@@ -510,6 +562,48 @@ export type AccessEventUncheckedUpdateManyWithoutOrganizationNestedInput = {
   connect?: Prisma.AccessEventWhereUniqueInput | Prisma.AccessEventWhereUniqueInput[]
   update?: Prisma.AccessEventUpdateWithWhereUniqueWithoutOrganizationInput | Prisma.AccessEventUpdateWithWhereUniqueWithoutOrganizationInput[]
   updateMany?: Prisma.AccessEventUpdateManyWithWhereWithoutOrganizationInput | Prisma.AccessEventUpdateManyWithWhereWithoutOrganizationInput[]
+  deleteMany?: Prisma.AccessEventScalarWhereInput | Prisma.AccessEventScalarWhereInput[]
+}
+
+export type AccessEventCreateNestedManyWithoutSiteInput = {
+  create?: Prisma.XOR<Prisma.AccessEventCreateWithoutSiteInput, Prisma.AccessEventUncheckedCreateWithoutSiteInput> | Prisma.AccessEventCreateWithoutSiteInput[] | Prisma.AccessEventUncheckedCreateWithoutSiteInput[]
+  connectOrCreate?: Prisma.AccessEventCreateOrConnectWithoutSiteInput | Prisma.AccessEventCreateOrConnectWithoutSiteInput[]
+  createMany?: Prisma.AccessEventCreateManySiteInputEnvelope
+  connect?: Prisma.AccessEventWhereUniqueInput | Prisma.AccessEventWhereUniqueInput[]
+}
+
+export type AccessEventUncheckedCreateNestedManyWithoutSiteInput = {
+  create?: Prisma.XOR<Prisma.AccessEventCreateWithoutSiteInput, Prisma.AccessEventUncheckedCreateWithoutSiteInput> | Prisma.AccessEventCreateWithoutSiteInput[] | Prisma.AccessEventUncheckedCreateWithoutSiteInput[]
+  connectOrCreate?: Prisma.AccessEventCreateOrConnectWithoutSiteInput | Prisma.AccessEventCreateOrConnectWithoutSiteInput[]
+  createMany?: Prisma.AccessEventCreateManySiteInputEnvelope
+  connect?: Prisma.AccessEventWhereUniqueInput | Prisma.AccessEventWhereUniqueInput[]
+}
+
+export type AccessEventUpdateManyWithoutSiteNestedInput = {
+  create?: Prisma.XOR<Prisma.AccessEventCreateWithoutSiteInput, Prisma.AccessEventUncheckedCreateWithoutSiteInput> | Prisma.AccessEventCreateWithoutSiteInput[] | Prisma.AccessEventUncheckedCreateWithoutSiteInput[]
+  connectOrCreate?: Prisma.AccessEventCreateOrConnectWithoutSiteInput | Prisma.AccessEventCreateOrConnectWithoutSiteInput[]
+  upsert?: Prisma.AccessEventUpsertWithWhereUniqueWithoutSiteInput | Prisma.AccessEventUpsertWithWhereUniqueWithoutSiteInput[]
+  createMany?: Prisma.AccessEventCreateManySiteInputEnvelope
+  set?: Prisma.AccessEventWhereUniqueInput | Prisma.AccessEventWhereUniqueInput[]
+  disconnect?: Prisma.AccessEventWhereUniqueInput | Prisma.AccessEventWhereUniqueInput[]
+  delete?: Prisma.AccessEventWhereUniqueInput | Prisma.AccessEventWhereUniqueInput[]
+  connect?: Prisma.AccessEventWhereUniqueInput | Prisma.AccessEventWhereUniqueInput[]
+  update?: Prisma.AccessEventUpdateWithWhereUniqueWithoutSiteInput | Prisma.AccessEventUpdateWithWhereUniqueWithoutSiteInput[]
+  updateMany?: Prisma.AccessEventUpdateManyWithWhereWithoutSiteInput | Prisma.AccessEventUpdateManyWithWhereWithoutSiteInput[]
+  deleteMany?: Prisma.AccessEventScalarWhereInput | Prisma.AccessEventScalarWhereInput[]
+}
+
+export type AccessEventUncheckedUpdateManyWithoutSiteNestedInput = {
+  create?: Prisma.XOR<Prisma.AccessEventCreateWithoutSiteInput, Prisma.AccessEventUncheckedCreateWithoutSiteInput> | Prisma.AccessEventCreateWithoutSiteInput[] | Prisma.AccessEventUncheckedCreateWithoutSiteInput[]
+  connectOrCreate?: Prisma.AccessEventCreateOrConnectWithoutSiteInput | Prisma.AccessEventCreateOrConnectWithoutSiteInput[]
+  upsert?: Prisma.AccessEventUpsertWithWhereUniqueWithoutSiteInput | Prisma.AccessEventUpsertWithWhereUniqueWithoutSiteInput[]
+  createMany?: Prisma.AccessEventCreateManySiteInputEnvelope
+  set?: Prisma.AccessEventWhereUniqueInput | Prisma.AccessEventWhereUniqueInput[]
+  disconnect?: Prisma.AccessEventWhereUniqueInput | Prisma.AccessEventWhereUniqueInput[]
+  delete?: Prisma.AccessEventWhereUniqueInput | Prisma.AccessEventWhereUniqueInput[]
+  connect?: Prisma.AccessEventWhereUniqueInput | Prisma.AccessEventWhereUniqueInput[]
+  update?: Prisma.AccessEventUpdateWithWhereUniqueWithoutSiteInput | Prisma.AccessEventUpdateWithWhereUniqueWithoutSiteInput[]
+  updateMany?: Prisma.AccessEventUpdateManyWithWhereWithoutSiteInput | Prisma.AccessEventUpdateManyWithWhereWithoutSiteInput[]
   deleteMany?: Prisma.AccessEventScalarWhereInput | Prisma.AccessEventScalarWhereInput[]
 }
 
@@ -649,6 +743,7 @@ export type EnumAccessDecisionFieldUpdateOperationsInput = {
 
 export type AccessEventCreateWithoutOrganizationInput = {
   id?: string
+  requestId?: string | null
   direction: $Enums.AccessDirection
   decision: $Enums.AccessDecision
   denialReason?: string | null
@@ -656,16 +751,19 @@ export type AccessEventCreateWithoutOrganizationInput = {
   turnstileOpened?: boolean
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
-  visit: Prisma.VisitRequestCreateNestedOneWithoutAccessEventsInput
-  visitorPass: Prisma.VisitorPassCreateNestedOneWithoutAccessEventsInput
-  gate: Prisma.GateCreateNestedOneWithoutAccessEventsInput
+  site?: Prisma.SiteCreateNestedOneWithoutAccessEventsInput
+  visit?: Prisma.VisitRequestCreateNestedOneWithoutAccessEventsInput
+  visitorPass?: Prisma.VisitorPassCreateNestedOneWithoutAccessEventsInput
+  gate?: Prisma.GateCreateNestedOneWithoutAccessEventsInput
 }
 
 export type AccessEventUncheckedCreateWithoutOrganizationInput = {
   id?: string
-  visitId: string
-  visitorPassId: string
-  gateId: string
+  siteId?: string | null
+  requestId?: string | null
+  visitId?: string | null
+  visitorPassId?: string | null
+  gateId?: string | null
   direction: $Enums.AccessDirection
   decision: $Enums.AccessDecision
   denialReason?: string | null
@@ -706,10 +804,12 @@ export type AccessEventScalarWhereInput = {
   OR?: Prisma.AccessEventScalarWhereInput[]
   NOT?: Prisma.AccessEventScalarWhereInput | Prisma.AccessEventScalarWhereInput[]
   id?: Prisma.UuidFilter<"AccessEvent"> | string
-  organizationId?: Prisma.UuidFilter<"AccessEvent"> | string
-  visitId?: Prisma.UuidFilter<"AccessEvent"> | string
-  visitorPassId?: Prisma.UuidFilter<"AccessEvent"> | string
-  gateId?: Prisma.UuidFilter<"AccessEvent"> | string
+  siteId?: Prisma.UuidNullableFilter<"AccessEvent"> | string | null
+  requestId?: Prisma.UuidNullableFilter<"AccessEvent"> | string | null
+  organizationId?: Prisma.UuidNullableFilter<"AccessEvent"> | string | null
+  visitId?: Prisma.UuidNullableFilter<"AccessEvent"> | string | null
+  visitorPassId?: Prisma.UuidNullableFilter<"AccessEvent"> | string | null
+  gateId?: Prisma.UuidNullableFilter<"AccessEvent"> | string | null
   direction?: Prisma.EnumAccessDirectionFilter<"AccessEvent"> | $Enums.AccessDirection
   decision?: Prisma.EnumAccessDecisionFilter<"AccessEvent"> | $Enums.AccessDecision
   denialReason?: Prisma.StringNullableFilter<"AccessEvent"> | string | null
@@ -719,8 +819,9 @@ export type AccessEventScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"AccessEvent"> | Date | string
 }
 
-export type AccessEventCreateWithoutVisitInput = {
+export type AccessEventCreateWithoutSiteInput = {
   id?: string
+  requestId?: string | null
   direction: $Enums.AccessDirection
   decision: $Enums.AccessDecision
   denialReason?: string | null
@@ -728,16 +829,77 @@ export type AccessEventCreateWithoutVisitInput = {
   turnstileOpened?: boolean
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
-  organization: Prisma.OrganizationCreateNestedOneWithoutAccessEventsInput
-  visitorPass: Prisma.VisitorPassCreateNestedOneWithoutAccessEventsInput
-  gate: Prisma.GateCreateNestedOneWithoutAccessEventsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutAccessEventsInput
+  visit?: Prisma.VisitRequestCreateNestedOneWithoutAccessEventsInput
+  visitorPass?: Prisma.VisitorPassCreateNestedOneWithoutAccessEventsInput
+  gate?: Prisma.GateCreateNestedOneWithoutAccessEventsInput
+}
+
+export type AccessEventUncheckedCreateWithoutSiteInput = {
+  id?: string
+  requestId?: string | null
+  organizationId?: string | null
+  visitId?: string | null
+  visitorPassId?: string | null
+  gateId?: string | null
+  direction: $Enums.AccessDirection
+  decision: $Enums.AccessDecision
+  denialReason?: string | null
+  scannedAt?: Date | string
+  turnstileOpened?: boolean
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+}
+
+export type AccessEventCreateOrConnectWithoutSiteInput = {
+  where: Prisma.AccessEventWhereUniqueInput
+  create: Prisma.XOR<Prisma.AccessEventCreateWithoutSiteInput, Prisma.AccessEventUncheckedCreateWithoutSiteInput>
+}
+
+export type AccessEventCreateManySiteInputEnvelope = {
+  data: Prisma.AccessEventCreateManySiteInput | Prisma.AccessEventCreateManySiteInput[]
+  skipDuplicates?: boolean
+}
+
+export type AccessEventUpsertWithWhereUniqueWithoutSiteInput = {
+  where: Prisma.AccessEventWhereUniqueInput
+  update: Prisma.XOR<Prisma.AccessEventUpdateWithoutSiteInput, Prisma.AccessEventUncheckedUpdateWithoutSiteInput>
+  create: Prisma.XOR<Prisma.AccessEventCreateWithoutSiteInput, Prisma.AccessEventUncheckedCreateWithoutSiteInput>
+}
+
+export type AccessEventUpdateWithWhereUniqueWithoutSiteInput = {
+  where: Prisma.AccessEventWhereUniqueInput
+  data: Prisma.XOR<Prisma.AccessEventUpdateWithoutSiteInput, Prisma.AccessEventUncheckedUpdateWithoutSiteInput>
+}
+
+export type AccessEventUpdateManyWithWhereWithoutSiteInput = {
+  where: Prisma.AccessEventScalarWhereInput
+  data: Prisma.XOR<Prisma.AccessEventUpdateManyMutationInput, Prisma.AccessEventUncheckedUpdateManyWithoutSiteInput>
+}
+
+export type AccessEventCreateWithoutVisitInput = {
+  id?: string
+  requestId?: string | null
+  direction: $Enums.AccessDirection
+  decision: $Enums.AccessDecision
+  denialReason?: string | null
+  scannedAt?: Date | string
+  turnstileOpened?: boolean
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  site?: Prisma.SiteCreateNestedOneWithoutAccessEventsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutAccessEventsInput
+  visitorPass?: Prisma.VisitorPassCreateNestedOneWithoutAccessEventsInput
+  gate?: Prisma.GateCreateNestedOneWithoutAccessEventsInput
 }
 
 export type AccessEventUncheckedCreateWithoutVisitInput = {
   id?: string
-  organizationId: string
-  visitorPassId: string
-  gateId: string
+  siteId?: string | null
+  requestId?: string | null
+  organizationId?: string | null
+  visitorPassId?: string | null
+  gateId?: string | null
   direction: $Enums.AccessDirection
   decision: $Enums.AccessDecision
   denialReason?: string | null
@@ -775,6 +937,7 @@ export type AccessEventUpdateManyWithWhereWithoutVisitInput = {
 
 export type AccessEventCreateWithoutVisitorPassInput = {
   id?: string
+  requestId?: string | null
   direction: $Enums.AccessDirection
   decision: $Enums.AccessDecision
   denialReason?: string | null
@@ -782,16 +945,19 @@ export type AccessEventCreateWithoutVisitorPassInput = {
   turnstileOpened?: boolean
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
-  organization: Prisma.OrganizationCreateNestedOneWithoutAccessEventsInput
-  visit: Prisma.VisitRequestCreateNestedOneWithoutAccessEventsInput
-  gate: Prisma.GateCreateNestedOneWithoutAccessEventsInput
+  site?: Prisma.SiteCreateNestedOneWithoutAccessEventsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutAccessEventsInput
+  visit?: Prisma.VisitRequestCreateNestedOneWithoutAccessEventsInput
+  gate?: Prisma.GateCreateNestedOneWithoutAccessEventsInput
 }
 
 export type AccessEventUncheckedCreateWithoutVisitorPassInput = {
   id?: string
-  organizationId: string
-  visitId: string
-  gateId: string
+  siteId?: string | null
+  requestId?: string | null
+  organizationId?: string | null
+  visitId?: string | null
+  gateId?: string | null
   direction: $Enums.AccessDirection
   decision: $Enums.AccessDecision
   denialReason?: string | null
@@ -829,6 +995,7 @@ export type AccessEventUpdateManyWithWhereWithoutVisitorPassInput = {
 
 export type AccessEventCreateWithoutGateInput = {
   id?: string
+  requestId?: string | null
   direction: $Enums.AccessDirection
   decision: $Enums.AccessDecision
   denialReason?: string | null
@@ -836,16 +1003,19 @@ export type AccessEventCreateWithoutGateInput = {
   turnstileOpened?: boolean
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
-  organization: Prisma.OrganizationCreateNestedOneWithoutAccessEventsInput
-  visit: Prisma.VisitRequestCreateNestedOneWithoutAccessEventsInput
-  visitorPass: Prisma.VisitorPassCreateNestedOneWithoutAccessEventsInput
+  site?: Prisma.SiteCreateNestedOneWithoutAccessEventsInput
+  organization?: Prisma.OrganizationCreateNestedOneWithoutAccessEventsInput
+  visit?: Prisma.VisitRequestCreateNestedOneWithoutAccessEventsInput
+  visitorPass?: Prisma.VisitorPassCreateNestedOneWithoutAccessEventsInput
 }
 
 export type AccessEventUncheckedCreateWithoutGateInput = {
   id?: string
-  organizationId: string
-  visitId: string
-  visitorPassId: string
+  siteId?: string | null
+  requestId?: string | null
+  organizationId?: string | null
+  visitId?: string | null
+  visitorPassId?: string | null
   direction: $Enums.AccessDirection
   decision: $Enums.AccessDecision
   denialReason?: string | null
@@ -883,9 +1053,11 @@ export type AccessEventUpdateManyWithWhereWithoutGateInput = {
 
 export type AccessEventCreateManyOrganizationInput = {
   id?: string
-  visitId: string
-  visitorPassId: string
-  gateId: string
+  siteId?: string | null
+  requestId?: string | null
+  visitId?: string | null
+  visitorPassId?: string | null
+  gateId?: string | null
   direction: $Enums.AccessDirection
   decision: $Enums.AccessDecision
   denialReason?: string | null
@@ -897,6 +1069,7 @@ export type AccessEventCreateManyOrganizationInput = {
 
 export type AccessEventUpdateWithoutOrganizationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direction?: Prisma.EnumAccessDirectionFieldUpdateOperationsInput | $Enums.AccessDirection
   decision?: Prisma.EnumAccessDecisionFieldUpdateOperationsInput | $Enums.AccessDecision
   denialReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -904,16 +1077,19 @@ export type AccessEventUpdateWithoutOrganizationInput = {
   turnstileOpened?: Prisma.BoolFieldUpdateOperationsInput | boolean
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  visit?: Prisma.VisitRequestUpdateOneRequiredWithoutAccessEventsNestedInput
-  visitorPass?: Prisma.VisitorPassUpdateOneRequiredWithoutAccessEventsNestedInput
-  gate?: Prisma.GateUpdateOneRequiredWithoutAccessEventsNestedInput
+  site?: Prisma.SiteUpdateOneWithoutAccessEventsNestedInput
+  visit?: Prisma.VisitRequestUpdateOneWithoutAccessEventsNestedInput
+  visitorPass?: Prisma.VisitorPassUpdateOneWithoutAccessEventsNestedInput
+  gate?: Prisma.GateUpdateOneWithoutAccessEventsNestedInput
 }
 
 export type AccessEventUncheckedUpdateWithoutOrganizationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  visitId?: Prisma.StringFieldUpdateOperationsInput | string
-  visitorPassId?: Prisma.StringFieldUpdateOperationsInput | string
-  gateId?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitorPassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direction?: Prisma.EnumAccessDirectionFieldUpdateOperationsInput | $Enums.AccessDirection
   decision?: Prisma.EnumAccessDecisionFieldUpdateOperationsInput | $Enums.AccessDecision
   denialReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -925,9 +1101,75 @@ export type AccessEventUncheckedUpdateWithoutOrganizationInput = {
 
 export type AccessEventUncheckedUpdateManyWithoutOrganizationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  visitId?: Prisma.StringFieldUpdateOperationsInput | string
-  visitorPassId?: Prisma.StringFieldUpdateOperationsInput | string
-  gateId?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitorPassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  direction?: Prisma.EnumAccessDirectionFieldUpdateOperationsInput | $Enums.AccessDirection
+  decision?: Prisma.EnumAccessDecisionFieldUpdateOperationsInput | $Enums.AccessDecision
+  denialReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scannedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  turnstileOpened?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type AccessEventCreateManySiteInput = {
+  id?: string
+  requestId?: string | null
+  organizationId?: string | null
+  visitId?: string | null
+  visitorPassId?: string | null
+  gateId?: string | null
+  direction: $Enums.AccessDirection
+  decision: $Enums.AccessDecision
+  denialReason?: string | null
+  scannedAt?: Date | string
+  turnstileOpened?: boolean
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+}
+
+export type AccessEventUpdateWithoutSiteInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  direction?: Prisma.EnumAccessDirectionFieldUpdateOperationsInput | $Enums.AccessDirection
+  decision?: Prisma.EnumAccessDecisionFieldUpdateOperationsInput | $Enums.AccessDecision
+  denialReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scannedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  turnstileOpened?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneWithoutAccessEventsNestedInput
+  visit?: Prisma.VisitRequestUpdateOneWithoutAccessEventsNestedInput
+  visitorPass?: Prisma.VisitorPassUpdateOneWithoutAccessEventsNestedInput
+  gate?: Prisma.GateUpdateOneWithoutAccessEventsNestedInput
+}
+
+export type AccessEventUncheckedUpdateWithoutSiteInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitorPassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  direction?: Prisma.EnumAccessDirectionFieldUpdateOperationsInput | $Enums.AccessDirection
+  decision?: Prisma.EnumAccessDecisionFieldUpdateOperationsInput | $Enums.AccessDecision
+  denialReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scannedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  turnstileOpened?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type AccessEventUncheckedUpdateManyWithoutSiteInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitorPassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direction?: Prisma.EnumAccessDirectionFieldUpdateOperationsInput | $Enums.AccessDirection
   decision?: Prisma.EnumAccessDecisionFieldUpdateOperationsInput | $Enums.AccessDecision
   denialReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -939,9 +1181,11 @@ export type AccessEventUncheckedUpdateManyWithoutOrganizationInput = {
 
 export type AccessEventCreateManyVisitInput = {
   id?: string
-  organizationId: string
-  visitorPassId: string
-  gateId: string
+  siteId?: string | null
+  requestId?: string | null
+  organizationId?: string | null
+  visitorPassId?: string | null
+  gateId?: string | null
   direction: $Enums.AccessDirection
   decision: $Enums.AccessDecision
   denialReason?: string | null
@@ -953,6 +1197,7 @@ export type AccessEventCreateManyVisitInput = {
 
 export type AccessEventUpdateWithoutVisitInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direction?: Prisma.EnumAccessDirectionFieldUpdateOperationsInput | $Enums.AccessDirection
   decision?: Prisma.EnumAccessDecisionFieldUpdateOperationsInput | $Enums.AccessDecision
   denialReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -960,16 +1205,19 @@ export type AccessEventUpdateWithoutVisitInput = {
   turnstileOpened?: Prisma.BoolFieldUpdateOperationsInput | boolean
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  organization?: Prisma.OrganizationUpdateOneRequiredWithoutAccessEventsNestedInput
-  visitorPass?: Prisma.VisitorPassUpdateOneRequiredWithoutAccessEventsNestedInput
-  gate?: Prisma.GateUpdateOneRequiredWithoutAccessEventsNestedInput
+  site?: Prisma.SiteUpdateOneWithoutAccessEventsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutAccessEventsNestedInput
+  visitorPass?: Prisma.VisitorPassUpdateOneWithoutAccessEventsNestedInput
+  gate?: Prisma.GateUpdateOneWithoutAccessEventsNestedInput
 }
 
 export type AccessEventUncheckedUpdateWithoutVisitInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
-  visitorPassId?: Prisma.StringFieldUpdateOperationsInput | string
-  gateId?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitorPassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direction?: Prisma.EnumAccessDirectionFieldUpdateOperationsInput | $Enums.AccessDirection
   decision?: Prisma.EnumAccessDecisionFieldUpdateOperationsInput | $Enums.AccessDecision
   denialReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -981,9 +1229,11 @@ export type AccessEventUncheckedUpdateWithoutVisitInput = {
 
 export type AccessEventUncheckedUpdateManyWithoutVisitInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
-  visitorPassId?: Prisma.StringFieldUpdateOperationsInput | string
-  gateId?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitorPassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direction?: Prisma.EnumAccessDirectionFieldUpdateOperationsInput | $Enums.AccessDirection
   decision?: Prisma.EnumAccessDecisionFieldUpdateOperationsInput | $Enums.AccessDecision
   denialReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -995,9 +1245,11 @@ export type AccessEventUncheckedUpdateManyWithoutVisitInput = {
 
 export type AccessEventCreateManyVisitorPassInput = {
   id?: string
-  organizationId: string
-  visitId: string
-  gateId: string
+  siteId?: string | null
+  requestId?: string | null
+  organizationId?: string | null
+  visitId?: string | null
+  gateId?: string | null
   direction: $Enums.AccessDirection
   decision: $Enums.AccessDecision
   denialReason?: string | null
@@ -1009,6 +1261,7 @@ export type AccessEventCreateManyVisitorPassInput = {
 
 export type AccessEventUpdateWithoutVisitorPassInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direction?: Prisma.EnumAccessDirectionFieldUpdateOperationsInput | $Enums.AccessDirection
   decision?: Prisma.EnumAccessDecisionFieldUpdateOperationsInput | $Enums.AccessDecision
   denialReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1016,16 +1269,19 @@ export type AccessEventUpdateWithoutVisitorPassInput = {
   turnstileOpened?: Prisma.BoolFieldUpdateOperationsInput | boolean
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  organization?: Prisma.OrganizationUpdateOneRequiredWithoutAccessEventsNestedInput
-  visit?: Prisma.VisitRequestUpdateOneRequiredWithoutAccessEventsNestedInput
-  gate?: Prisma.GateUpdateOneRequiredWithoutAccessEventsNestedInput
+  site?: Prisma.SiteUpdateOneWithoutAccessEventsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutAccessEventsNestedInput
+  visit?: Prisma.VisitRequestUpdateOneWithoutAccessEventsNestedInput
+  gate?: Prisma.GateUpdateOneWithoutAccessEventsNestedInput
 }
 
 export type AccessEventUncheckedUpdateWithoutVisitorPassInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
-  visitId?: Prisma.StringFieldUpdateOperationsInput | string
-  gateId?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direction?: Prisma.EnumAccessDirectionFieldUpdateOperationsInput | $Enums.AccessDirection
   decision?: Prisma.EnumAccessDecisionFieldUpdateOperationsInput | $Enums.AccessDecision
   denialReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1037,9 +1293,11 @@ export type AccessEventUncheckedUpdateWithoutVisitorPassInput = {
 
 export type AccessEventUncheckedUpdateManyWithoutVisitorPassInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
-  visitId?: Prisma.StringFieldUpdateOperationsInput | string
-  gateId?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direction?: Prisma.EnumAccessDirectionFieldUpdateOperationsInput | $Enums.AccessDirection
   decision?: Prisma.EnumAccessDecisionFieldUpdateOperationsInput | $Enums.AccessDecision
   denialReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1051,9 +1309,11 @@ export type AccessEventUncheckedUpdateManyWithoutVisitorPassInput = {
 
 export type AccessEventCreateManyGateInput = {
   id?: string
-  organizationId: string
-  visitId: string
-  visitorPassId: string
+  siteId?: string | null
+  requestId?: string | null
+  organizationId?: string | null
+  visitId?: string | null
+  visitorPassId?: string | null
   direction: $Enums.AccessDirection
   decision: $Enums.AccessDecision
   denialReason?: string | null
@@ -1065,6 +1325,7 @@ export type AccessEventCreateManyGateInput = {
 
 export type AccessEventUpdateWithoutGateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direction?: Prisma.EnumAccessDirectionFieldUpdateOperationsInput | $Enums.AccessDirection
   decision?: Prisma.EnumAccessDecisionFieldUpdateOperationsInput | $Enums.AccessDecision
   denialReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1072,16 +1333,19 @@ export type AccessEventUpdateWithoutGateInput = {
   turnstileOpened?: Prisma.BoolFieldUpdateOperationsInput | boolean
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  organization?: Prisma.OrganizationUpdateOneRequiredWithoutAccessEventsNestedInput
-  visit?: Prisma.VisitRequestUpdateOneRequiredWithoutAccessEventsNestedInput
-  visitorPass?: Prisma.VisitorPassUpdateOneRequiredWithoutAccessEventsNestedInput
+  site?: Prisma.SiteUpdateOneWithoutAccessEventsNestedInput
+  organization?: Prisma.OrganizationUpdateOneWithoutAccessEventsNestedInput
+  visit?: Prisma.VisitRequestUpdateOneWithoutAccessEventsNestedInput
+  visitorPass?: Prisma.VisitorPassUpdateOneWithoutAccessEventsNestedInput
 }
 
 export type AccessEventUncheckedUpdateWithoutGateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
-  visitId?: Prisma.StringFieldUpdateOperationsInput | string
-  visitorPassId?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitorPassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direction?: Prisma.EnumAccessDirectionFieldUpdateOperationsInput | $Enums.AccessDirection
   decision?: Prisma.EnumAccessDecisionFieldUpdateOperationsInput | $Enums.AccessDecision
   denialReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1093,9 +1357,11 @@ export type AccessEventUncheckedUpdateWithoutGateInput = {
 
 export type AccessEventUncheckedUpdateManyWithoutGateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
-  visitId?: Prisma.StringFieldUpdateOperationsInput | string
-  visitorPassId?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requestId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitorPassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direction?: Prisma.EnumAccessDirectionFieldUpdateOperationsInput | $Enums.AccessDirection
   decision?: Prisma.EnumAccessDecisionFieldUpdateOperationsInput | $Enums.AccessDecision
   denialReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1109,6 +1375,8 @@ export type AccessEventUncheckedUpdateManyWithoutGateInput = {
 
 export type AccessEventSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  siteId?: boolean
+  requestId?: boolean
   organizationId?: boolean
   visitId?: boolean
   visitorPassId?: boolean
@@ -1120,14 +1388,17 @@ export type AccessEventSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   turnstileOpened?: boolean
   metadata?: boolean
   createdAt?: boolean
-  organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
-  visit?: boolean | Prisma.VisitRequestDefaultArgs<ExtArgs>
-  visitorPass?: boolean | Prisma.VisitorPassDefaultArgs<ExtArgs>
-  gate?: boolean | Prisma.GateDefaultArgs<ExtArgs>
+  site?: boolean | Prisma.AccessEvent$siteArgs<ExtArgs>
+  organization?: boolean | Prisma.AccessEvent$organizationArgs<ExtArgs>
+  visit?: boolean | Prisma.AccessEvent$visitArgs<ExtArgs>
+  visitorPass?: boolean | Prisma.AccessEvent$visitorPassArgs<ExtArgs>
+  gate?: boolean | Prisma.AccessEvent$gateArgs<ExtArgs>
 }, ExtArgs["result"]["accessEvent"]>
 
 export type AccessEventSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  siteId?: boolean
+  requestId?: boolean
   organizationId?: boolean
   visitId?: boolean
   visitorPassId?: boolean
@@ -1139,14 +1410,17 @@ export type AccessEventSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   turnstileOpened?: boolean
   metadata?: boolean
   createdAt?: boolean
-  organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
-  visit?: boolean | Prisma.VisitRequestDefaultArgs<ExtArgs>
-  visitorPass?: boolean | Prisma.VisitorPassDefaultArgs<ExtArgs>
-  gate?: boolean | Prisma.GateDefaultArgs<ExtArgs>
+  site?: boolean | Prisma.AccessEvent$siteArgs<ExtArgs>
+  organization?: boolean | Prisma.AccessEvent$organizationArgs<ExtArgs>
+  visit?: boolean | Prisma.AccessEvent$visitArgs<ExtArgs>
+  visitorPass?: boolean | Prisma.AccessEvent$visitorPassArgs<ExtArgs>
+  gate?: boolean | Prisma.AccessEvent$gateArgs<ExtArgs>
 }, ExtArgs["result"]["accessEvent"]>
 
 export type AccessEventSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  siteId?: boolean
+  requestId?: boolean
   organizationId?: boolean
   visitId?: boolean
   visitorPassId?: boolean
@@ -1158,14 +1432,17 @@ export type AccessEventSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   turnstileOpened?: boolean
   metadata?: boolean
   createdAt?: boolean
-  organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
-  visit?: boolean | Prisma.VisitRequestDefaultArgs<ExtArgs>
-  visitorPass?: boolean | Prisma.VisitorPassDefaultArgs<ExtArgs>
-  gate?: boolean | Prisma.GateDefaultArgs<ExtArgs>
+  site?: boolean | Prisma.AccessEvent$siteArgs<ExtArgs>
+  organization?: boolean | Prisma.AccessEvent$organizationArgs<ExtArgs>
+  visit?: boolean | Prisma.AccessEvent$visitArgs<ExtArgs>
+  visitorPass?: boolean | Prisma.AccessEvent$visitorPassArgs<ExtArgs>
+  gate?: boolean | Prisma.AccessEvent$gateArgs<ExtArgs>
 }, ExtArgs["result"]["accessEvent"]>
 
 export type AccessEventSelectScalar = {
   id?: boolean
+  siteId?: boolean
+  requestId?: boolean
   organizationId?: boolean
   visitId?: boolean
   visitorPassId?: boolean
@@ -1179,40 +1456,46 @@ export type AccessEventSelectScalar = {
   createdAt?: boolean
 }
 
-export type AccessEventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "visitId" | "visitorPassId" | "gateId" | "direction" | "decision" | "denialReason" | "scannedAt" | "turnstileOpened" | "metadata" | "createdAt", ExtArgs["result"]["accessEvent"]>
+export type AccessEventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "siteId" | "requestId" | "organizationId" | "visitId" | "visitorPassId" | "gateId" | "direction" | "decision" | "denialReason" | "scannedAt" | "turnstileOpened" | "metadata" | "createdAt", ExtArgs["result"]["accessEvent"]>
 export type AccessEventInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
-  visit?: boolean | Prisma.VisitRequestDefaultArgs<ExtArgs>
-  visitorPass?: boolean | Prisma.VisitorPassDefaultArgs<ExtArgs>
-  gate?: boolean | Prisma.GateDefaultArgs<ExtArgs>
+  site?: boolean | Prisma.AccessEvent$siteArgs<ExtArgs>
+  organization?: boolean | Prisma.AccessEvent$organizationArgs<ExtArgs>
+  visit?: boolean | Prisma.AccessEvent$visitArgs<ExtArgs>
+  visitorPass?: boolean | Prisma.AccessEvent$visitorPassArgs<ExtArgs>
+  gate?: boolean | Prisma.AccessEvent$gateArgs<ExtArgs>
 }
 export type AccessEventIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
-  visit?: boolean | Prisma.VisitRequestDefaultArgs<ExtArgs>
-  visitorPass?: boolean | Prisma.VisitorPassDefaultArgs<ExtArgs>
-  gate?: boolean | Prisma.GateDefaultArgs<ExtArgs>
+  site?: boolean | Prisma.AccessEvent$siteArgs<ExtArgs>
+  organization?: boolean | Prisma.AccessEvent$organizationArgs<ExtArgs>
+  visit?: boolean | Prisma.AccessEvent$visitArgs<ExtArgs>
+  visitorPass?: boolean | Prisma.AccessEvent$visitorPassArgs<ExtArgs>
+  gate?: boolean | Prisma.AccessEvent$gateArgs<ExtArgs>
 }
 export type AccessEventIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
-  visit?: boolean | Prisma.VisitRequestDefaultArgs<ExtArgs>
-  visitorPass?: boolean | Prisma.VisitorPassDefaultArgs<ExtArgs>
-  gate?: boolean | Prisma.GateDefaultArgs<ExtArgs>
+  site?: boolean | Prisma.AccessEvent$siteArgs<ExtArgs>
+  organization?: boolean | Prisma.AccessEvent$organizationArgs<ExtArgs>
+  visit?: boolean | Prisma.AccessEvent$visitArgs<ExtArgs>
+  visitorPass?: boolean | Prisma.AccessEvent$visitorPassArgs<ExtArgs>
+  gate?: boolean | Prisma.AccessEvent$gateArgs<ExtArgs>
 }
 
 export type $AccessEventPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "AccessEvent"
   objects: {
-    organization: Prisma.$OrganizationPayload<ExtArgs>
-    visit: Prisma.$VisitRequestPayload<ExtArgs>
-    visitorPass: Prisma.$VisitorPassPayload<ExtArgs>
-    gate: Prisma.$GatePayload<ExtArgs>
+    site: Prisma.$SitePayload<ExtArgs> | null
+    organization: Prisma.$OrganizationPayload<ExtArgs> | null
+    visit: Prisma.$VisitRequestPayload<ExtArgs> | null
+    visitorPass: Prisma.$VisitorPassPayload<ExtArgs> | null
+    gate: Prisma.$GatePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    organizationId: string
-    visitId: string
-    visitorPassId: string
-    gateId: string
+    siteId: string | null
+    requestId: string | null
+    organizationId: string | null
+    visitId: string | null
+    visitorPassId: string | null
+    gateId: string | null
     direction: $Enums.AccessDirection
     decision: $Enums.AccessDecision
     denialReason: string | null
@@ -1614,10 +1897,11 @@ readonly fields: AccessEventFieldRefs;
  */
 export interface Prisma__AccessEventClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  organization<T extends Prisma.OrganizationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrganizationDefaultArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  visit<T extends Prisma.VisitRequestDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VisitRequestDefaultArgs<ExtArgs>>): Prisma.Prisma__VisitRequestClient<runtime.Types.Result.GetResult<Prisma.$VisitRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  visitorPass<T extends Prisma.VisitorPassDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VisitorPassDefaultArgs<ExtArgs>>): Prisma.Prisma__VisitorPassClient<runtime.Types.Result.GetResult<Prisma.$VisitorPassPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  gate<T extends Prisma.GateDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GateDefaultArgs<ExtArgs>>): Prisma.Prisma__GateClient<runtime.Types.Result.GetResult<Prisma.$GatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  site<T extends Prisma.AccessEvent$siteArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AccessEvent$siteArgs<ExtArgs>>): Prisma.Prisma__SiteClient<runtime.Types.Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  organization<T extends Prisma.AccessEvent$organizationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AccessEvent$organizationArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  visit<T extends Prisma.AccessEvent$visitArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AccessEvent$visitArgs<ExtArgs>>): Prisma.Prisma__VisitRequestClient<runtime.Types.Result.GetResult<Prisma.$VisitRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  visitorPass<T extends Prisma.AccessEvent$visitorPassArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AccessEvent$visitorPassArgs<ExtArgs>>): Prisma.Prisma__VisitorPassClient<runtime.Types.Result.GetResult<Prisma.$VisitorPassPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  gate<T extends Prisma.AccessEvent$gateArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AccessEvent$gateArgs<ExtArgs>>): Prisma.Prisma__GateClient<runtime.Types.Result.GetResult<Prisma.$GatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1648,6 +1932,8 @@ export interface Prisma__AccessEventClient<T, Null = never, ExtArgs extends runt
  */
 export interface AccessEventFieldRefs {
   readonly id: Prisma.FieldRef<"AccessEvent", 'String'>
+  readonly siteId: Prisma.FieldRef<"AccessEvent", 'String'>
+  readonly requestId: Prisma.FieldRef<"AccessEvent", 'String'>
   readonly organizationId: Prisma.FieldRef<"AccessEvent", 'String'>
   readonly visitId: Prisma.FieldRef<"AccessEvent", 'String'>
   readonly visitorPassId: Prisma.FieldRef<"AccessEvent", 'String'>
@@ -2057,6 +2343,101 @@ export type AccessEventDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Limit how many AccessEvents to delete.
    */
   limit?: number
+}
+
+/**
+ * AccessEvent.site
+ */
+export type AccessEvent$siteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Site
+   */
+  select?: Prisma.SiteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Site
+   */
+  omit?: Prisma.SiteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SiteInclude<ExtArgs> | null
+  where?: Prisma.SiteWhereInput
+}
+
+/**
+ * AccessEvent.organization
+ */
+export type AccessEvent$organizationArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Organization
+   */
+  select?: Prisma.OrganizationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Organization
+   */
+  omit?: Prisma.OrganizationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrganizationInclude<ExtArgs> | null
+  where?: Prisma.OrganizationWhereInput
+}
+
+/**
+ * AccessEvent.visit
+ */
+export type AccessEvent$visitArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VisitRequest
+   */
+  select?: Prisma.VisitRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VisitRequest
+   */
+  omit?: Prisma.VisitRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VisitRequestInclude<ExtArgs> | null
+  where?: Prisma.VisitRequestWhereInput
+}
+
+/**
+ * AccessEvent.visitorPass
+ */
+export type AccessEvent$visitorPassArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VisitorPass
+   */
+  select?: Prisma.VisitorPassSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VisitorPass
+   */
+  omit?: Prisma.VisitorPassOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VisitorPassInclude<ExtArgs> | null
+  where?: Prisma.VisitorPassWhereInput
+}
+
+/**
+ * AccessEvent.gate
+ */
+export type AccessEvent$gateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Gate
+   */
+  select?: Prisma.GateSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Gate
+   */
+  omit?: Prisma.GateOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GateInclude<ExtArgs> | null
+  where?: Prisma.GateWhereInput
 }
 
 /**

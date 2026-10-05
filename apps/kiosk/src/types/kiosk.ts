@@ -47,7 +47,20 @@ export type KioskRegistrationResult = {
     status: "WAITING_APPROVAL";
 
     registeredAt: string;
+    receiptToken: string;
   };
+};
+
+export type KioskVisitStatus = {
+  id: string; status: string; fullName: string; source: string;
+};
+
+export type KioskIssuedPass = {
+  passId: string; passNumber: string; fullName: string;
+  site: { id: string; name: string; logoUrl?: string | null };
+  organization: { id: string; name: string };
+  departmentOrOffice?: string | null; hostName?: string | null; purpose: string;
+  issuedAt: string; validFrom: string; validUntil: string; qrValue: string;
 };
 
 export type OrganizationOption = {

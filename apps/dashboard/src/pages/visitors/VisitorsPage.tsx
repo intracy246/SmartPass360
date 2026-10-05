@@ -13,6 +13,7 @@ import { GlassCard } from "../../components/Cards/GlassCard";
 import { FormField } from "../../components/Forms/FormField";
 import { VisitorPassPreview } from "../../components/VisitorPass/VisitorPassPreview";
 import { CameraCapture } from "../../components/CameraCapture/CameraCapture";
+import { VisitorQueue } from "../../components/VisitorQueue/VisitorQueue";
 
 import type {
   CreateVisitPayload,
@@ -176,6 +177,7 @@ export function VisitorsPage() {
         </div>
       </header>
 
+      <VisitorQueue />
      <div className="visitors-page__workspace">
   <form
     className="visitor-form"

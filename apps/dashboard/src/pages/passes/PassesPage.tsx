@@ -217,7 +217,8 @@ export function PassesPage() {
         keepPreviousData,
 
       enabled:
-        activeTab === "VISITOR"
+        activeTab === "VISITOR",
+      refetchInterval: 3000
     });
 
   const visitorPasses =

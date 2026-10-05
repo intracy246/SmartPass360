@@ -1,0 +1,9 @@
+.visitor-queue { margin: 24px 0; padding: 22px; border: 1px solid #334155; border-radius: 16px; background: #101c30; color: #eef3fa; }
+.visitor-queue header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.visitor-queue h2 { margin: 0 0 8px; }
+.visitor-queue p { color: #abbcd2; }
+.visitor-queue button { padding: 10px 14px; border: 1px solid #477fbd; border-radius: 8px; background: #153e6a; color: white; cursor: pointer; }
+.visitor-queue button:disabled { opacity: .5; }
+.visitor-queue__scroll { overflow-x: auto; }
+.visitor-queue table { width: 100%; border-collapse: collapse; font-size: 14px; text-align: left; }
+.visitor-queue th, .visitor-queue td { padding: 14px 12px; border-bottom: 1px solid #334155; vertical-align: top; }

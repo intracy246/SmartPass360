@@ -20,8 +20,9 @@ export type AccessEventReason =
 
 export type AccessValidationPayload = {
   credential: string;
-  gateId?: string;
-  direction: AccessDirection;
+  gateId: string;
+  direction?: AccessDirection;
+  requestId?: string;
 };
 
 export type AccessValidationResult = {
@@ -40,6 +41,7 @@ export type AccessValidationResult = {
     gateName?: string;
     timestamp: string;
     message: string;
+    turnstileCommand: "UNLOCK" | "KEEP_LOCKED";
   };
 };
 

@@ -595,11 +595,6 @@ export type VisitorPassSumOrderByAggregateInput = {
   printCount?: Prisma.SortOrder
 }
 
-export type VisitorPassScalarRelationFilter = {
-  is?: Prisma.VisitorPassWhereInput
-  isNot?: Prisma.VisitorPassWhereInput
-}
-
 export type VisitorPassCreateNestedManyWithoutOrganizationInput = {
   create?: Prisma.XOR<Prisma.VisitorPassCreateWithoutOrganizationInput, Prisma.VisitorPassUncheckedCreateWithoutOrganizationInput> | Prisma.VisitorPassCreateWithoutOrganizationInput[] | Prisma.VisitorPassUncheckedCreateWithoutOrganizationInput[]
   connectOrCreate?: Prisma.VisitorPassCreateOrConnectWithoutOrganizationInput | Prisma.VisitorPassCreateOrConnectWithoutOrganizationInput[]
@@ -692,10 +687,12 @@ export type VisitorPassCreateNestedOneWithoutAccessEventsInput = {
   connect?: Prisma.VisitorPassWhereUniqueInput
 }
 
-export type VisitorPassUpdateOneRequiredWithoutAccessEventsNestedInput = {
+export type VisitorPassUpdateOneWithoutAccessEventsNestedInput = {
   create?: Prisma.XOR<Prisma.VisitorPassCreateWithoutAccessEventsInput, Prisma.VisitorPassUncheckedCreateWithoutAccessEventsInput>
   connectOrCreate?: Prisma.VisitorPassCreateOrConnectWithoutAccessEventsInput
   upsert?: Prisma.VisitorPassUpsertWithoutAccessEventsInput
+  disconnect?: Prisma.VisitorPassWhereInput | boolean
+  delete?: Prisma.VisitorPassWhereInput | boolean
   connect?: Prisma.VisitorPassWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.VisitorPassUpdateToOneWithWhereWithoutAccessEventsInput, Prisma.VisitorPassUpdateWithoutAccessEventsInput>, Prisma.VisitorPassUncheckedUpdateWithoutAccessEventsInput>
 }

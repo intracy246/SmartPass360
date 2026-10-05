@@ -121,6 +121,8 @@ model Site {
 
   organizations SiteOrganization[]
   kiosks        Kiosk[]
+  visits        VisitRequest[]
+  accessEvents  AccessEvent[]
 
   @@index([isActive])
   @@index([status])
@@ -158,6 +160,7 @@ model Kiosk {
   updatedAt      DateTime @updatedAt @map("updated_at")
 
   site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  visits VisitRequest[]
 
   @@index([siteId])
   @@index([isActive])
@@ -233,6 +236,10 @@ model Visitor {
 
 model VisitRequest {
   id                String      @id @default(uuid()) @db.Uuid
+  siteId            String?     @map("site_id") @db.Uuid
+  kioskId           String?     @map("kiosk_id") @db.Uuid
+  source            String      @default("UNKNOWN")
+  kioskReceiptHash  String?     @map("kiosk_receipt_hash")
   organizationId    String      @map("organization_id") @db.Uuid
   visitorId         String      @map("visitor_id") @db.Uuid
   hostId            String?     @map("host_id") @db.Uuid
@@ -254,6 +261,9 @@ model VisitRequest {
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
+  site Site? @relation(fields: [siteId], references: [id], onDelete: Restrict)
+  kiosk Kiosk? @relation(fields: [kioskId], references: [id], onDelete: SetNull)
+
   visitor Visitor @relation(fields: [visitorId], references: [id], onDelete: Restrict)
 
   host Host? @relation(fields: [hostId], references: [id], onDelete: SetNull)
@@ -269,6 +279,8 @@ model VisitRequest {
   @@index([departmentId])
   @@index([status])
   @@index([createdAt])
+  @@index([siteId, status])
+  @@index([kioskId])
   @@map("visit_requests")
 }
 
@@ -325,10 +337,12 @@ model Gate {
 
 model AccessEvent {
   id              String          @id @default(uuid()) @db.Uuid
-  organizationId  String          @map("organization_id") @db.Uuid
-  visitId         String          @map("visit_id") @db.Uuid
-  visitorPassId   String          @map("visitor_pass_id") @db.Uuid
-  gateId          String          @map("gate_id") @db.Uuid
+  siteId          String?         @map("site_id") @db.Uuid
+  requestId       String?         @map("request_id") @db.Uuid
+  organizationId  String?         @map("organization_id") @db.Uuid
+  visitId         String?         @map("visit_id") @db.Uuid
+  visitorPassId   String?         @map("visitor_pass_id") @db.Uuid
+  gateId          String?         @map("gate_id") @db.Uuid
   direction       AccessDirection
   decision        AccessDecision
   denialReason    String?         @map("denial_reason")
@@ -337,13 +351,14 @@ model AccessEvent {
   metadata        Json?
   createdAt       DateTime        @default(now()) @map("created_at")
 
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  site Site? @relation(fields: [siteId], references: [id], onDelete: Restrict)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-  visit VisitRequest @relation(fields: [visitId], references: [id], onDelete: Cascade)
+  visit VisitRequest? @relation(fields: [visitId], references: [id], onDelete: Cascade)
 
-  visitorPass VisitorPass @relation(fields: [visitorPassId], references: [id], onDelete: Cascade)
+  visitorPass VisitorPass? @relation(fields: [visitorPassId], references: [id], onDelete: Cascade)
 
-  gate Gate @relation(fields: [gateId], references: [id], onDelete: Restrict)
+  gate Gate? @relation(fields: [gateId], references: [id], onDelete: Restrict)
 
   @@index([organizationId])
   @@index([visitId])
@@ -351,6 +366,8 @@ model AccessEvent {
   @@index([gateId])
   @@index([decision])
   @@index([scannedAt])
+  @@index([siteId, scannedAt])
+  @@unique([siteId, requestId])
   @@map("access_events")
 }
 

@@ -12,9 +12,11 @@ import {
 
 import {
   getAccessEvents,
+  getVisitorGates,
   scanPermanentPass,
   validateAccess
 } from "../../api/access-api";
+import { VisitorQueue } from "../../components/VisitorQueue/VisitorQueue";
 
 import { ApiError } from "../../api/api-client";
 
@@ -63,7 +65,8 @@ export function AccessControlPage() {
   const [credential, setCredential] = useState("");
   const [gateId, setGateId] = useState("");
   const [direction, setDirection] =
-    useState<AccessDirection>("ENTRY");
+    useState<AccessDirection | "AUTO">("AUTO");
+  const gatesQuery = useQuery({ queryKey: ["visitor-gates"], queryFn: getVisitorGates });
 
   const [validationResult, setValidationResult] =
     useState<AccessValidationResult | null>(null);
@@ -89,7 +92,7 @@ export function AccessControlPage() {
   const accessEventsQuery = useQuery({
     queryKey: ["access-events"],
     queryFn: () => getAccessEvents(1, 20),
-    refetchInterval: 15_000
+    refetchInterval: 3000
   });
 
   const validationMutation = useMutation({
@@ -135,8 +138,9 @@ export function AccessControlPage() {
 
     validationMutation.mutate({
       credential: cleanedCredential,
-      gateId: gateId.trim() || undefined,
-      direction
+      gateId,
+      direction: direction === "AUTO" ? undefined : direction,
+      requestId: crypto.randomUUID()
     });
   }
 
@@ -226,6 +230,8 @@ export function AccessControlPage() {
           Turnstile validation surface
         </div>
       </header>
+
+      <VisitorQueue />
 
       <section className="permanent-gate-scanner">
         <div className="permanent-gate-scanner__header">
@@ -400,7 +406,7 @@ export function AccessControlPage() {
               <span>Pass credential</span>
 
               <input
-                type="text"
+                type="password"
                 value={credential}
                 placeholder="Scan QR or enter pass token"
                 autoFocus
@@ -418,10 +424,11 @@ export function AccessControlPage() {
                   value={direction}
                   onChange={(event) =>
                     setDirection(
-                      event.target.value as AccessDirection
+                      event.target.value as AccessDirection | "AUTO"
                     )
                   }
                 >
+                  <option value="AUTO">Automatic entry / exit</option>
                   <option value="ENTRY">
                     Entry
                   </option>
@@ -433,16 +440,19 @@ export function AccessControlPage() {
               </label>
 
               <label className="access-field">
-                <span>Gate ID</span>
+                <span>Visitor gate</span>
 
-                <input
-                  type="text"
+                <select
                   value={gateId}
-                  placeholder="Optional until gate API exists"
+                  required
                   onChange={(event) =>
                     setGateId(event.target.value)
                   }
-                />
+                >
+                  <option value="">Select gate</option>
+                  {gatesQuery.data?.data.map(gate => <option key={gate.id} value={gate.id} disabled={!gate.isActive || gate.status !== "ONLINE"}>{gate.name} · {gate.direction}</option>)}
+                </select>
+                {gatesQuery.error && <span role="alert">{gatesQuery.error.message}</span>}
               </label>
             </div>
 
@@ -532,6 +542,7 @@ export function AccessControlPage() {
                   <h2>
                     {validationResult.data.decision}
                   </h2>
+                  <strong>{validationResult.data.turnstileCommand}</strong>
 
                   <p>
                     {validationResult.data.message}

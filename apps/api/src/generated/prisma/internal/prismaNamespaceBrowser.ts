@@ -52,6 +52,9 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Organization: 'Organization',
+  Site: 'Site',
+  SiteOrganization: 'SiteOrganization',
+  Kiosk: 'Kiosk',
   Department: 'Department',
   Host: 'Host',
   Visitor: 'Visitor',
@@ -98,6 +101,58 @@ export const OrganizationScalarFieldEnum = {
 } as const
 
 export type OrganizationScalarFieldEnum = (typeof OrganizationScalarFieldEnum)[keyof typeof OrganizationScalarFieldEnum]
+
+
+export const SiteScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  code: 'code',
+  logoUrl: 'logoUrl',
+  address: 'address',
+  city: 'city',
+  country: 'country',
+  adminUsername: 'adminUsername',
+  adminPasswordHash: 'adminPasswordHash',
+  mustChangePassword: 'mustChangePassword',
+  status: 'status',
+  isActive: 'isActive',
+  provisionedAt: 'provisionedAt',
+  activatedAt: 'activatedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SiteScalarFieldEnum = (typeof SiteScalarFieldEnum)[keyof typeof SiteScalarFieldEnum]
+
+
+export const SiteOrganizationScalarFieldEnum = {
+  id: 'id',
+  siteId: 'siteId',
+  organizationId: 'organizationId',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SiteOrganizationScalarFieldEnum = (typeof SiteOrganizationScalarFieldEnum)[keyof typeof SiteOrganizationScalarFieldEnum]
+
+
+export const KioskScalarFieldEnum = {
+  id: 'id',
+  siteId: 'siteId',
+  name: 'name',
+  code: 'code',
+  location: 'location',
+  activationCode: 'activationCode',
+  deviceId: 'deviceId',
+  isActive: 'isActive',
+  activatedAt: 'activatedAt',
+  lastSeenAt: 'lastSeenAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type KioskScalarFieldEnum = (typeof KioskScalarFieldEnum)[keyof typeof KioskScalarFieldEnum]
 
 
 export const DepartmentScalarFieldEnum = {
@@ -149,12 +204,18 @@ export type VisitorScalarFieldEnum = (typeof VisitorScalarFieldEnum)[keyof typeo
 
 export const VisitRequestScalarFieldEnum = {
   id: 'id',
+  siteId: 'siteId',
+  kioskId: 'kioskId',
+  source: 'source',
+  kioskReceiptHash: 'kioskReceiptHash',
   organizationId: 'organizationId',
   visitorId: 'visitorId',
   hostId: 'hostId',
   departmentId: 'departmentId',
   visitorType: 'visitorType',
   purpose: 'purpose',
+  destinationOffice: 'destinationOffice',
+  hostNameSnapshot: 'hostNameSnapshot',
   scheduledDate: 'scheduledDate',
   expectedEntryTime: 'expectedEntryTime',
   expectedExitTime: 'expectedExitTime',
@@ -209,6 +270,8 @@ export type GateScalarFieldEnum = (typeof GateScalarFieldEnum)[keyof typeof Gate
 
 export const AccessEventScalarFieldEnum = {
   id: 'id',
+  siteId: 'siteId',
+  requestId: 'requestId',
   organizationId: 'organizationId',
   visitId: 'visitId',
   visitorPassId: 'visitorPassId',

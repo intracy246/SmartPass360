@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { activateKiosk } from "./api/kiosk-api";
 import { ApiError } from "./api/api-client";
 import { KioskRegistrationPage } from "./pages/KioskRegistrationPage";
@@ -17,15 +18,27 @@ function getDeviceId() {
 }
 
 export default function App() {
-  const initialKioskId = window.localStorage.getItem("smartpass360.kioskId");
+  const initialKioskId = window.localStorage.getItem("smartpass360.deviceId")
+    ? window.localStorage.getItem("smartpass360.kioskId")
+    : null;
   const [activatedKioskId, setActivatedKioskId] = useState(initialKioskId);
   const [activationCode, setActivationCode] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isActivating, setIsActivating] = useState(false);
   const deviceId = useMemo(() => getDeviceId(), []);
+  const queryClient = useQueryClient();
+
+  const clearActivation = useCallback((message: string) => {
+    for (const key of ["kioskId", "siteId", "siteName", "kioskCode"]) {
+      window.localStorage.removeItem(`smartpass360.${key}`);
+    }
+    queryClient.removeQueries({ queryKey: ["kiosk-config"] });
+    setActivatedKioskId(null);
+    setErrorMessage(message);
+  }, [queryClient]);
 
   if (activatedKioskId) {
-    return <KioskRegistrationPage />;
+    return <KioskRegistrationPage onActivationInvalid={clearActivation} />;
   }
 
   async function submitActivation(event: React.FormEvent<HTMLFormElement>) {
@@ -43,13 +56,12 @@ export default function App() {
       window.localStorage.setItem("smartpass360.siteId", response.data.site.id);
       window.localStorage.setItem("smartpass360.siteName", response.data.site.name);
       window.localStorage.setItem("smartpass360.kioskCode", response.data.kiosk.code);
+      queryClient.setQueryData(["kiosk-config", response.data.kiosk.id, deviceId], response);
 
       setActivatedKioskId(response.data.kiosk.id);
     } catch (error) {
       if (error instanceof ApiError) {
         setErrorMessage(error.message);
-      } else if (error instanceof TypeError) {
-        setErrorMessage("Cannot reach SmartPass360 API through the kiosk server. Confirm the API is running on port 4000 and restart the kiosk app.");
       } else {
         setErrorMessage(error instanceof Error ? error.message : "Kiosk activation failed.");
       }

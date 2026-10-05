@@ -9,6 +9,9 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/Organization'
+export type * from './models/Site'
+export type * from './models/SiteOrganization'
+export type * from './models/Kiosk'
 export type * from './models/Department'
 export type * from './models/Host'
 export type * from './models/Visitor'

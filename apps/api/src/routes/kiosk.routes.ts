@@ -3,6 +3,7 @@ import { Router } from "express";
 import { z } from "zod";
 
 import { prisma } from "../lib/prisma";
+import { Prisma } from "../generated/prisma/client";
 import { requireBuilding, type AuthUser } from "../middleware/auth.middleware";
 
 export const kioskRouter = Router();
@@ -33,6 +34,24 @@ const activateSchema = z.object({
   activationCode: z.string().trim().min(6).max(64),
   deviceId: z.string().trim().min(3).max(160)
 });
+
+// Public device configuration must never serialize building admin credentials.
+const deviceSiteSelect = {
+  id: true,
+  name: true,
+  code: true,
+  logoUrl: true,
+  isActive: true,
+  status: true,
+  organizations: {
+    where: { isActive: true, organization: { isActive: true } },
+    select: {
+      organization: {
+        select: { id: true, name: true, code: true, isActive: true }
+      }
+    }
+  }
+} satisfies Prisma.SiteSelect;
 
 kioskRouter.patch("/sites/:siteId/settings", requireBuilding, async (request, response, next) => {
   try {
@@ -149,14 +168,7 @@ kioskRouter.post("/activate", async (request, response, next) => {
         activationCode: parsed.data.activationCode.toUpperCase()
       },
       include: {
-        site: {
-          include: {
-            organizations: {
-              where: { isActive: true },
-              include: { organization: true }
-            }
-          }
-        }
+        site: { select: deviceSiteSelect }
       }
     });
 
@@ -205,14 +217,36 @@ kioskRouter.post("/activate", async (request, response, next) => {
       });
     }
 
-    const updated = await prisma.kiosk.update({
-      where: { id: kiosk.id },
-      data: {
-        deviceId: parsed.data.deviceId,
-        activatedAt: kiosk.activatedAt ?? new Date(),
-        lastSeenAt: new Date()
-      }
+    const updated = await prisma.$transaction(async (tx) => {
+      const available = {
+        id: kiosk.id,
+        isActive: true,
+        site: { isActive: true, status: "ACTIVE" as const }
+      };
+      // Only an unbound row can be claimed, even if two devices race.
+      await tx.kiosk.updateMany({
+        where: { ...available, deviceId: null },
+        data: { deviceId: parsed.data.deviceId }
+      });
+      await tx.kiosk.updateMany({
+        where: { ...available, deviceId: parsed.data.deviceId, activatedAt: null },
+        data: { activatedAt: new Date() }
+      });
+      const heartbeat = await tx.kiosk.updateMany({
+        where: { ...available, deviceId: parsed.data.deviceId },
+        data: { lastSeenAt: new Date() }
+      });
+      return heartbeat.count ? tx.kiosk.findUniqueOrThrow({ where: { id: kiosk.id } }) : null;
     });
+
+    if (!updated) {
+      return response.status(409).json({
+        error: {
+          code: "KIOSK_NOT_AVAILABLE",
+          message: "This kiosk is no longer available for activation on this device."
+        }
+      });
+    }
 
     return response.status(200).json({
       success: true,
@@ -223,11 +257,19 @@ kioskRouter.post("/activate", async (request, response, next) => {
       }
     });
   } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      return response.status(409).json({
+        error: {
+          code: "KIOSK_DEVICE_ALREADY_BOUND",
+          message: "This device is already activated for another kiosk."
+        }
+      });
+    }
     return next(error);
   }
 });
 
-kioskRouter.patch("/:kioskId", requireBuilding, async (request, response, next) => {
+kioskRouter.patch<{ kioskId: string }>("/:kioskId", requireBuilding, async (request, response, next) => {
   try {
     const user = response.locals.authUser as AuthUser;
     const parsed = kioskUpdateSchema.safeParse(request.body);
@@ -268,7 +310,7 @@ kioskRouter.patch("/:kioskId", requireBuilding, async (request, response, next) 
   }
 });
 
-kioskRouter.delete("/:kioskId", requireBuilding, async (request, response, next) => {
+kioskRouter.delete<{ kioskId: string }>("/:kioskId", requireBuilding, async (request, response, next) => {
   try {
     const user = response.locals.authUser as AuthUser;
     const existing = await prisma.kiosk.findFirst({
@@ -311,14 +353,7 @@ kioskRouter.get("/:kioskId/config", async (request, response, next) => {
     const kiosk = await prisma.kiosk.findUnique({
       where: { id: request.params.kioskId },
       include: {
-        site: {
-          include: {
-            organizations: {
-              where: { isActive: true },
-              include: { organization: true }
-            }
-          }
-        }
+        site: { select: deviceSiteSelect }
       }
     });
 
@@ -338,7 +373,7 @@ kioskRouter.get("/:kioskId/config", async (request, response, next) => {
       });
     }
 
-    await prisma.kiosk.update({
+    const updated = await prisma.kiosk.update({
       where: { id: kiosk.id },
       data: { lastSeenAt: new Date() }
     });
@@ -346,7 +381,7 @@ kioskRouter.get("/:kioskId/config", async (request, response, next) => {
     return response.status(200).json({
       success: true,
       data: {
-        kiosk,
+        kiosk: updated,
         site: kiosk.site,
         organizations: kiosk.site.organizations.map((item) => item.organization)
       }

@@ -87,6 +87,15 @@ export const AccessDecision = {
 export type AccessDecision = (typeof AccessDecision)[keyof typeof AccessDecision]
 
 
+export const SiteStatus = {
+  PENDING: 'PENDING',
+  ACTIVE: 'ACTIVE',
+  SUSPENDED: 'SUSPENDED'
+} as const
+
+export type SiteStatus = (typeof SiteStatus)[keyof typeof SiteStatus]
+
+
 export const PermanentPassHolderType = {
   EMPLOYEE: 'EMPLOYEE',
   SECURITY: 'SECURITY',

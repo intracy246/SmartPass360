@@ -1,4 +1,6 @@
 import type { VisitorPassPreviewData } from "../../types/visitor";
+import { useEffect, useState } from "react";
+import QRCode from "qrcode";
 
 import "./VisitorPassPreview.css";
 
@@ -57,6 +59,14 @@ export function VisitorPassPreview({
   organizationName = "SMARTPASS360",
   organizationSubtitle = "Secure Visitor Access"
 }: VisitorPassPreviewProps) {
+  const [qrImage, setQrImage] = useState("");
+  useEffect(() => {
+    let active = true;
+    if (data.qrValue) void QRCode.toDataURL(data.qrValue, { width: 240, margin: 4 })
+      .then(image => { if (active) setQrImage(image); })
+      .catch(() => { if (active) setQrImage(""); });
+    return () => { active = false; };
+  }, [data.qrValue]);
   const displayName =
     data.fullName.trim() || "Visitor name";
 
@@ -142,19 +152,11 @@ export function VisitorPassPreview({
 
       <div className="visitor-pass-preview__code-section">
         <div className="visitor-pass-preview__qr">
-          {data.qrValue ? (
-            <div className="visitor-pass-preview__qr-ready">
-              QR READY
-            </div>
+          {data.qrValue && qrImage ? (
+            <img src={qrImage} alt="Visitor access QR" style={{ width: "100%", height: "auto" }} />
           ) : (
             <>
-              <div className="visitor-pass-preview__qr-grid">
-                {Array.from({ length: 36 }).map((_, index) => (
-                  <span key={index} />
-                ))}
-              </div>
-
-              <small>Waiting for secure QR token</small>
+              <small>{data.qrValue ? "Preparing secure QR" : "QR issued only after approval"}</small>
             </>
           )}
         </div>

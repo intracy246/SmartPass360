@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useMemo,
   useState,
   type FormEvent
@@ -17,9 +18,11 @@ import {
 import { ApiError } from "../api/api-client";
 
 import { KioskField } from "../components/KioskField";
+import { KioskVisitCompletion } from "../components/KioskVisitCompletion";
 
 import type {
   KioskRegistrationPayload,
+  KioskRegistrationResult,
   VisitorIdentificationType
 } from "../types/kiosk";
 
@@ -51,7 +54,7 @@ const initialForm: RegistrationForm = {
   purposeOfVisit: ""
 };
 
-export function KioskRegistrationPage() {
+export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInvalid: (message: string) => void }) {
   const [form, setForm] =
     useState<RegistrationForm>(initialForm);
 
@@ -59,20 +62,40 @@ export function KioskRegistrationPage() {
     useState<string | null>(null);
 
   const [completedRegistration, setCompletedRegistration] =
-    useState<{
-      referenceNumber: string;
-      registeredAt: string;
-    } | null>(null);
+    useState<KioskRegistrationResult["data"] | null>(() => {
+      try {
+        const saved = JSON.parse(window.sessionStorage.getItem("smartpass360.pendingVisit") ?? "null");
+        return saved?.receiptToken && saved?.visitId ? saved : null;
+      } catch { return null; }
+    });
 
   const registeredKioskId =
     window.localStorage.getItem("smartpass360.kioskId");
 
   const kioskConfigQuery = useQuery({
-    queryKey: ["kiosk-config", registeredKioskId],
+    queryKey: ["kiosk-config", registeredKioskId, window.localStorage.getItem("smartpass360.deviceId")],
     queryFn: () => getRegisteredKioskConfig(registeredKioskId!),
     enabled: Boolean(registeredKioskId),
-    retry: 1
+    retry: (failureCount, error) => !(error instanceof ApiError && [401, 403, 404].includes(error.status)) && failureCount < 1
   });
+
+  useEffect(() => {
+    const error = kioskConfigQuery.error;
+    if (!(error instanceof ApiError)) return;
+    const details = error.details as { error?: { code?: string } } | null;
+    if (["KIOSK_DEVICE_REQUIRED", "KIOSK_NOT_AVAILABLE"].includes(details?.error?.code ?? "")) {
+      onActivationInvalid(error.message);
+    }
+  }, [kioskConfigQuery.error, onActivationInvalid]);
+
+  useEffect(() => {
+    const config = kioskConfigQuery.data?.data;
+    if (config) {
+      window.localStorage.setItem("smartpass360.siteId", config.site.id);
+      window.localStorage.setItem("smartpass360.siteName", config.site.name);
+      window.localStorage.setItem("smartpass360.kioskCode", config.kiosk.code);
+    }
+  }, [kioskConfigQuery.data]);
 
   const building = kioskConfigQuery.data?.data.site;
 
@@ -80,13 +103,8 @@ export function KioskRegistrationPage() {
     mutationFn: registerVisitorFromKiosk,
 
     onSuccess(response) {
-      setCompletedRegistration({
-        referenceNumber:
-          response.data.referenceNumber,
-
-        registeredAt:
-          response.data.registeredAt
-      });
+      window.sessionStorage.setItem("smartpass360.pendingVisit", JSON.stringify(response.data));
+      setCompletedRegistration(response.data);
 
       setErrorMessage(null);
       setForm(initialForm);
@@ -199,48 +217,14 @@ export function KioskRegistrationPage() {
   }
 
   function startAnotherRegistration() {
+    window.sessionStorage.removeItem("smartpass360.pendingVisit");
     setCompletedRegistration(null);
     setErrorMessage(null);
     setForm(initialForm);
   }
 
   if (completedRegistration) {
-    return (
-      <main className="kiosk-screen">
-        <section className="kiosk-complete">
-          <div className="kiosk-complete__icon">
-            ✓
-          </div>
-
-          <p className="kiosk-complete__eyebrow">
-            Registration submitted
-          </p>
-
-          <h1>Please wait for reception approval</h1>
-
-          <p className="kiosk-complete__description">
-            Your information has been sent securely to
-            the reception dashboard.
-          </p>
-
-          <div className="kiosk-reference">
-            <span>Visitor reference</span>
-
-            <strong>
-              {completedRegistration.referenceNumber}
-            </strong>
-          </div>
-
-          <button
-            type="button"
-            className="kiosk-primary-button"
-            onClick={startAnotherRegistration}
-          >
-            Register Another Visitor
-          </button>
-        </section>
-      </main>
-    );
+    return <KioskVisitCompletion registration={completedRegistration} onFinish={startAnotherRegistration} />;
   }
 
   return (
@@ -305,9 +289,9 @@ export function KioskRegistrationPage() {
             </strong>
 
             <span>
-              Please contact the receptionist for
-              assistance.
+              {kioskConfigQuery.error.message}
             </span>
+            <button type="button" onClick={() => void kioskConfigQuery.refetch()}>Retry connection</button>
           </div>
         )}
 
@@ -578,6 +562,7 @@ export function KioskRegistrationPage() {
               className="kiosk-primary-button"
               disabled={
                 registrationMutation.isPending ||
+                kioskConfigQuery.isPending ||
                 kioskConfigQuery.isError ||
                 !registeredKioskId
               }

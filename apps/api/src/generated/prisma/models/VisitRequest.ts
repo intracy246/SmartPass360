@@ -26,12 +26,18 @@ export type AggregateVisitRequest = {
 
 export type VisitRequestMinAggregateOutputType = {
   id: string | null
+  siteId: string | null
+  kioskId: string | null
+  source: string | null
+  kioskReceiptHash: string | null
   organizationId: string | null
   visitorId: string | null
   hostId: string | null
   departmentId: string | null
   visitorType: $Enums.VisitorType | null
   purpose: string | null
+  destinationOffice: string | null
+  hostNameSnapshot: string | null
   scheduledDate: Date | null
   expectedEntryTime: Date | null
   expectedExitTime: Date | null
@@ -46,12 +52,18 @@ export type VisitRequestMinAggregateOutputType = {
 
 export type VisitRequestMaxAggregateOutputType = {
   id: string | null
+  siteId: string | null
+  kioskId: string | null
+  source: string | null
+  kioskReceiptHash: string | null
   organizationId: string | null
   visitorId: string | null
   hostId: string | null
   departmentId: string | null
   visitorType: $Enums.VisitorType | null
   purpose: string | null
+  destinationOffice: string | null
+  hostNameSnapshot: string | null
   scheduledDate: Date | null
   expectedEntryTime: Date | null
   expectedExitTime: Date | null
@@ -66,12 +78,18 @@ export type VisitRequestMaxAggregateOutputType = {
 
 export type VisitRequestCountAggregateOutputType = {
   id: number
+  siteId: number
+  kioskId: number
+  source: number
+  kioskReceiptHash: number
   organizationId: number
   visitorId: number
   hostId: number
   departmentId: number
   visitorType: number
   purpose: number
+  destinationOffice: number
+  hostNameSnapshot: number
   scheduledDate: number
   expectedEntryTime: number
   expectedExitTime: number
@@ -88,12 +106,18 @@ export type VisitRequestCountAggregateOutputType = {
 
 export type VisitRequestMinAggregateInputType = {
   id?: true
+  siteId?: true
+  kioskId?: true
+  source?: true
+  kioskReceiptHash?: true
   organizationId?: true
   visitorId?: true
   hostId?: true
   departmentId?: true
   visitorType?: true
   purpose?: true
+  destinationOffice?: true
+  hostNameSnapshot?: true
   scheduledDate?: true
   expectedEntryTime?: true
   expectedExitTime?: true
@@ -108,12 +132,18 @@ export type VisitRequestMinAggregateInputType = {
 
 export type VisitRequestMaxAggregateInputType = {
   id?: true
+  siteId?: true
+  kioskId?: true
+  source?: true
+  kioskReceiptHash?: true
   organizationId?: true
   visitorId?: true
   hostId?: true
   departmentId?: true
   visitorType?: true
   purpose?: true
+  destinationOffice?: true
+  hostNameSnapshot?: true
   scheduledDate?: true
   expectedEntryTime?: true
   expectedExitTime?: true
@@ -128,12 +158,18 @@ export type VisitRequestMaxAggregateInputType = {
 
 export type VisitRequestCountAggregateInputType = {
   id?: true
+  siteId?: true
+  kioskId?: true
+  source?: true
+  kioskReceiptHash?: true
   organizationId?: true
   visitorId?: true
   hostId?: true
   departmentId?: true
   visitorType?: true
   purpose?: true
+  destinationOffice?: true
+  hostNameSnapshot?: true
   scheduledDate?: true
   expectedEntryTime?: true
   expectedExitTime?: true
@@ -221,12 +257,18 @@ export type VisitRequestGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
 
 export type VisitRequestGroupByOutputType = {
   id: string
+  siteId: string | null
+  kioskId: string | null
+  source: string
+  kioskReceiptHash: string | null
   organizationId: string
   visitorId: string
   hostId: string | null
   departmentId: string | null
   visitorType: $Enums.VisitorType
   purpose: string
+  destinationOffice: string | null
+  hostNameSnapshot: string | null
   scheduledDate: Date | null
   expectedEntryTime: Date | null
   expectedExitTime: Date | null
@@ -262,12 +304,18 @@ export type VisitRequestWhereInput = {
   OR?: Prisma.VisitRequestWhereInput[]
   NOT?: Prisma.VisitRequestWhereInput | Prisma.VisitRequestWhereInput[]
   id?: Prisma.UuidFilter<"VisitRequest"> | string
+  siteId?: Prisma.UuidNullableFilter<"VisitRequest"> | string | null
+  kioskId?: Prisma.UuidNullableFilter<"VisitRequest"> | string | null
+  source?: Prisma.StringFilter<"VisitRequest"> | string
+  kioskReceiptHash?: Prisma.StringNullableFilter<"VisitRequest"> | string | null
   organizationId?: Prisma.UuidFilter<"VisitRequest"> | string
   visitorId?: Prisma.UuidFilter<"VisitRequest"> | string
   hostId?: Prisma.UuidNullableFilter<"VisitRequest"> | string | null
   departmentId?: Prisma.UuidNullableFilter<"VisitRequest"> | string | null
   visitorType?: Prisma.EnumVisitorTypeFilter<"VisitRequest"> | $Enums.VisitorType
   purpose?: Prisma.StringFilter<"VisitRequest"> | string
+  destinationOffice?: Prisma.StringNullableFilter<"VisitRequest"> | string | null
+  hostNameSnapshot?: Prisma.StringNullableFilter<"VisitRequest"> | string | null
   scheduledDate?: Prisma.DateTimeNullableFilter<"VisitRequest"> | Date | string | null
   expectedEntryTime?: Prisma.DateTimeNullableFilter<"VisitRequest"> | Date | string | null
   expectedExitTime?: Prisma.DateTimeNullableFilter<"VisitRequest"> | Date | string | null
@@ -279,6 +327,8 @@ export type VisitRequestWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"VisitRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"VisitRequest"> | Date | string
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
+  site?: Prisma.XOR<Prisma.SiteNullableScalarRelationFilter, Prisma.SiteWhereInput> | null
+  kiosk?: Prisma.XOR<Prisma.KioskNullableScalarRelationFilter, Prisma.KioskWhereInput> | null
   visitor?: Prisma.XOR<Prisma.VisitorScalarRelationFilter, Prisma.VisitorWhereInput>
   host?: Prisma.XOR<Prisma.HostNullableScalarRelationFilter, Prisma.HostWhereInput> | null
   department?: Prisma.XOR<Prisma.DepartmentNullableScalarRelationFilter, Prisma.DepartmentWhereInput> | null
@@ -288,12 +338,18 @@ export type VisitRequestWhereInput = {
 
 export type VisitRequestOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  siteId?: Prisma.SortOrderInput | Prisma.SortOrder
+  kioskId?: Prisma.SortOrderInput | Prisma.SortOrder
+  source?: Prisma.SortOrder
+  kioskReceiptHash?: Prisma.SortOrderInput | Prisma.SortOrder
   organizationId?: Prisma.SortOrder
   visitorId?: Prisma.SortOrder
   hostId?: Prisma.SortOrderInput | Prisma.SortOrder
   departmentId?: Prisma.SortOrderInput | Prisma.SortOrder
   visitorType?: Prisma.SortOrder
   purpose?: Prisma.SortOrder
+  destinationOffice?: Prisma.SortOrderInput | Prisma.SortOrder
+  hostNameSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   scheduledDate?: Prisma.SortOrderInput | Prisma.SortOrder
   expectedEntryTime?: Prisma.SortOrderInput | Prisma.SortOrder
   expectedExitTime?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -305,6 +361,8 @@ export type VisitRequestOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   organization?: Prisma.OrganizationOrderByWithRelationInput
+  site?: Prisma.SiteOrderByWithRelationInput
+  kiosk?: Prisma.KioskOrderByWithRelationInput
   visitor?: Prisma.VisitorOrderByWithRelationInput
   host?: Prisma.HostOrderByWithRelationInput
   department?: Prisma.DepartmentOrderByWithRelationInput
@@ -317,12 +375,18 @@ export type VisitRequestWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.VisitRequestWhereInput | Prisma.VisitRequestWhereInput[]
   OR?: Prisma.VisitRequestWhereInput[]
   NOT?: Prisma.VisitRequestWhereInput | Prisma.VisitRequestWhereInput[]
+  siteId?: Prisma.UuidNullableFilter<"VisitRequest"> | string | null
+  kioskId?: Prisma.UuidNullableFilter<"VisitRequest"> | string | null
+  source?: Prisma.StringFilter<"VisitRequest"> | string
+  kioskReceiptHash?: Prisma.StringNullableFilter<"VisitRequest"> | string | null
   organizationId?: Prisma.UuidFilter<"VisitRequest"> | string
   visitorId?: Prisma.UuidFilter<"VisitRequest"> | string
   hostId?: Prisma.UuidNullableFilter<"VisitRequest"> | string | null
   departmentId?: Prisma.UuidNullableFilter<"VisitRequest"> | string | null
   visitorType?: Prisma.EnumVisitorTypeFilter<"VisitRequest"> | $Enums.VisitorType
   purpose?: Prisma.StringFilter<"VisitRequest"> | string
+  destinationOffice?: Prisma.StringNullableFilter<"VisitRequest"> | string | null
+  hostNameSnapshot?: Prisma.StringNullableFilter<"VisitRequest"> | string | null
   scheduledDate?: Prisma.DateTimeNullableFilter<"VisitRequest"> | Date | string | null
   expectedEntryTime?: Prisma.DateTimeNullableFilter<"VisitRequest"> | Date | string | null
   expectedExitTime?: Prisma.DateTimeNullableFilter<"VisitRequest"> | Date | string | null
@@ -334,6 +398,8 @@ export type VisitRequestWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"VisitRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"VisitRequest"> | Date | string
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
+  site?: Prisma.XOR<Prisma.SiteNullableScalarRelationFilter, Prisma.SiteWhereInput> | null
+  kiosk?: Prisma.XOR<Prisma.KioskNullableScalarRelationFilter, Prisma.KioskWhereInput> | null
   visitor?: Prisma.XOR<Prisma.VisitorScalarRelationFilter, Prisma.VisitorWhereInput>
   host?: Prisma.XOR<Prisma.HostNullableScalarRelationFilter, Prisma.HostWhereInput> | null
   department?: Prisma.XOR<Prisma.DepartmentNullableScalarRelationFilter, Prisma.DepartmentWhereInput> | null
@@ -343,12 +409,18 @@ export type VisitRequestWhereUniqueInput = Prisma.AtLeast<{
 
 export type VisitRequestOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  siteId?: Prisma.SortOrderInput | Prisma.SortOrder
+  kioskId?: Prisma.SortOrderInput | Prisma.SortOrder
+  source?: Prisma.SortOrder
+  kioskReceiptHash?: Prisma.SortOrderInput | Prisma.SortOrder
   organizationId?: Prisma.SortOrder
   visitorId?: Prisma.SortOrder
   hostId?: Prisma.SortOrderInput | Prisma.SortOrder
   departmentId?: Prisma.SortOrderInput | Prisma.SortOrder
   visitorType?: Prisma.SortOrder
   purpose?: Prisma.SortOrder
+  destinationOffice?: Prisma.SortOrderInput | Prisma.SortOrder
+  hostNameSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   scheduledDate?: Prisma.SortOrderInput | Prisma.SortOrder
   expectedEntryTime?: Prisma.SortOrderInput | Prisma.SortOrder
   expectedExitTime?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -369,12 +441,18 @@ export type VisitRequestScalarWhereWithAggregatesInput = {
   OR?: Prisma.VisitRequestScalarWhereWithAggregatesInput[]
   NOT?: Prisma.VisitRequestScalarWhereWithAggregatesInput | Prisma.VisitRequestScalarWhereWithAggregatesInput[]
   id?: Prisma.UuidWithAggregatesFilter<"VisitRequest"> | string
+  siteId?: Prisma.UuidNullableWithAggregatesFilter<"VisitRequest"> | string | null
+  kioskId?: Prisma.UuidNullableWithAggregatesFilter<"VisitRequest"> | string | null
+  source?: Prisma.StringWithAggregatesFilter<"VisitRequest"> | string
+  kioskReceiptHash?: Prisma.StringNullableWithAggregatesFilter<"VisitRequest"> | string | null
   organizationId?: Prisma.UuidWithAggregatesFilter<"VisitRequest"> | string
   visitorId?: Prisma.UuidWithAggregatesFilter<"VisitRequest"> | string
   hostId?: Prisma.UuidNullableWithAggregatesFilter<"VisitRequest"> | string | null
   departmentId?: Prisma.UuidNullableWithAggregatesFilter<"VisitRequest"> | string | null
   visitorType?: Prisma.EnumVisitorTypeWithAggregatesFilter<"VisitRequest"> | $Enums.VisitorType
   purpose?: Prisma.StringWithAggregatesFilter<"VisitRequest"> | string
+  destinationOffice?: Prisma.StringNullableWithAggregatesFilter<"VisitRequest"> | string | null
+  hostNameSnapshot?: Prisma.StringNullableWithAggregatesFilter<"VisitRequest"> | string | null
   scheduledDate?: Prisma.DateTimeNullableWithAggregatesFilter<"VisitRequest"> | Date | string | null
   expectedEntryTime?: Prisma.DateTimeNullableWithAggregatesFilter<"VisitRequest"> | Date | string | null
   expectedExitTime?: Prisma.DateTimeNullableWithAggregatesFilter<"VisitRequest"> | Date | string | null
@@ -389,8 +467,12 @@ export type VisitRequestScalarWhereWithAggregatesInput = {
 
 export type VisitRequestCreateInput = {
   id?: string
+  source?: string
+  kioskReceiptHash?: string | null
   visitorType?: $Enums.VisitorType
-  purpose: string
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
   scheduledDate?: Date | string | null
   expectedEntryTime?: Date | string | null
   expectedExitTime?: Date | string | null
@@ -402,6 +484,8 @@ export type VisitRequestCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   organization: Prisma.OrganizationCreateNestedOneWithoutVisitsInput
+  site?: Prisma.SiteCreateNestedOneWithoutVisitsInput
+  kiosk?: Prisma.KioskCreateNestedOneWithoutVisitsInput
   visitor: Prisma.VisitorCreateNestedOneWithoutVisitsInput
   host?: Prisma.HostCreateNestedOneWithoutVisitsInput
   department?: Prisma.DepartmentCreateNestedOneWithoutVisitsInput
@@ -411,12 +495,18 @@ export type VisitRequestCreateInput = {
 
 export type VisitRequestUncheckedCreateInput = {
   id?: string
+  siteId?: string | null
+  kioskId?: string | null
+  source?: string
+  kioskReceiptHash?: string | null
   organizationId: string
   visitorId: string
   hostId?: string | null
   departmentId?: string | null
   visitorType?: $Enums.VisitorType
-  purpose: string
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
   scheduledDate?: Date | string | null
   expectedEntryTime?: Date | string | null
   expectedExitTime?: Date | string | null
@@ -433,8 +523,12 @@ export type VisitRequestUncheckedCreateInput = {
 
 export type VisitRequestUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
   purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -446,6 +540,8 @@ export type VisitRequestUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutVisitsNestedInput
+  site?: Prisma.SiteUpdateOneWithoutVisitsNestedInput
+  kiosk?: Prisma.KioskUpdateOneWithoutVisitsNestedInput
   visitor?: Prisma.VisitorUpdateOneRequiredWithoutVisitsNestedInput
   host?: Prisma.HostUpdateOneWithoutVisitsNestedInput
   department?: Prisma.DepartmentUpdateOneWithoutVisitsNestedInput
@@ -455,12 +551,18 @@ export type VisitRequestUpdateInput = {
 
 export type VisitRequestUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kioskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   visitorId?: Prisma.StringFieldUpdateOperationsInput | string
   hostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
   purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -477,12 +579,18 @@ export type VisitRequestUncheckedUpdateInput = {
 
 export type VisitRequestCreateManyInput = {
   id?: string
+  siteId?: string | null
+  kioskId?: string | null
+  source?: string
+  kioskReceiptHash?: string | null
   organizationId: string
   visitorId: string
   hostId?: string | null
   departmentId?: string | null
   visitorType?: $Enums.VisitorType
-  purpose: string
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
   scheduledDate?: Date | string | null
   expectedEntryTime?: Date | string | null
   expectedExitTime?: Date | string | null
@@ -497,8 +605,12 @@ export type VisitRequestCreateManyInput = {
 
 export type VisitRequestUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
   purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -513,12 +625,18 @@ export type VisitRequestUpdateManyMutationInput = {
 
 export type VisitRequestUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kioskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   visitorId?: Prisma.StringFieldUpdateOperationsInput | string
   hostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
   purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -543,12 +661,18 @@ export type VisitRequestOrderByRelationAggregateInput = {
 
 export type VisitRequestCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  siteId?: Prisma.SortOrder
+  kioskId?: Prisma.SortOrder
+  source?: Prisma.SortOrder
+  kioskReceiptHash?: Prisma.SortOrder
   organizationId?: Prisma.SortOrder
   visitorId?: Prisma.SortOrder
   hostId?: Prisma.SortOrder
   departmentId?: Prisma.SortOrder
   visitorType?: Prisma.SortOrder
   purpose?: Prisma.SortOrder
+  destinationOffice?: Prisma.SortOrder
+  hostNameSnapshot?: Prisma.SortOrder
   scheduledDate?: Prisma.SortOrder
   expectedEntryTime?: Prisma.SortOrder
   expectedExitTime?: Prisma.SortOrder
@@ -563,12 +687,18 @@ export type VisitRequestCountOrderByAggregateInput = {
 
 export type VisitRequestMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  siteId?: Prisma.SortOrder
+  kioskId?: Prisma.SortOrder
+  source?: Prisma.SortOrder
+  kioskReceiptHash?: Prisma.SortOrder
   organizationId?: Prisma.SortOrder
   visitorId?: Prisma.SortOrder
   hostId?: Prisma.SortOrder
   departmentId?: Prisma.SortOrder
   visitorType?: Prisma.SortOrder
   purpose?: Prisma.SortOrder
+  destinationOffice?: Prisma.SortOrder
+  hostNameSnapshot?: Prisma.SortOrder
   scheduledDate?: Prisma.SortOrder
   expectedEntryTime?: Prisma.SortOrder
   expectedExitTime?: Prisma.SortOrder
@@ -583,12 +713,18 @@ export type VisitRequestMaxOrderByAggregateInput = {
 
 export type VisitRequestMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  siteId?: Prisma.SortOrder
+  kioskId?: Prisma.SortOrder
+  source?: Prisma.SortOrder
+  kioskReceiptHash?: Prisma.SortOrder
   organizationId?: Prisma.SortOrder
   visitorId?: Prisma.SortOrder
   hostId?: Prisma.SortOrder
   departmentId?: Prisma.SortOrder
   visitorType?: Prisma.SortOrder
   purpose?: Prisma.SortOrder
+  destinationOffice?: Prisma.SortOrder
+  hostNameSnapshot?: Prisma.SortOrder
   scheduledDate?: Prisma.SortOrder
   expectedEntryTime?: Prisma.SortOrder
   expectedExitTime?: Prisma.SortOrder
@@ -604,6 +740,11 @@ export type VisitRequestMinOrderByAggregateInput = {
 export type VisitRequestScalarRelationFilter = {
   is?: Prisma.VisitRequestWhereInput
   isNot?: Prisma.VisitRequestWhereInput
+}
+
+export type VisitRequestNullableScalarRelationFilter = {
+  is?: Prisma.VisitRequestWhereInput | null
+  isNot?: Prisma.VisitRequestWhereInput | null
 }
 
 export type VisitRequestCreateNestedManyWithoutOrganizationInput = {
@@ -645,6 +786,90 @@ export type VisitRequestUncheckedUpdateManyWithoutOrganizationNestedInput = {
   connect?: Prisma.VisitRequestWhereUniqueInput | Prisma.VisitRequestWhereUniqueInput[]
   update?: Prisma.VisitRequestUpdateWithWhereUniqueWithoutOrganizationInput | Prisma.VisitRequestUpdateWithWhereUniqueWithoutOrganizationInput[]
   updateMany?: Prisma.VisitRequestUpdateManyWithWhereWithoutOrganizationInput | Prisma.VisitRequestUpdateManyWithWhereWithoutOrganizationInput[]
+  deleteMany?: Prisma.VisitRequestScalarWhereInput | Prisma.VisitRequestScalarWhereInput[]
+}
+
+export type VisitRequestCreateNestedManyWithoutSiteInput = {
+  create?: Prisma.XOR<Prisma.VisitRequestCreateWithoutSiteInput, Prisma.VisitRequestUncheckedCreateWithoutSiteInput> | Prisma.VisitRequestCreateWithoutSiteInput[] | Prisma.VisitRequestUncheckedCreateWithoutSiteInput[]
+  connectOrCreate?: Prisma.VisitRequestCreateOrConnectWithoutSiteInput | Prisma.VisitRequestCreateOrConnectWithoutSiteInput[]
+  createMany?: Prisma.VisitRequestCreateManySiteInputEnvelope
+  connect?: Prisma.VisitRequestWhereUniqueInput | Prisma.VisitRequestWhereUniqueInput[]
+}
+
+export type VisitRequestUncheckedCreateNestedManyWithoutSiteInput = {
+  create?: Prisma.XOR<Prisma.VisitRequestCreateWithoutSiteInput, Prisma.VisitRequestUncheckedCreateWithoutSiteInput> | Prisma.VisitRequestCreateWithoutSiteInput[] | Prisma.VisitRequestUncheckedCreateWithoutSiteInput[]
+  connectOrCreate?: Prisma.VisitRequestCreateOrConnectWithoutSiteInput | Prisma.VisitRequestCreateOrConnectWithoutSiteInput[]
+  createMany?: Prisma.VisitRequestCreateManySiteInputEnvelope
+  connect?: Prisma.VisitRequestWhereUniqueInput | Prisma.VisitRequestWhereUniqueInput[]
+}
+
+export type VisitRequestUpdateManyWithoutSiteNestedInput = {
+  create?: Prisma.XOR<Prisma.VisitRequestCreateWithoutSiteInput, Prisma.VisitRequestUncheckedCreateWithoutSiteInput> | Prisma.VisitRequestCreateWithoutSiteInput[] | Prisma.VisitRequestUncheckedCreateWithoutSiteInput[]
+  connectOrCreate?: Prisma.VisitRequestCreateOrConnectWithoutSiteInput | Prisma.VisitRequestCreateOrConnectWithoutSiteInput[]
+  upsert?: Prisma.VisitRequestUpsertWithWhereUniqueWithoutSiteInput | Prisma.VisitRequestUpsertWithWhereUniqueWithoutSiteInput[]
+  createMany?: Prisma.VisitRequestCreateManySiteInputEnvelope
+  set?: Prisma.VisitRequestWhereUniqueInput | Prisma.VisitRequestWhereUniqueInput[]
+  disconnect?: Prisma.VisitRequestWhereUniqueInput | Prisma.VisitRequestWhereUniqueInput[]
+  delete?: Prisma.VisitRequestWhereUniqueInput | Prisma.VisitRequestWhereUniqueInput[]
+  connect?: Prisma.VisitRequestWhereUniqueInput | Prisma.VisitRequestWhereUniqueInput[]
+  update?: Prisma.VisitRequestUpdateWithWhereUniqueWithoutSiteInput | Prisma.VisitRequestUpdateWithWhereUniqueWithoutSiteInput[]
+  updateMany?: Prisma.VisitRequestUpdateManyWithWhereWithoutSiteInput | Prisma.VisitRequestUpdateManyWithWhereWithoutSiteInput[]
+  deleteMany?: Prisma.VisitRequestScalarWhereInput | Prisma.VisitRequestScalarWhereInput[]
+}
+
+export type VisitRequestUncheckedUpdateManyWithoutSiteNestedInput = {
+  create?: Prisma.XOR<Prisma.VisitRequestCreateWithoutSiteInput, Prisma.VisitRequestUncheckedCreateWithoutSiteInput> | Prisma.VisitRequestCreateWithoutSiteInput[] | Prisma.VisitRequestUncheckedCreateWithoutSiteInput[]
+  connectOrCreate?: Prisma.VisitRequestCreateOrConnectWithoutSiteInput | Prisma.VisitRequestCreateOrConnectWithoutSiteInput[]
+  upsert?: Prisma.VisitRequestUpsertWithWhereUniqueWithoutSiteInput | Prisma.VisitRequestUpsertWithWhereUniqueWithoutSiteInput[]
+  createMany?: Prisma.VisitRequestCreateManySiteInputEnvelope
+  set?: Prisma.VisitRequestWhereUniqueInput | Prisma.VisitRequestWhereUniqueInput[]
+  disconnect?: Prisma.VisitRequestWhereUniqueInput | Prisma.VisitRequestWhereUniqueInput[]
+  delete?: Prisma.VisitRequestWhereUniqueInput | Prisma.VisitRequestWhereUniqueInput[]
+  connect?: Prisma.VisitRequestWhereUniqueInput | Prisma.VisitRequestWhereUniqueInput[]
+  update?: Prisma.VisitRequestUpdateWithWhereUniqueWithoutSiteInput | Prisma.VisitRequestUpdateWithWhereUniqueWithoutSiteInput[]
+  updateMany?: Prisma.VisitRequestUpdateManyWithWhereWithoutSiteInput | Prisma.VisitRequestUpdateManyWithWhereWithoutSiteInput[]
+  deleteMany?: Prisma.VisitRequestScalarWhereInput | Prisma.VisitRequestScalarWhereInput[]
+}
+
+export type VisitRequestCreateNestedManyWithoutKioskInput = {
+  create?: Prisma.XOR<Prisma.VisitRequestCreateWithoutKioskInput, Prisma.VisitRequestUncheckedCreateWithoutKioskInput> | Prisma.VisitRequestCreateWithoutKioskInput[] | Prisma.VisitRequestUncheckedCreateWithoutKioskInput[]
+  connectOrCreate?: Prisma.VisitRequestCreateOrConnectWithoutKioskInput | Prisma.VisitRequestCreateOrConnectWithoutKioskInput[]
+  createMany?: Prisma.VisitRequestCreateManyKioskInputEnvelope
+  connect?: Prisma.VisitRequestWhereUniqueInput | Prisma.VisitRequestWhereUniqueInput[]
+}
+
+export type VisitRequestUncheckedCreateNestedManyWithoutKioskInput = {
+  create?: Prisma.XOR<Prisma.VisitRequestCreateWithoutKioskInput, Prisma.VisitRequestUncheckedCreateWithoutKioskInput> | Prisma.VisitRequestCreateWithoutKioskInput[] | Prisma.VisitRequestUncheckedCreateWithoutKioskInput[]
+  connectOrCreate?: Prisma.VisitRequestCreateOrConnectWithoutKioskInput | Prisma.VisitRequestCreateOrConnectWithoutKioskInput[]
+  createMany?: Prisma.VisitRequestCreateManyKioskInputEnvelope
+  connect?: Prisma.VisitRequestWhereUniqueInput | Prisma.VisitRequestWhereUniqueInput[]
+}
+
+export type VisitRequestUpdateManyWithoutKioskNestedInput = {
+  create?: Prisma.XOR<Prisma.VisitRequestCreateWithoutKioskInput, Prisma.VisitRequestUncheckedCreateWithoutKioskInput> | Prisma.VisitRequestCreateWithoutKioskInput[] | Prisma.VisitRequestUncheckedCreateWithoutKioskInput[]
+  connectOrCreate?: Prisma.VisitRequestCreateOrConnectWithoutKioskInput | Prisma.VisitRequestCreateOrConnectWithoutKioskInput[]
+  upsert?: Prisma.VisitRequestUpsertWithWhereUniqueWithoutKioskInput | Prisma.VisitRequestUpsertWithWhereUniqueWithoutKioskInput[]
+  createMany?: Prisma.VisitRequestCreateManyKioskInputEnvelope
+  set?: Prisma.VisitRequestWhereUniqueInput | Prisma.VisitRequestWhereUniqueInput[]
+  disconnect?: Prisma.VisitRequestWhereUniqueInput | Prisma.VisitRequestWhereUniqueInput[]
+  delete?: Prisma.VisitRequestWhereUniqueInput | Prisma.VisitRequestWhereUniqueInput[]
+  connect?: Prisma.VisitRequestWhereUniqueInput | Prisma.VisitRequestWhereUniqueInput[]
+  update?: Prisma.VisitRequestUpdateWithWhereUniqueWithoutKioskInput | Prisma.VisitRequestUpdateWithWhereUniqueWithoutKioskInput[]
+  updateMany?: Prisma.VisitRequestUpdateManyWithWhereWithoutKioskInput | Prisma.VisitRequestUpdateManyWithWhereWithoutKioskInput[]
+  deleteMany?: Prisma.VisitRequestScalarWhereInput | Prisma.VisitRequestScalarWhereInput[]
+}
+
+export type VisitRequestUncheckedUpdateManyWithoutKioskNestedInput = {
+  create?: Prisma.XOR<Prisma.VisitRequestCreateWithoutKioskInput, Prisma.VisitRequestUncheckedCreateWithoutKioskInput> | Prisma.VisitRequestCreateWithoutKioskInput[] | Prisma.VisitRequestUncheckedCreateWithoutKioskInput[]
+  connectOrCreate?: Prisma.VisitRequestCreateOrConnectWithoutKioskInput | Prisma.VisitRequestCreateOrConnectWithoutKioskInput[]
+  upsert?: Prisma.VisitRequestUpsertWithWhereUniqueWithoutKioskInput | Prisma.VisitRequestUpsertWithWhereUniqueWithoutKioskInput[]
+  createMany?: Prisma.VisitRequestCreateManyKioskInputEnvelope
+  set?: Prisma.VisitRequestWhereUniqueInput | Prisma.VisitRequestWhereUniqueInput[]
+  disconnect?: Prisma.VisitRequestWhereUniqueInput | Prisma.VisitRequestWhereUniqueInput[]
+  delete?: Prisma.VisitRequestWhereUniqueInput | Prisma.VisitRequestWhereUniqueInput[]
+  connect?: Prisma.VisitRequestWhereUniqueInput | Prisma.VisitRequestWhereUniqueInput[]
+  update?: Prisma.VisitRequestUpdateWithWhereUniqueWithoutKioskInput | Prisma.VisitRequestUpdateWithWhereUniqueWithoutKioskInput[]
+  updateMany?: Prisma.VisitRequestUpdateManyWithWhereWithoutKioskInput | Prisma.VisitRequestUpdateManyWithWhereWithoutKioskInput[]
   deleteMany?: Prisma.VisitRequestScalarWhereInput | Prisma.VisitRequestScalarWhereInput[]
 }
 
@@ -778,10 +1003,6 @@ export type EnumVisitorTypeFieldUpdateOperationsInput = {
   set?: $Enums.VisitorType
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type EnumVisitStatusFieldUpdateOperationsInput = {
   set?: $Enums.VisitStatus
 }
@@ -806,18 +1027,24 @@ export type VisitRequestCreateNestedOneWithoutAccessEventsInput = {
   connect?: Prisma.VisitRequestWhereUniqueInput
 }
 
-export type VisitRequestUpdateOneRequiredWithoutAccessEventsNestedInput = {
+export type VisitRequestUpdateOneWithoutAccessEventsNestedInput = {
   create?: Prisma.XOR<Prisma.VisitRequestCreateWithoutAccessEventsInput, Prisma.VisitRequestUncheckedCreateWithoutAccessEventsInput>
   connectOrCreate?: Prisma.VisitRequestCreateOrConnectWithoutAccessEventsInput
   upsert?: Prisma.VisitRequestUpsertWithoutAccessEventsInput
+  disconnect?: Prisma.VisitRequestWhereInput | boolean
+  delete?: Prisma.VisitRequestWhereInput | boolean
   connect?: Prisma.VisitRequestWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.VisitRequestUpdateToOneWithWhereWithoutAccessEventsInput, Prisma.VisitRequestUpdateWithoutAccessEventsInput>, Prisma.VisitRequestUncheckedUpdateWithoutAccessEventsInput>
 }
 
 export type VisitRequestCreateWithoutOrganizationInput = {
   id?: string
+  source?: string
+  kioskReceiptHash?: string | null
   visitorType?: $Enums.VisitorType
-  purpose: string
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
   scheduledDate?: Date | string | null
   expectedEntryTime?: Date | string | null
   expectedExitTime?: Date | string | null
@@ -828,6 +1055,8 @@ export type VisitRequestCreateWithoutOrganizationInput = {
   checkedOutAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  site?: Prisma.SiteCreateNestedOneWithoutVisitsInput
+  kiosk?: Prisma.KioskCreateNestedOneWithoutVisitsInput
   visitor: Prisma.VisitorCreateNestedOneWithoutVisitsInput
   host?: Prisma.HostCreateNestedOneWithoutVisitsInput
   department?: Prisma.DepartmentCreateNestedOneWithoutVisitsInput
@@ -837,11 +1066,17 @@ export type VisitRequestCreateWithoutOrganizationInput = {
 
 export type VisitRequestUncheckedCreateWithoutOrganizationInput = {
   id?: string
+  siteId?: string | null
+  kioskId?: string | null
+  source?: string
+  kioskReceiptHash?: string | null
   visitorId: string
   hostId?: string | null
   departmentId?: string | null
   visitorType?: $Enums.VisitorType
-  purpose: string
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
   scheduledDate?: Date | string | null
   expectedEntryTime?: Date | string | null
   expectedExitTime?: Date | string | null
@@ -887,12 +1122,18 @@ export type VisitRequestScalarWhereInput = {
   OR?: Prisma.VisitRequestScalarWhereInput[]
   NOT?: Prisma.VisitRequestScalarWhereInput | Prisma.VisitRequestScalarWhereInput[]
   id?: Prisma.UuidFilter<"VisitRequest"> | string
+  siteId?: Prisma.UuidNullableFilter<"VisitRequest"> | string | null
+  kioskId?: Prisma.UuidNullableFilter<"VisitRequest"> | string | null
+  source?: Prisma.StringFilter<"VisitRequest"> | string
+  kioskReceiptHash?: Prisma.StringNullableFilter<"VisitRequest"> | string | null
   organizationId?: Prisma.UuidFilter<"VisitRequest"> | string
   visitorId?: Prisma.UuidFilter<"VisitRequest"> | string
   hostId?: Prisma.UuidNullableFilter<"VisitRequest"> | string | null
   departmentId?: Prisma.UuidNullableFilter<"VisitRequest"> | string | null
   visitorType?: Prisma.EnumVisitorTypeFilter<"VisitRequest"> | $Enums.VisitorType
   purpose?: Prisma.StringFilter<"VisitRequest"> | string
+  destinationOffice?: Prisma.StringNullableFilter<"VisitRequest"> | string | null
+  hostNameSnapshot?: Prisma.StringNullableFilter<"VisitRequest"> | string | null
   scheduledDate?: Prisma.DateTimeNullableFilter<"VisitRequest"> | Date | string | null
   expectedEntryTime?: Prisma.DateTimeNullableFilter<"VisitRequest"> | Date | string | null
   expectedExitTime?: Prisma.DateTimeNullableFilter<"VisitRequest"> | Date | string | null
@@ -905,10 +1146,14 @@ export type VisitRequestScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"VisitRequest"> | Date | string
 }
 
-export type VisitRequestCreateWithoutDepartmentInput = {
+export type VisitRequestCreateWithoutSiteInput = {
   id?: string
+  source?: string
+  kioskReceiptHash?: string | null
   visitorType?: $Enums.VisitorType
-  purpose: string
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
   scheduledDate?: Date | string | null
   expectedEntryTime?: Date | string | null
   expectedExitTime?: Date | string | null
@@ -920,6 +1165,168 @@ export type VisitRequestCreateWithoutDepartmentInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   organization: Prisma.OrganizationCreateNestedOneWithoutVisitsInput
+  kiosk?: Prisma.KioskCreateNestedOneWithoutVisitsInput
+  visitor: Prisma.VisitorCreateNestedOneWithoutVisitsInput
+  host?: Prisma.HostCreateNestedOneWithoutVisitsInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutVisitsInput
+  pass?: Prisma.VisitorPassCreateNestedOneWithoutVisitInput
+  accessEvents?: Prisma.AccessEventCreateNestedManyWithoutVisitInput
+}
+
+export type VisitRequestUncheckedCreateWithoutSiteInput = {
+  id?: string
+  kioskId?: string | null
+  source?: string
+  kioskReceiptHash?: string | null
+  organizationId: string
+  visitorId: string
+  hostId?: string | null
+  departmentId?: string | null
+  visitorType?: $Enums.VisitorType
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
+  scheduledDate?: Date | string | null
+  expectedEntryTime?: Date | string | null
+  expectedExitTime?: Date | string | null
+  approvalRequired?: boolean
+  status?: $Enums.VisitStatus
+  approvedAt?: Date | string | null
+  checkedInAt?: Date | string | null
+  checkedOutAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  pass?: Prisma.VisitorPassUncheckedCreateNestedOneWithoutVisitInput
+  accessEvents?: Prisma.AccessEventUncheckedCreateNestedManyWithoutVisitInput
+}
+
+export type VisitRequestCreateOrConnectWithoutSiteInput = {
+  where: Prisma.VisitRequestWhereUniqueInput
+  create: Prisma.XOR<Prisma.VisitRequestCreateWithoutSiteInput, Prisma.VisitRequestUncheckedCreateWithoutSiteInput>
+}
+
+export type VisitRequestCreateManySiteInputEnvelope = {
+  data: Prisma.VisitRequestCreateManySiteInput | Prisma.VisitRequestCreateManySiteInput[]
+  skipDuplicates?: boolean
+}
+
+export type VisitRequestUpsertWithWhereUniqueWithoutSiteInput = {
+  where: Prisma.VisitRequestWhereUniqueInput
+  update: Prisma.XOR<Prisma.VisitRequestUpdateWithoutSiteInput, Prisma.VisitRequestUncheckedUpdateWithoutSiteInput>
+  create: Prisma.XOR<Prisma.VisitRequestCreateWithoutSiteInput, Prisma.VisitRequestUncheckedCreateWithoutSiteInput>
+}
+
+export type VisitRequestUpdateWithWhereUniqueWithoutSiteInput = {
+  where: Prisma.VisitRequestWhereUniqueInput
+  data: Prisma.XOR<Prisma.VisitRequestUpdateWithoutSiteInput, Prisma.VisitRequestUncheckedUpdateWithoutSiteInput>
+}
+
+export type VisitRequestUpdateManyWithWhereWithoutSiteInput = {
+  where: Prisma.VisitRequestScalarWhereInput
+  data: Prisma.XOR<Prisma.VisitRequestUpdateManyMutationInput, Prisma.VisitRequestUncheckedUpdateManyWithoutSiteInput>
+}
+
+export type VisitRequestCreateWithoutKioskInput = {
+  id?: string
+  source?: string
+  kioskReceiptHash?: string | null
+  visitorType?: $Enums.VisitorType
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
+  scheduledDate?: Date | string | null
+  expectedEntryTime?: Date | string | null
+  expectedExitTime?: Date | string | null
+  approvalRequired?: boolean
+  status?: $Enums.VisitStatus
+  approvedAt?: Date | string | null
+  checkedInAt?: Date | string | null
+  checkedOutAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutVisitsInput
+  site?: Prisma.SiteCreateNestedOneWithoutVisitsInput
+  visitor: Prisma.VisitorCreateNestedOneWithoutVisitsInput
+  host?: Prisma.HostCreateNestedOneWithoutVisitsInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutVisitsInput
+  pass?: Prisma.VisitorPassCreateNestedOneWithoutVisitInput
+  accessEvents?: Prisma.AccessEventCreateNestedManyWithoutVisitInput
+}
+
+export type VisitRequestUncheckedCreateWithoutKioskInput = {
+  id?: string
+  siteId?: string | null
+  source?: string
+  kioskReceiptHash?: string | null
+  organizationId: string
+  visitorId: string
+  hostId?: string | null
+  departmentId?: string | null
+  visitorType?: $Enums.VisitorType
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
+  scheduledDate?: Date | string | null
+  expectedEntryTime?: Date | string | null
+  expectedExitTime?: Date | string | null
+  approvalRequired?: boolean
+  status?: $Enums.VisitStatus
+  approvedAt?: Date | string | null
+  checkedInAt?: Date | string | null
+  checkedOutAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  pass?: Prisma.VisitorPassUncheckedCreateNestedOneWithoutVisitInput
+  accessEvents?: Prisma.AccessEventUncheckedCreateNestedManyWithoutVisitInput
+}
+
+export type VisitRequestCreateOrConnectWithoutKioskInput = {
+  where: Prisma.VisitRequestWhereUniqueInput
+  create: Prisma.XOR<Prisma.VisitRequestCreateWithoutKioskInput, Prisma.VisitRequestUncheckedCreateWithoutKioskInput>
+}
+
+export type VisitRequestCreateManyKioskInputEnvelope = {
+  data: Prisma.VisitRequestCreateManyKioskInput | Prisma.VisitRequestCreateManyKioskInput[]
+  skipDuplicates?: boolean
+}
+
+export type VisitRequestUpsertWithWhereUniqueWithoutKioskInput = {
+  where: Prisma.VisitRequestWhereUniqueInput
+  update: Prisma.XOR<Prisma.VisitRequestUpdateWithoutKioskInput, Prisma.VisitRequestUncheckedUpdateWithoutKioskInput>
+  create: Prisma.XOR<Prisma.VisitRequestCreateWithoutKioskInput, Prisma.VisitRequestUncheckedCreateWithoutKioskInput>
+}
+
+export type VisitRequestUpdateWithWhereUniqueWithoutKioskInput = {
+  where: Prisma.VisitRequestWhereUniqueInput
+  data: Prisma.XOR<Prisma.VisitRequestUpdateWithoutKioskInput, Prisma.VisitRequestUncheckedUpdateWithoutKioskInput>
+}
+
+export type VisitRequestUpdateManyWithWhereWithoutKioskInput = {
+  where: Prisma.VisitRequestScalarWhereInput
+  data: Prisma.XOR<Prisma.VisitRequestUpdateManyMutationInput, Prisma.VisitRequestUncheckedUpdateManyWithoutKioskInput>
+}
+
+export type VisitRequestCreateWithoutDepartmentInput = {
+  id?: string
+  source?: string
+  kioskReceiptHash?: string | null
+  visitorType?: $Enums.VisitorType
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
+  scheduledDate?: Date | string | null
+  expectedEntryTime?: Date | string | null
+  expectedExitTime?: Date | string | null
+  approvalRequired?: boolean
+  status?: $Enums.VisitStatus
+  approvedAt?: Date | string | null
+  checkedInAt?: Date | string | null
+  checkedOutAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutVisitsInput
+  site?: Prisma.SiteCreateNestedOneWithoutVisitsInput
+  kiosk?: Prisma.KioskCreateNestedOneWithoutVisitsInput
   visitor: Prisma.VisitorCreateNestedOneWithoutVisitsInput
   host?: Prisma.HostCreateNestedOneWithoutVisitsInput
   pass?: Prisma.VisitorPassCreateNestedOneWithoutVisitInput
@@ -928,11 +1335,17 @@ export type VisitRequestCreateWithoutDepartmentInput = {
 
 export type VisitRequestUncheckedCreateWithoutDepartmentInput = {
   id?: string
+  siteId?: string | null
+  kioskId?: string | null
+  source?: string
+  kioskReceiptHash?: string | null
   organizationId: string
   visitorId: string
   hostId?: string | null
   visitorType?: $Enums.VisitorType
-  purpose: string
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
   scheduledDate?: Date | string | null
   expectedEntryTime?: Date | string | null
   expectedExitTime?: Date | string | null
@@ -975,8 +1388,12 @@ export type VisitRequestUpdateManyWithWhereWithoutDepartmentInput = {
 
 export type VisitRequestCreateWithoutHostInput = {
   id?: string
+  source?: string
+  kioskReceiptHash?: string | null
   visitorType?: $Enums.VisitorType
-  purpose: string
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
   scheduledDate?: Date | string | null
   expectedEntryTime?: Date | string | null
   expectedExitTime?: Date | string | null
@@ -988,6 +1405,8 @@ export type VisitRequestCreateWithoutHostInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   organization: Prisma.OrganizationCreateNestedOneWithoutVisitsInput
+  site?: Prisma.SiteCreateNestedOneWithoutVisitsInput
+  kiosk?: Prisma.KioskCreateNestedOneWithoutVisitsInput
   visitor: Prisma.VisitorCreateNestedOneWithoutVisitsInput
   department?: Prisma.DepartmentCreateNestedOneWithoutVisitsInput
   pass?: Prisma.VisitorPassCreateNestedOneWithoutVisitInput
@@ -996,11 +1415,17 @@ export type VisitRequestCreateWithoutHostInput = {
 
 export type VisitRequestUncheckedCreateWithoutHostInput = {
   id?: string
+  siteId?: string | null
+  kioskId?: string | null
+  source?: string
+  kioskReceiptHash?: string | null
   organizationId: string
   visitorId: string
   departmentId?: string | null
   visitorType?: $Enums.VisitorType
-  purpose: string
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
   scheduledDate?: Date | string | null
   expectedEntryTime?: Date | string | null
   expectedExitTime?: Date | string | null
@@ -1043,8 +1468,12 @@ export type VisitRequestUpdateManyWithWhereWithoutHostInput = {
 
 export type VisitRequestCreateWithoutVisitorInput = {
   id?: string
+  source?: string
+  kioskReceiptHash?: string | null
   visitorType?: $Enums.VisitorType
-  purpose: string
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
   scheduledDate?: Date | string | null
   expectedEntryTime?: Date | string | null
   expectedExitTime?: Date | string | null
@@ -1056,6 +1485,8 @@ export type VisitRequestCreateWithoutVisitorInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   organization: Prisma.OrganizationCreateNestedOneWithoutVisitsInput
+  site?: Prisma.SiteCreateNestedOneWithoutVisitsInput
+  kiosk?: Prisma.KioskCreateNestedOneWithoutVisitsInput
   host?: Prisma.HostCreateNestedOneWithoutVisitsInput
   department?: Prisma.DepartmentCreateNestedOneWithoutVisitsInput
   pass?: Prisma.VisitorPassCreateNestedOneWithoutVisitInput
@@ -1064,11 +1495,17 @@ export type VisitRequestCreateWithoutVisitorInput = {
 
 export type VisitRequestUncheckedCreateWithoutVisitorInput = {
   id?: string
+  siteId?: string | null
+  kioskId?: string | null
+  source?: string
+  kioskReceiptHash?: string | null
   organizationId: string
   hostId?: string | null
   departmentId?: string | null
   visitorType?: $Enums.VisitorType
-  purpose: string
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
   scheduledDate?: Date | string | null
   expectedEntryTime?: Date | string | null
   expectedExitTime?: Date | string | null
@@ -1111,8 +1548,12 @@ export type VisitRequestUpdateManyWithWhereWithoutVisitorInput = {
 
 export type VisitRequestCreateWithoutPassInput = {
   id?: string
+  source?: string
+  kioskReceiptHash?: string | null
   visitorType?: $Enums.VisitorType
-  purpose: string
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
   scheduledDate?: Date | string | null
   expectedEntryTime?: Date | string | null
   expectedExitTime?: Date | string | null
@@ -1124,6 +1565,8 @@ export type VisitRequestCreateWithoutPassInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   organization: Prisma.OrganizationCreateNestedOneWithoutVisitsInput
+  site?: Prisma.SiteCreateNestedOneWithoutVisitsInput
+  kiosk?: Prisma.KioskCreateNestedOneWithoutVisitsInput
   visitor: Prisma.VisitorCreateNestedOneWithoutVisitsInput
   host?: Prisma.HostCreateNestedOneWithoutVisitsInput
   department?: Prisma.DepartmentCreateNestedOneWithoutVisitsInput
@@ -1132,12 +1575,18 @@ export type VisitRequestCreateWithoutPassInput = {
 
 export type VisitRequestUncheckedCreateWithoutPassInput = {
   id?: string
+  siteId?: string | null
+  kioskId?: string | null
+  source?: string
+  kioskReceiptHash?: string | null
   organizationId: string
   visitorId: string
   hostId?: string | null
   departmentId?: string | null
   visitorType?: $Enums.VisitorType
-  purpose: string
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
   scheduledDate?: Date | string | null
   expectedEntryTime?: Date | string | null
   expectedExitTime?: Date | string | null
@@ -1169,8 +1618,12 @@ export type VisitRequestUpdateToOneWithWhereWithoutPassInput = {
 
 export type VisitRequestUpdateWithoutPassInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
   purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1182,6 +1635,8 @@ export type VisitRequestUpdateWithoutPassInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutVisitsNestedInput
+  site?: Prisma.SiteUpdateOneWithoutVisitsNestedInput
+  kiosk?: Prisma.KioskUpdateOneWithoutVisitsNestedInput
   visitor?: Prisma.VisitorUpdateOneRequiredWithoutVisitsNestedInput
   host?: Prisma.HostUpdateOneWithoutVisitsNestedInput
   department?: Prisma.DepartmentUpdateOneWithoutVisitsNestedInput
@@ -1190,12 +1645,18 @@ export type VisitRequestUpdateWithoutPassInput = {
 
 export type VisitRequestUncheckedUpdateWithoutPassInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kioskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   visitorId?: Prisma.StringFieldUpdateOperationsInput | string
   hostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
   purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1211,8 +1672,12 @@ export type VisitRequestUncheckedUpdateWithoutPassInput = {
 
 export type VisitRequestCreateWithoutAccessEventsInput = {
   id?: string
+  source?: string
+  kioskReceiptHash?: string | null
   visitorType?: $Enums.VisitorType
-  purpose: string
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
   scheduledDate?: Date | string | null
   expectedEntryTime?: Date | string | null
   expectedExitTime?: Date | string | null
@@ -1224,6 +1689,8 @@ export type VisitRequestCreateWithoutAccessEventsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   organization: Prisma.OrganizationCreateNestedOneWithoutVisitsInput
+  site?: Prisma.SiteCreateNestedOneWithoutVisitsInput
+  kiosk?: Prisma.KioskCreateNestedOneWithoutVisitsInput
   visitor: Prisma.VisitorCreateNestedOneWithoutVisitsInput
   host?: Prisma.HostCreateNestedOneWithoutVisitsInput
   department?: Prisma.DepartmentCreateNestedOneWithoutVisitsInput
@@ -1232,12 +1699,18 @@ export type VisitRequestCreateWithoutAccessEventsInput = {
 
 export type VisitRequestUncheckedCreateWithoutAccessEventsInput = {
   id?: string
+  siteId?: string | null
+  kioskId?: string | null
+  source?: string
+  kioskReceiptHash?: string | null
   organizationId: string
   visitorId: string
   hostId?: string | null
   departmentId?: string | null
   visitorType?: $Enums.VisitorType
-  purpose: string
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
   scheduledDate?: Date | string | null
   expectedEntryTime?: Date | string | null
   expectedExitTime?: Date | string | null
@@ -1269,8 +1742,12 @@ export type VisitRequestUpdateToOneWithWhereWithoutAccessEventsInput = {
 
 export type VisitRequestUpdateWithoutAccessEventsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
   purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1282,6 +1759,8 @@ export type VisitRequestUpdateWithoutAccessEventsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutVisitsNestedInput
+  site?: Prisma.SiteUpdateOneWithoutVisitsNestedInput
+  kiosk?: Prisma.KioskUpdateOneWithoutVisitsNestedInput
   visitor?: Prisma.VisitorUpdateOneRequiredWithoutVisitsNestedInput
   host?: Prisma.HostUpdateOneWithoutVisitsNestedInput
   department?: Prisma.DepartmentUpdateOneWithoutVisitsNestedInput
@@ -1290,12 +1769,18 @@ export type VisitRequestUpdateWithoutAccessEventsInput = {
 
 export type VisitRequestUncheckedUpdateWithoutAccessEventsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kioskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   visitorId?: Prisma.StringFieldUpdateOperationsInput | string
   hostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
   purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1311,11 +1796,17 @@ export type VisitRequestUncheckedUpdateWithoutAccessEventsInput = {
 
 export type VisitRequestCreateManyOrganizationInput = {
   id?: string
+  siteId?: string | null
+  kioskId?: string | null
+  source?: string
+  kioskReceiptHash?: string | null
   visitorId: string
   hostId?: string | null
   departmentId?: string | null
   visitorType?: $Enums.VisitorType
-  purpose: string
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
   scheduledDate?: Date | string | null
   expectedEntryTime?: Date | string | null
   expectedExitTime?: Date | string | null
@@ -1330,8 +1821,12 @@ export type VisitRequestCreateManyOrganizationInput = {
 
 export type VisitRequestUpdateWithoutOrganizationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
   purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1342,6 +1837,8 @@ export type VisitRequestUpdateWithoutOrganizationInput = {
   checkedOutAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  site?: Prisma.SiteUpdateOneWithoutVisitsNestedInput
+  kiosk?: Prisma.KioskUpdateOneWithoutVisitsNestedInput
   visitor?: Prisma.VisitorUpdateOneRequiredWithoutVisitsNestedInput
   host?: Prisma.HostUpdateOneWithoutVisitsNestedInput
   department?: Prisma.DepartmentUpdateOneWithoutVisitsNestedInput
@@ -1351,11 +1848,17 @@ export type VisitRequestUpdateWithoutOrganizationInput = {
 
 export type VisitRequestUncheckedUpdateWithoutOrganizationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kioskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visitorId?: Prisma.StringFieldUpdateOperationsInput | string
   hostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
   purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1372,11 +1875,225 @@ export type VisitRequestUncheckedUpdateWithoutOrganizationInput = {
 
 export type VisitRequestUncheckedUpdateManyWithoutOrganizationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kioskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visitorId?: Prisma.StringFieldUpdateOperationsInput | string
   hostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
   purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvalRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedInAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedOutAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type VisitRequestCreateManySiteInput = {
+  id?: string
+  kioskId?: string | null
+  source?: string
+  kioskReceiptHash?: string | null
+  organizationId: string
+  visitorId: string
+  hostId?: string | null
+  departmentId?: string | null
+  visitorType?: $Enums.VisitorType
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
+  scheduledDate?: Date | string | null
+  expectedEntryTime?: Date | string | null
+  expectedExitTime?: Date | string | null
+  approvalRequired?: boolean
+  status?: $Enums.VisitStatus
+  approvedAt?: Date | string | null
+  checkedInAt?: Date | string | null
+  checkedOutAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type VisitRequestUpdateWithoutSiteInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
+  purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvalRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedInAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedOutAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutVisitsNestedInput
+  kiosk?: Prisma.KioskUpdateOneWithoutVisitsNestedInput
+  visitor?: Prisma.VisitorUpdateOneRequiredWithoutVisitsNestedInput
+  host?: Prisma.HostUpdateOneWithoutVisitsNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutVisitsNestedInput
+  pass?: Prisma.VisitorPassUpdateOneWithoutVisitNestedInput
+  accessEvents?: Prisma.AccessEventUpdateManyWithoutVisitNestedInput
+}
+
+export type VisitRequestUncheckedUpdateWithoutSiteInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  visitorId?: Prisma.StringFieldUpdateOperationsInput | string
+  hostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
+  purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvalRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedInAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedOutAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pass?: Prisma.VisitorPassUncheckedUpdateOneWithoutVisitNestedInput
+  accessEvents?: Prisma.AccessEventUncheckedUpdateManyWithoutVisitNestedInput
+}
+
+export type VisitRequestUncheckedUpdateManyWithoutSiteInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  visitorId?: Prisma.StringFieldUpdateOperationsInput | string
+  hostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
+  purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvalRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedInAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedOutAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type VisitRequestCreateManyKioskInput = {
+  id?: string
+  siteId?: string | null
+  source?: string
+  kioskReceiptHash?: string | null
+  organizationId: string
+  visitorId: string
+  hostId?: string | null
+  departmentId?: string | null
+  visitorType?: $Enums.VisitorType
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
+  scheduledDate?: Date | string | null
+  expectedEntryTime?: Date | string | null
+  expectedExitTime?: Date | string | null
+  approvalRequired?: boolean
+  status?: $Enums.VisitStatus
+  approvedAt?: Date | string | null
+  checkedInAt?: Date | string | null
+  checkedOutAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type VisitRequestUpdateWithoutKioskInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
+  purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvalRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedInAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedOutAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutVisitsNestedInput
+  site?: Prisma.SiteUpdateOneWithoutVisitsNestedInput
+  visitor?: Prisma.VisitorUpdateOneRequiredWithoutVisitsNestedInput
+  host?: Prisma.HostUpdateOneWithoutVisitsNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutVisitsNestedInput
+  pass?: Prisma.VisitorPassUpdateOneWithoutVisitNestedInput
+  accessEvents?: Prisma.AccessEventUpdateManyWithoutVisitNestedInput
+}
+
+export type VisitRequestUncheckedUpdateWithoutKioskInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  visitorId?: Prisma.StringFieldUpdateOperationsInput | string
+  hostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
+  purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvalRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedInAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkedOutAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pass?: Prisma.VisitorPassUncheckedUpdateOneWithoutVisitNestedInput
+  accessEvents?: Prisma.AccessEventUncheckedUpdateManyWithoutVisitNestedInput
+}
+
+export type VisitRequestUncheckedUpdateManyWithoutKioskInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  visitorId?: Prisma.StringFieldUpdateOperationsInput | string
+  hostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
+  purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1391,11 +2108,17 @@ export type VisitRequestUncheckedUpdateManyWithoutOrganizationInput = {
 
 export type VisitRequestCreateManyDepartmentInput = {
   id?: string
+  siteId?: string | null
+  kioskId?: string | null
+  source?: string
+  kioskReceiptHash?: string | null
   organizationId: string
   visitorId: string
   hostId?: string | null
   visitorType?: $Enums.VisitorType
-  purpose: string
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
   scheduledDate?: Date | string | null
   expectedEntryTime?: Date | string | null
   expectedExitTime?: Date | string | null
@@ -1410,8 +2133,12 @@ export type VisitRequestCreateManyDepartmentInput = {
 
 export type VisitRequestUpdateWithoutDepartmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
   purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1423,6 +2150,8 @@ export type VisitRequestUpdateWithoutDepartmentInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutVisitsNestedInput
+  site?: Prisma.SiteUpdateOneWithoutVisitsNestedInput
+  kiosk?: Prisma.KioskUpdateOneWithoutVisitsNestedInput
   visitor?: Prisma.VisitorUpdateOneRequiredWithoutVisitsNestedInput
   host?: Prisma.HostUpdateOneWithoutVisitsNestedInput
   pass?: Prisma.VisitorPassUpdateOneWithoutVisitNestedInput
@@ -1431,11 +2160,17 @@ export type VisitRequestUpdateWithoutDepartmentInput = {
 
 export type VisitRequestUncheckedUpdateWithoutDepartmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kioskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   visitorId?: Prisma.StringFieldUpdateOperationsInput | string
   hostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
   purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1452,11 +2187,17 @@ export type VisitRequestUncheckedUpdateWithoutDepartmentInput = {
 
 export type VisitRequestUncheckedUpdateManyWithoutDepartmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kioskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   visitorId?: Prisma.StringFieldUpdateOperationsInput | string
   hostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
   purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1471,11 +2212,17 @@ export type VisitRequestUncheckedUpdateManyWithoutDepartmentInput = {
 
 export type VisitRequestCreateManyHostInput = {
   id?: string
+  siteId?: string | null
+  kioskId?: string | null
+  source?: string
+  kioskReceiptHash?: string | null
   organizationId: string
   visitorId: string
   departmentId?: string | null
   visitorType?: $Enums.VisitorType
-  purpose: string
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
   scheduledDate?: Date | string | null
   expectedEntryTime?: Date | string | null
   expectedExitTime?: Date | string | null
@@ -1490,8 +2237,12 @@ export type VisitRequestCreateManyHostInput = {
 
 export type VisitRequestUpdateWithoutHostInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
   purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1503,6 +2254,8 @@ export type VisitRequestUpdateWithoutHostInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutVisitsNestedInput
+  site?: Prisma.SiteUpdateOneWithoutVisitsNestedInput
+  kiosk?: Prisma.KioskUpdateOneWithoutVisitsNestedInput
   visitor?: Prisma.VisitorUpdateOneRequiredWithoutVisitsNestedInput
   department?: Prisma.DepartmentUpdateOneWithoutVisitsNestedInput
   pass?: Prisma.VisitorPassUpdateOneWithoutVisitNestedInput
@@ -1511,11 +2264,17 @@ export type VisitRequestUpdateWithoutHostInput = {
 
 export type VisitRequestUncheckedUpdateWithoutHostInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kioskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   visitorId?: Prisma.StringFieldUpdateOperationsInput | string
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
   purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1532,11 +2291,17 @@ export type VisitRequestUncheckedUpdateWithoutHostInput = {
 
 export type VisitRequestUncheckedUpdateManyWithoutHostInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kioskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   visitorId?: Prisma.StringFieldUpdateOperationsInput | string
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
   purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1551,11 +2316,17 @@ export type VisitRequestUncheckedUpdateManyWithoutHostInput = {
 
 export type VisitRequestCreateManyVisitorInput = {
   id?: string
+  siteId?: string | null
+  kioskId?: string | null
+  source?: string
+  kioskReceiptHash?: string | null
   organizationId: string
   hostId?: string | null
   departmentId?: string | null
   visitorType?: $Enums.VisitorType
-  purpose: string
+  purpose?: string
+  destinationOffice?: string | null
+  hostNameSnapshot?: string | null
   scheduledDate?: Date | string | null
   expectedEntryTime?: Date | string | null
   expectedExitTime?: Date | string | null
@@ -1570,8 +2341,12 @@ export type VisitRequestCreateManyVisitorInput = {
 
 export type VisitRequestUpdateWithoutVisitorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
   purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1583,6 +2358,8 @@ export type VisitRequestUpdateWithoutVisitorInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutVisitsNestedInput
+  site?: Prisma.SiteUpdateOneWithoutVisitsNestedInput
+  kiosk?: Prisma.KioskUpdateOneWithoutVisitsNestedInput
   host?: Prisma.HostUpdateOneWithoutVisitsNestedInput
   department?: Prisma.DepartmentUpdateOneWithoutVisitsNestedInput
   pass?: Prisma.VisitorPassUpdateOneWithoutVisitNestedInput
@@ -1591,11 +2368,17 @@ export type VisitRequestUpdateWithoutVisitorInput = {
 
 export type VisitRequestUncheckedUpdateWithoutVisitorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kioskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   hostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
   purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1612,11 +2395,17 @@ export type VisitRequestUncheckedUpdateWithoutVisitorInput = {
 
 export type VisitRequestUncheckedUpdateManyWithoutVisitorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  siteId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kioskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  kioskReceiptHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   hostId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visitorType?: Prisma.EnumVisitorTypeFieldUpdateOperationsInput | $Enums.VisitorType
   purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationOffice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hostNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedEntryTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   expectedExitTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1662,12 +2451,18 @@ export type VisitRequestCountOutputTypeCountAccessEventsArgs<ExtArgs extends run
 
 export type VisitRequestSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  siteId?: boolean
+  kioskId?: boolean
+  source?: boolean
+  kioskReceiptHash?: boolean
   organizationId?: boolean
   visitorId?: boolean
   hostId?: boolean
   departmentId?: boolean
   visitorType?: boolean
   purpose?: boolean
+  destinationOffice?: boolean
+  hostNameSnapshot?: boolean
   scheduledDate?: boolean
   expectedEntryTime?: boolean
   expectedExitTime?: boolean
@@ -1679,6 +2474,8 @@ export type VisitRequestSelect<ExtArgs extends runtime.Types.Extensions.Internal
   createdAt?: boolean
   updatedAt?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  site?: boolean | Prisma.VisitRequest$siteArgs<ExtArgs>
+  kiosk?: boolean | Prisma.VisitRequest$kioskArgs<ExtArgs>
   visitor?: boolean | Prisma.VisitorDefaultArgs<ExtArgs>
   host?: boolean | Prisma.VisitRequest$hostArgs<ExtArgs>
   department?: boolean | Prisma.VisitRequest$departmentArgs<ExtArgs>
@@ -1689,12 +2486,18 @@ export type VisitRequestSelect<ExtArgs extends runtime.Types.Extensions.Internal
 
 export type VisitRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  siteId?: boolean
+  kioskId?: boolean
+  source?: boolean
+  kioskReceiptHash?: boolean
   organizationId?: boolean
   visitorId?: boolean
   hostId?: boolean
   departmentId?: boolean
   visitorType?: boolean
   purpose?: boolean
+  destinationOffice?: boolean
+  hostNameSnapshot?: boolean
   scheduledDate?: boolean
   expectedEntryTime?: boolean
   expectedExitTime?: boolean
@@ -1706,6 +2509,8 @@ export type VisitRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   createdAt?: boolean
   updatedAt?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  site?: boolean | Prisma.VisitRequest$siteArgs<ExtArgs>
+  kiosk?: boolean | Prisma.VisitRequest$kioskArgs<ExtArgs>
   visitor?: boolean | Prisma.VisitorDefaultArgs<ExtArgs>
   host?: boolean | Prisma.VisitRequest$hostArgs<ExtArgs>
   department?: boolean | Prisma.VisitRequest$departmentArgs<ExtArgs>
@@ -1713,12 +2518,18 @@ export type VisitRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
 
 export type VisitRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  siteId?: boolean
+  kioskId?: boolean
+  source?: boolean
+  kioskReceiptHash?: boolean
   organizationId?: boolean
   visitorId?: boolean
   hostId?: boolean
   departmentId?: boolean
   visitorType?: boolean
   purpose?: boolean
+  destinationOffice?: boolean
+  hostNameSnapshot?: boolean
   scheduledDate?: boolean
   expectedEntryTime?: boolean
   expectedExitTime?: boolean
@@ -1730,6 +2541,8 @@ export type VisitRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   createdAt?: boolean
   updatedAt?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  site?: boolean | Prisma.VisitRequest$siteArgs<ExtArgs>
+  kiosk?: boolean | Prisma.VisitRequest$kioskArgs<ExtArgs>
   visitor?: boolean | Prisma.VisitorDefaultArgs<ExtArgs>
   host?: boolean | Prisma.VisitRequest$hostArgs<ExtArgs>
   department?: boolean | Prisma.VisitRequest$departmentArgs<ExtArgs>
@@ -1737,12 +2550,18 @@ export type VisitRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
 
 export type VisitRequestSelectScalar = {
   id?: boolean
+  siteId?: boolean
+  kioskId?: boolean
+  source?: boolean
+  kioskReceiptHash?: boolean
   organizationId?: boolean
   visitorId?: boolean
   hostId?: boolean
   departmentId?: boolean
   visitorType?: boolean
   purpose?: boolean
+  destinationOffice?: boolean
+  hostNameSnapshot?: boolean
   scheduledDate?: boolean
   expectedEntryTime?: boolean
   expectedExitTime?: boolean
@@ -1755,9 +2574,11 @@ export type VisitRequestSelectScalar = {
   updatedAt?: boolean
 }
 
-export type VisitRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "visitorId" | "hostId" | "departmentId" | "visitorType" | "purpose" | "scheduledDate" | "expectedEntryTime" | "expectedExitTime" | "approvalRequired" | "status" | "approvedAt" | "checkedInAt" | "checkedOutAt" | "createdAt" | "updatedAt", ExtArgs["result"]["visitRequest"]>
+export type VisitRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "siteId" | "kioskId" | "source" | "kioskReceiptHash" | "organizationId" | "visitorId" | "hostId" | "departmentId" | "visitorType" | "purpose" | "destinationOffice" | "hostNameSnapshot" | "scheduledDate" | "expectedEntryTime" | "expectedExitTime" | "approvalRequired" | "status" | "approvedAt" | "checkedInAt" | "checkedOutAt" | "createdAt" | "updatedAt", ExtArgs["result"]["visitRequest"]>
 export type VisitRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  site?: boolean | Prisma.VisitRequest$siteArgs<ExtArgs>
+  kiosk?: boolean | Prisma.VisitRequest$kioskArgs<ExtArgs>
   visitor?: boolean | Prisma.VisitorDefaultArgs<ExtArgs>
   host?: boolean | Prisma.VisitRequest$hostArgs<ExtArgs>
   department?: boolean | Prisma.VisitRequest$departmentArgs<ExtArgs>
@@ -1767,12 +2588,16 @@ export type VisitRequestInclude<ExtArgs extends runtime.Types.Extensions.Interna
 }
 export type VisitRequestIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  site?: boolean | Prisma.VisitRequest$siteArgs<ExtArgs>
+  kiosk?: boolean | Prisma.VisitRequest$kioskArgs<ExtArgs>
   visitor?: boolean | Prisma.VisitorDefaultArgs<ExtArgs>
   host?: boolean | Prisma.VisitRequest$hostArgs<ExtArgs>
   department?: boolean | Prisma.VisitRequest$departmentArgs<ExtArgs>
 }
 export type VisitRequestIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  site?: boolean | Prisma.VisitRequest$siteArgs<ExtArgs>
+  kiosk?: boolean | Prisma.VisitRequest$kioskArgs<ExtArgs>
   visitor?: boolean | Prisma.VisitorDefaultArgs<ExtArgs>
   host?: boolean | Prisma.VisitRequest$hostArgs<ExtArgs>
   department?: boolean | Prisma.VisitRequest$departmentArgs<ExtArgs>
@@ -1782,6 +2607,8 @@ export type $VisitRequestPayload<ExtArgs extends runtime.Types.Extensions.Intern
   name: "VisitRequest"
   objects: {
     organization: Prisma.$OrganizationPayload<ExtArgs>
+    site: Prisma.$SitePayload<ExtArgs> | null
+    kiosk: Prisma.$KioskPayload<ExtArgs> | null
     visitor: Prisma.$VisitorPayload<ExtArgs>
     host: Prisma.$HostPayload<ExtArgs> | null
     department: Prisma.$DepartmentPayload<ExtArgs> | null
@@ -1790,12 +2617,18 @@ export type $VisitRequestPayload<ExtArgs extends runtime.Types.Extensions.Intern
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    siteId: string | null
+    kioskId: string | null
+    source: string
+    kioskReceiptHash: string | null
     organizationId: string
     visitorId: string
     hostId: string | null
     departmentId: string | null
     visitorType: $Enums.VisitorType
     purpose: string
+    destinationOffice: string | null
+    hostNameSnapshot: string | null
     scheduledDate: Date | null
     expectedEntryTime: Date | null
     expectedExitTime: Date | null
@@ -2201,6 +3034,8 @@ readonly fields: VisitRequestFieldRefs;
 export interface Prisma__VisitRequestClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   organization<T extends Prisma.OrganizationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrganizationDefaultArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  site<T extends Prisma.VisitRequest$siteArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VisitRequest$siteArgs<ExtArgs>>): Prisma.Prisma__SiteClient<runtime.Types.Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  kiosk<T extends Prisma.VisitRequest$kioskArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VisitRequest$kioskArgs<ExtArgs>>): Prisma.Prisma__KioskClient<runtime.Types.Result.GetResult<Prisma.$KioskPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   visitor<T extends Prisma.VisitorDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VisitorDefaultArgs<ExtArgs>>): Prisma.Prisma__VisitorClient<runtime.Types.Result.GetResult<Prisma.$VisitorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   host<T extends Prisma.VisitRequest$hostArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VisitRequest$hostArgs<ExtArgs>>): Prisma.Prisma__HostClient<runtime.Types.Result.GetResult<Prisma.$HostPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   department<T extends Prisma.VisitRequest$departmentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.VisitRequest$departmentArgs<ExtArgs>>): Prisma.Prisma__DepartmentClient<runtime.Types.Result.GetResult<Prisma.$DepartmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -2236,12 +3071,18 @@ export interface Prisma__VisitRequestClient<T, Null = never, ExtArgs extends run
  */
 export interface VisitRequestFieldRefs {
   readonly id: Prisma.FieldRef<"VisitRequest", 'String'>
+  readonly siteId: Prisma.FieldRef<"VisitRequest", 'String'>
+  readonly kioskId: Prisma.FieldRef<"VisitRequest", 'String'>
+  readonly source: Prisma.FieldRef<"VisitRequest", 'String'>
+  readonly kioskReceiptHash: Prisma.FieldRef<"VisitRequest", 'String'>
   readonly organizationId: Prisma.FieldRef<"VisitRequest", 'String'>
   readonly visitorId: Prisma.FieldRef<"VisitRequest", 'String'>
   readonly hostId: Prisma.FieldRef<"VisitRequest", 'String'>
   readonly departmentId: Prisma.FieldRef<"VisitRequest", 'String'>
   readonly visitorType: Prisma.FieldRef<"VisitRequest", 'VisitorType'>
   readonly purpose: Prisma.FieldRef<"VisitRequest", 'String'>
+  readonly destinationOffice: Prisma.FieldRef<"VisitRequest", 'String'>
+  readonly hostNameSnapshot: Prisma.FieldRef<"VisitRequest", 'String'>
   readonly scheduledDate: Prisma.FieldRef<"VisitRequest", 'DateTime'>
   readonly expectedEntryTime: Prisma.FieldRef<"VisitRequest", 'DateTime'>
   readonly expectedExitTime: Prisma.FieldRef<"VisitRequest", 'DateTime'>
@@ -2650,6 +3491,44 @@ export type VisitRequestDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Limit how many VisitRequests to delete.
    */
   limit?: number
+}
+
+/**
+ * VisitRequest.site
+ */
+export type VisitRequest$siteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Site
+   */
+  select?: Prisma.SiteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Site
+   */
+  omit?: Prisma.SiteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SiteInclude<ExtArgs> | null
+  where?: Prisma.SiteWhereInput
+}
+
+/**
+ * VisitRequest.kiosk
+ */
+export type VisitRequest$kioskArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Kiosk
+   */
+  select?: Prisma.KioskSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Kiosk
+   */
+  omit?: Prisma.KioskOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KioskInclude<ExtArgs> | null
+  where?: Prisma.KioskWhereInput
 }
 
 /**

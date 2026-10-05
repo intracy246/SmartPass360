@@ -4,7 +4,9 @@ import type {
   KioskRegistrationPayload,
   KioskRegistrationResult,
   OrganizationOptionResponse,
-  KioskBuildingConfigResponse
+  KioskBuildingConfigResponse,
+  KioskVisitStatus,
+  KioskIssuedPass
 } from "../types/kiosk";
 
 export function activateKiosk(payload: { activationCode: string; deviceId: string }) {
@@ -27,9 +29,28 @@ export function registerVisitorFromKiosk(
     "/visitors/kiosk-registration",
     {
       method: "POST",
+      headers: deviceHeaders(),
       body: payload
     }
   );
+}
+
+function deviceHeaders() {
+  return { "x-kiosk-device-id": window.localStorage.getItem("smartpass360.deviceId") ?? "" };
+}
+
+export function getKioskVisitStatus(visitId: string, receiptToken: string) {
+  return apiRequest<{ success: boolean; data: KioskVisitStatus }>(`/visitors/${visitId}/kiosk-status`, {
+    method: "POST", headers: deviceHeaders(),
+    body: { kioskId: window.localStorage.getItem("smartpass360.kioskId"), receiptToken }
+  });
+}
+
+export function issueKioskPass(visitId: string, receiptToken: string) {
+  return apiRequest<{ success: boolean; data: KioskIssuedPass }>(`/visitors/${visitId}/kiosk-pass`, {
+    method: "POST", headers: deviceHeaders(),
+    body: { kioskId: window.localStorage.getItem("smartpass360.kioskId"), receiptToken }
+  });
 }
 
 export function getRegisteredKioskConfig(kioskId: string) {

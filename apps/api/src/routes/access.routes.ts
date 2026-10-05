@@ -2,8 +2,43 @@
 import { Router } from "express";
 import { z } from "zod";
 import { prisma } from "../lib/prisma";
+import { requireBuilding, type AuthUser } from "../middleware/auth.middleware";
+import { validateVisitorScan, visitorScanSchema } from "../services/visitor-access";
 
 export const accessRouter = Router();
+
+accessRouter.post("/validate", requireBuilding, async (request, response, next) => {
+  try {
+    const parsed = visitorScanSchema.safeParse(request.body);
+    if (!parsed.success) return response.status(400).json({ decision: "DENIED", turnstileCommand: "KEEP_LOCKED", error: { code: "VALIDATION_ERROR", message: "A visitor QR, valid gate ID and optional direction are required." } });
+    const user = response.locals.authUser as AuthUser;
+    const result = await validateVisitorScan(user.siteId!, parsed.data);
+    return response.json({ success: true, ...result, data: result });
+  } catch (error) { return next(error); }
+});
+
+accessRouter.get("/gates", requireBuilding, async (_request, response, next) => {
+  try {
+    const user = response.locals.authUser as AuthUser;
+    const gates = await prisma.gate.findMany({ where: { organization: { siteOrganizations: { some: { siteId: user.siteId!, isActive: true } } } }, select: { id: true, name: true, direction: true, isActive: true, status: true } });
+    return response.json({ success: true, data: gates });
+  } catch (error) { return next(error); }
+});
+
+accessRouter.get("/events", requireBuilding, async (request, response, next) => {
+  try {
+    const parsed = z.object({ page: z.coerce.number().int().positive().default(1), pageSize: z.coerce.number().int().min(1).max(100).default(20) }).safeParse(request.query);
+    if (!parsed.success) return response.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Invalid event pagination." } });
+    const user = response.locals.authUser as AuthUser;
+    const { page, pageSize } = parsed.data;
+    const where = { siteId: user.siteId! };
+    const [events, total] = await Promise.all([
+      prisma.accessEvent.findMany({ where, include: { gate: true, visitorPass: { select: { passNumber: true } }, visit: { select: { visitor: { select: { fullName: true } } } } }, orderBy: { scannedAt: "desc" }, skip: (page - 1) * pageSize, take: pageSize }),
+      prisma.accessEvent.count({ where })
+    ]);
+    return response.json({ success: true, data: events.map(event => ({ id: event.id, visitorName: event.visit?.visitor.fullName, passNumber: event.visitorPass?.passNumber, gateName: event.gate?.name, direction: event.direction, decision: event.decision, reason: event.denialReason ?? "VALID_PASS", occurredAt: event.scannedAt })), meta: { page, pageSize, total, totalPages: Math.ceil(total / pageSize) } });
+  } catch (error) { return next(error); }
+});
 
 const scanSchema = z.object({
   qrCode: z.string().trim().min(1).max(2000),

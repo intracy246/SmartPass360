@@ -145,15 +145,7 @@ export function PassDetailsDrawer({
 
         <section className="pass-drawer__qr-section">
           <div className="pass-drawer__qr">
-            <div className="pass-drawer__qr-grid">
-              {Array.from({ length: 49 }).map(
-                (_, index) => (
-                  <span key={index} />
-                )
-              )}
-            </div>
-
-            <small>Secure QR token from API</small>
+            <small>The secure QR is delivered to the registering kiosk at issuance. It is not stored in pass history.</small>
           </div>
 
           <div className="pass-drawer__qr-info">
@@ -228,9 +220,8 @@ export function PassDetailsDrawer({
           <strong>Backend-controlled actions</strong>
 
           <p>
-            Printing, reprinting and revocation will only
-            complete after their API endpoints return a
-            successful response.
+            The visitor prints the approved pass at the originating kiosk.
+            Pass history does not expose the raw access credential.
           </p>
         </section>
 

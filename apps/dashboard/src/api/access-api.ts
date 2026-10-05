@@ -33,6 +33,10 @@ export function getAccessEvents(
     `/access/events?${searchParams.toString()}`
   );
 }
+
+export function getVisitorGates() {
+  return apiRequest<{ data: { id: string; name: string; direction: string; isActive: boolean; status: string }[] }>("/access/gates");
+}
 export function scanPermanentPass(
   payload: PermanentPassScanPayload
 ): Promise<PermanentPassScanResult> {

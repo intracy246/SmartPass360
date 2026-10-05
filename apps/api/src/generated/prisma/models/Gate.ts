@@ -440,9 +440,9 @@ export type GateMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
-export type GateScalarRelationFilter = {
-  is?: Prisma.GateWhereInput
-  isNot?: Prisma.GateWhereInput
+export type GateNullableScalarRelationFilter = {
+  is?: Prisma.GateWhereInput | null
+  isNot?: Prisma.GateWhereInput | null
 }
 
 export type GateCreateNestedManyWithoutOrganizationInput = {
@@ -501,10 +501,12 @@ export type GateCreateNestedOneWithoutAccessEventsInput = {
   connect?: Prisma.GateWhereUniqueInput
 }
 
-export type GateUpdateOneRequiredWithoutAccessEventsNestedInput = {
+export type GateUpdateOneWithoutAccessEventsNestedInput = {
   create?: Prisma.XOR<Prisma.GateCreateWithoutAccessEventsInput, Prisma.GateUncheckedCreateWithoutAccessEventsInput>
   connectOrCreate?: Prisma.GateCreateOrConnectWithoutAccessEventsInput
   upsert?: Prisma.GateUpsertWithoutAccessEventsInput
+  disconnect?: Prisma.GateWhereInput | boolean
+  delete?: Prisma.GateWhereInput | boolean
   connect?: Prisma.GateWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.GateUpdateToOneWithWhereWithoutAccessEventsInput, Prisma.GateUpdateWithoutAccessEventsInput>, Prisma.GateUncheckedUpdateWithoutAccessEventsInput>
 }

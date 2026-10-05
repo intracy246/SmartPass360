@@ -1,8 +1,10 @@
 const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
 
+// Development has one transport: same-origin Vite proxy to the local API.
+// A stale .env URL must not silently bypass that proxy.
 const API_BASE_URL =
-  configuredApiBaseUrl && configuredApiBaseUrl.length > 0
-    ? configuredApiBaseUrl.replace(/\/$/, "")
+  !import.meta.env.DEV && configuredApiBaseUrl
+    ? configuredApiBaseUrl.replace(/\/+$/, "")
     : "/api/v1";
 
 export class ApiError extends Error {
@@ -30,9 +32,10 @@ export async function apiRequest<T>(
   endpoint: string,
   options: ApiRequestOptions = {}
 ): Promise<T> {
-  const response = await fetch(
-    `${API_BASE_URL}${endpoint}`,
-    {
+  const url = `${API_BASE_URL}${endpoint}`;
+  let response: Response;
+  try {
+    response = await fetch(url, {
       ...options,
       headers: {
         Accept: "application/json",
@@ -43,8 +46,11 @@ export async function apiRequest<T>(
         options.body === undefined
           ? undefined
           : JSON.stringify(options.body)
-    }
-  );
+    });
+  } catch (error) {
+    if (!(error instanceof TypeError)) throw error;
+    throw new ApiError(`Cannot reach SmartPass360 API at ${url}. Check the connection and that the API is running.`, 0);
+  }
 
   let responseBody: unknown = null;
 
@@ -52,7 +58,15 @@ export async function apiRequest<T>(
     response.headers.get("content-type") ?? "";
 
   if (contentType.includes("application/json")) {
-    responseBody = await response.json();
+    try {
+      responseBody = await response.json();
+    } catch {
+      throw new ApiError(`SmartPass360 API returned invalid JSON (HTTP ${response.status}).`, response.status);
+    }
+  }
+
+  if (responseBody === null) {
+    throw new ApiError(`SmartPass360 API returned a non-JSON response (HTTP ${response.status}). Check the API server configuration.`, response.status);
   }
 
   if (!response.ok) {
