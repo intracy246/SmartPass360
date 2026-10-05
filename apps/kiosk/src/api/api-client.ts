@@ -3,7 +3,7 @@ const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
 const API_BASE_URL =
   configuredApiBaseUrl && configuredApiBaseUrl.length > 0
     ? configuredApiBaseUrl.replace(/\/$/, "")
-    : "/api/v1";
+    : "http://127.0.0.1:4000/api/v1";
 
 export class ApiError extends Error {
   status: number;
@@ -34,13 +34,11 @@ export async function apiRequest<T>(
     `${API_BASE_URL}${endpoint}`,
     {
       ...options,
-
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
         ...options.headers
       },
-
       body:
         options.body === undefined
           ? undefined
@@ -69,7 +67,7 @@ export async function apiRequest<T>(
     throw new ApiError(
       errorBody?.error?.message ??
         errorBody?.message ??
-        "The SmartPass360 service returned an error.",
+        `SmartPass360 API returned HTTP ${response.status}.`,
       response.status,
       responseBody
     );
