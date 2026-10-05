@@ -54,7 +54,115 @@ const initialForm: RegistrationForm = {
   purposeOfVisit: ""
 };
 
+type KioskLanguage = "en" | "sw";
+
+const copy = {
+  en: {
+    languageEnglish: "English",
+    languageSwahili: "Kiswahili",
+    welcome: "Welcome",
+    registerVisit: "Register your visit",
+    intro: "Enter your details below. Reception will review your registration and issue your visitor pass.",
+    registrationNotCompleted: "Registration not completed",
+    orgUnavailable: "{t.orgUnavailable}",
+    retryConnection: "{t.retryConnection}",
+    yourInformation: "Your information",
+    yourInformationHelp: "Enter the visitor's identification details.",
+    fullName: "Full name",
+    fullNamePlaceholder: t.fullNamePlaceholder,
+    phoneNumber: "Phone number",
+    identificationType: "Identification type",
+    noIdentification: "{t.noIdentification}",
+    nationalId: "{t.nationalId}",
+    passport: "{t.passport}",
+    drivingLicence: "{t.drivingLicence}",
+    voterId: "{t.voterId}",
+    otherIdentification: "{t.otherIdentification}",
+    identificationNumber: "Identification number",
+    notRequired: t.notRequired,
+    enterIdentificationNumber: t.enterIdentificationNumber,
+    company: "Company",
+    companyPlaceholder: t.companyPlaceholder,
+    vehicleRegistration: "Vehicle registration",
+    vehiclePlaceholder: t.vehiclePlaceholder,
+    visitInformation: "Visit information",
+    visitInformationHelp: "Tell reception who and where you are visiting.",
+    organization: "Organization",
+    loadingOrganizations: t.loadingOrganizations,
+    selectOrganization: t.selectOrganization,
+    departmentOffice: "Department or office",
+    departmentPlaceholder: t.departmentPlaceholder,
+    host: "Person you are visiting",
+    hostPlaceholder: t.hostPlaceholder,
+    purpose: "Purpose of visit",
+    purposePlaceholder: t.purposePlaceholder,
+    clearForm: "Clear Form",
+    submitting: "Submitting...",
+    submitRegistration: "Submit Registration",
+    needAssistance: "Need assistance? Please contact reception.",
+    poweredBy: "Powered by SmartPass360",
+    selectOrganizationError: "Please select the organization you are visiting.",
+    fullNameError: "Please enter your full name.",
+    phoneError: "Please enter a valid phone number.",
+    serviceError: "Registration service is unavailable. Please contact reception."
+  },
+  sw: {
+    languageEnglish: "English",
+    languageSwahili: "Kiswahili",
+    welcome: "Karibu",
+    registerVisit: "Jisajili kwa ziara yako",
+    intro: "Jaza taarifa zako hapa chini. Mapokezi yatakagua usajili wako na kutoa pasi ya mgeni.",
+    registrationNotCompleted: "Usajili haujakamilika",
+    orgUnavailable: "Huduma ya mashirika haipatikani",
+    retryConnection: "Jaribu tena",
+    yourInformation: "Taarifa zako",
+    yourInformationHelp: "Weka taarifa za utambulisho wa mgeni.",
+    fullName: "Jina kamili",
+    fullNamePlaceholder: "Weka jina lako kamili",
+    phoneNumber: "Namba ya simu",
+    identificationType: "Aina ya kitambulisho",
+    noIdentification: "Bila kitambulisho",
+    nationalId: "Kitambulisho cha Taifa",
+    passport: "Pasipoti",
+    drivingLicence: "Leseni ya udereva",
+    voterId: "Kitambulisho cha mpiga kura",
+    otherIdentification: "Kitambulisho kingine",
+    identificationNumber: "Namba ya kitambulisho",
+    notRequired: "Haihitajiki",
+    enterIdentificationNumber: "Weka namba ya kitambulisho",
+    company: "Kampuni",
+    companyPlaceholder: "Jina la kampuni (hiari)",
+    vehicleRegistration: "Namba ya gari",
+    vehiclePlaceholder: "Namba ya gari (hiari)",
+    visitInformation: "Taarifa za ziara",
+    visitInformationHelp: "Eleza unaenda kwa nani na sehemu gani.",
+    organization: "Shirika",
+    loadingOrganizations: "Inapakia mashirika...",
+    selectOrganization: "Chagua shirika",
+    departmentOffice: "Idara au ofisi",
+    departmentPlaceholder: "Mfano: Idara ya TEHAMA",
+    host: "Mtu unayemtembelea",
+    hostPlaceholder: "Jina la mwenyeji (hiari)",
+    purpose: "Sababu ya ziara",
+    purposePlaceholder: "Eleza sababu ya ziara yako",
+    clearForm: "Futa Fomu",
+    submitting: "Inatuma...",
+    submitRegistration: "Tuma Usajili",
+    needAssistance: "Unahitaji msaada? Wasiliana na mapokezi.",
+    poweredBy: "Inaendeshwa na SmartPass360",
+    selectOrganizationError: "Tafadhali chagua shirika unalotembelea.",
+    fullNameError: "Tafadhali weka jina lako kamili.",
+    phoneError: "Tafadhali weka namba sahihi ya simu.",
+    serviceError: "Huduma ya usajili haipatikani. Tafadhali wasiliana na mapokezi."
+  }
+} as const;
+
 export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInvalid: (message: string) => void }) {
+  const [language, setLanguage] = useState<KioskLanguage>(() => {
+    return window.sessionStorage.getItem("smartpass360.kioskLanguage") === "sw" ? "sw" : "en";
+  });
+  const t = copy[language];
+
   const [form, setForm] =
     useState<RegistrationForm>(initialForm);
 
@@ -118,9 +226,7 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
         return;
       }
 
-      setErrorMessage(
-        "Registration service is unavailable. Please contact reception."
-      );
+      setErrorMessage(t.serviceError);
     }
   });
 
@@ -154,7 +260,7 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
 
     if (!form.organizationId) {
       setErrorMessage(
-        "Please select the organization you are visiting."
+        t.selectOrganizationError
       );
 
       return;
@@ -162,7 +268,7 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
 
     if (form.fullName.trim().length < 3) {
       setErrorMessage(
-        "Please enter your full name."
+        t.fullNameError
       );
 
       return;
@@ -170,7 +276,7 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
 
     if (form.phoneNumber.trim().length < 7) {
       setErrorMessage(
-        "Please enter a valid phone number."
+        t.phoneError
       );
 
       return;
@@ -224,7 +330,7 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
   }
 
   if (completedRegistration) {
-    return <KioskVisitCompletion registration={completedRegistration} onFinish={startAnotherRegistration} />;
+    return <KioskVisitCompletion registration={completedRegistration} onFinish={startAnotherRegistration} language={language} />;
   }
 
   return (
@@ -247,25 +353,23 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
           </div>
 
           <div className="kiosk-language">
-            <button type="button">
-              English
+            <button type="button" aria-pressed={language === "en"} onClick={() => { setLanguage("en"); window.sessionStorage.setItem("smartpass360.kioskLanguage", "en"); }}>
+              {t.languageEnglish}
             </button>
 
-            <button type="button" disabled>
-              Kiswahili
+            <button type="button" aria-pressed={language === "sw"} onClick={() => { setLanguage("sw"); window.sessionStorage.setItem("smartpass360.kioskLanguage", "sw"); }}>
+              {t.languageSwahili}
             </button>
           </div>
         </header>
 
         <section className="kiosk-intro">
-          <p>Welcome</p>
+          <p>{t.welcome}</p>
 
-          <h1>Register your visit</h1>
+          <h1>{t.registerVisit}</h1>
 
           <span>
-            Enter your details below. Reception will
-            review your registration and issue your
-            visitor pass.
+            {t.intro}
           </span>
         </section>
 
@@ -274,7 +378,7 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
             className="kiosk-alert"
             role="alert"
           >
-            <strong>Registration not completed</strong>
+            <strong>{t.registrationNotCompleted}</strong>
             <span>{errorMessage}</span>
           </div>
         )}
@@ -304,17 +408,16 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
               <span>01</span>
 
               <div>
-                <h2>Your information</h2>
+                <h2>{t.yourInformation}</h2>
                 <p>
-                  Enter the visitor's identification
-                  details.
+                  {t.yourInformationHelp}
                 </p>
               </div>
             </div>
 
             <div className="kiosk-form__grid">
               <KioskField
-                label="Full name"
+                label={t.fullName}
                 required
                 inputProps={{
                   value: form.fullName,
@@ -331,7 +434,7 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
               />
 
               <KioskField
-                label="Phone number"
+                label={t.phoneNumber}
                 required
                 inputProps={{
                   type: "tel",
@@ -348,7 +451,7 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
               />
 
               <KioskField
-                label="Identification type"
+                label={t.identificationType}
                 type="select"
                 selectProps={{
                   value:
@@ -388,7 +491,7 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
               </KioskField>
 
               <KioskField
-                label="Identification number"
+                label={t.identificationNumber}
                 inputProps={{
                   value:
                     form.identificationNumber,
@@ -412,7 +515,7 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
               />
 
               <KioskField
-                label="Company"
+                label={t.company}
                 inputProps={{
                   value: form.companyName,
                   placeholder:
@@ -427,7 +530,7 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
               />
 
               <KioskField
-                label="Vehicle registration"
+                label={t.vehicleRegistration}
                 inputProps={{
                   value:
                     form.vehicleRegistrationNumber,
@@ -450,18 +553,17 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
               <span>02</span>
 
               <div>
-                <h2>Visit information</h2>
+                <h2>{t.visitInformation}</h2>
 
                 <p>
-                  Tell reception who and where you are
-                  visiting.
+                  {t.visitInformationHelp}
                 </p>
               </div>
             </div>
 
             <div className="kiosk-form__grid">
               <KioskField
-                label="Organization"
+                label={t.organization}
                 required
                 type="select"
                 selectProps={{
@@ -492,7 +594,7 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
               </KioskField>
 
               <KioskField
-                label="Department or office"
+                label={t.departmentOffice}
                 inputProps={{
                   value:
                     form.departmentOrOffice,
@@ -509,7 +611,7 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
               />
 
               <KioskField
-                label="Person you are visiting"
+                label={t.host}
                 inputProps={{
                   value: form.hostName,
                   placeholder:
@@ -525,7 +627,7 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
 
               <div className="kiosk-form__wide">
                 <KioskField
-                  label="Purpose of visit"
+                  label={t.purpose}
                   type="textarea"
                   textareaProps={{
                     value:
@@ -554,7 +656,7 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
                 setErrorMessage(null);
               }}
             >
-              Clear Form
+              {t.clearForm}
             </button>
 
             <button
@@ -568,18 +670,18 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
               }
             >
               {registrationMutation.isPending
-                ? "Submitting..."
-                : "Submit Registration"}
+                ? t.submitting
+                : t.submitRegistration}
             </button>
           </div>
         </form>
 
         <footer className="kiosk-footer">
           <span>
-            Need assistance? Please contact reception.
+            {t.needAssistance}
           </span>
 
-          <strong>Powered by SmartPass360</strong>
+          <strong>{t.poweredBy}</strong>
         </footer>
       </div>
     </main>
