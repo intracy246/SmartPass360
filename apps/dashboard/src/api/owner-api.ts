@@ -39,3 +39,29 @@ export function provisionBuilding(payload: {
     body: payload
   });
 }
+
+
+export function updateOwnerBuilding(
+  siteId: string,
+  payload: {
+    name: string;
+    code: string;
+    address?: string | null;
+    city?: string | null;
+    country?: string | null;
+    adminUsername?: string | null;
+    status?: "PENDING" | "ACTIVE" | "SUSPENDED";
+    isActive?: boolean;
+  }
+) {
+  return apiRequest<{ success: boolean; data: OwnerBuilding }>(`/auth/buildings/${siteId}`, {
+    method: "PATCH",
+    body: payload
+  });
+}
+
+export function deleteOwnerBuilding(siteId: string) {
+  return apiRequest<{ success: boolean; data: { id: string } }>(`/auth/buildings/${siteId}`, {
+    method: "DELETE"
+  });
+}
