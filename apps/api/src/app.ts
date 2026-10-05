@@ -41,7 +41,22 @@ app.use(helmet());
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+
+      const localDevelopmentOrigins = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174"
+      ];
+
+      if (
+        allowedOrigins.includes(origin) ||
+        localDevelopmentOrigins.includes(origin)
+      ) {
         callback(null, true);
         return;
       }
