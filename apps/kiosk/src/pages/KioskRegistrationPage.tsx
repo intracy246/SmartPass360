@@ -10,7 +10,6 @@ import {
 } from "@tanstack/react-query";
 
 import {
-  getKioskOrganizations,
   getRegisteredKioskConfig,
   registerVisitorFromKiosk
 } from "../api/kiosk-api";
@@ -76,12 +75,6 @@ export function KioskRegistrationPage() {
   });
 
   const building = kioskConfigQuery.data?.data.site;
-
-  const organizationsQuery = useQuery({
-    queryKey: ["kiosk-organizations"],
-    queryFn: getKioskOrganizations,
-    staleTime: 60_000
-  });
 
   const registrationMutation = useMutation({
     mutationFn: registerVisitorFromKiosk,
@@ -165,14 +158,6 @@ export function KioskRegistrationPage() {
       return;
     }
 
-    if (!form.departmentOrOffice.trim()) {
-      setErrorMessage(
-        "Please enter the department or office."
-      );
-
-      return;
-    }
-
     const payload: KioskRegistrationPayload = {
       organizationId: form.organizationId,
 
@@ -197,13 +182,15 @@ export function KioskRegistrationPage() {
         form.vehicleRegistrationNumber.trim() ||
         undefined,
 
+      kioskId: registeredKioskId!,
+
       departmentOrOffice:
-        form.departmentOrOffice.trim(),
+        form.departmentOrOffice.trim() || undefined,
 
       hostName: form.hostName.trim() || undefined,
 
       purposeOfVisit:
-        form.purposeOfVisit.trim(),
+        form.purposeOfVisit.trim() || undefined,
 
       source: "KIOSK"
     };
@@ -308,7 +295,7 @@ export function KioskRegistrationPage() {
           </div>
         )}
 
-        {organizationsQuery.isError && (
+        {kioskConfigQuery.isError && (
           <div
             className="kiosk-alert"
             role="alert"
@@ -495,9 +482,7 @@ export function KioskRegistrationPage() {
                 type="select"
                 selectProps={{
                   value: form.organizationId,
-                  disabled:
-                    organizationsQuery.isPending ||
-                    organizationsQuery.isError,
+                  disabled: kioskConfigQuery.isPending || kioskConfigQuery.isError,
 
                   onChange: (event) =>
                     updateField(
@@ -507,9 +492,7 @@ export function KioskRegistrationPage() {
                 }}
               >
                 <option value="">
-                  {organizationsQuery.isPending
-                    ? "Loading organizations..."
-                    : "Select organization"}
+                  {kioskConfigQuery.isPending ? "Loading organizations..." : "Select organization"}
                 </option>
 
                 {organizations.map(
@@ -526,7 +509,6 @@ export function KioskRegistrationPage() {
 
               <KioskField
                 label="Department or office"
-                required
                 inputProps={{
                   value:
                     form.departmentOrOffice,
@@ -560,7 +542,6 @@ export function KioskRegistrationPage() {
               <div className="kiosk-form__wide">
                 <KioskField
                   label="Purpose of visit"
-                  required
                   type="textarea"
                   textareaProps={{
                     value:
@@ -597,7 +578,8 @@ export function KioskRegistrationPage() {
               className="kiosk-primary-button"
               disabled={
                 registrationMutation.isPending ||
-                organizationsQuery.isError
+                kioskConfigQuery.isError ||
+                !registeredKioskId
               }
             >
               {registrationMutation.isPending
