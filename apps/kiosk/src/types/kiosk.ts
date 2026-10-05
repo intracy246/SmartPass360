@@ -23,7 +23,7 @@ export type KioskRegistrationPayload = {
 
   departmentOrOffice: string;
 
-  hostName: string;
+  hostName?: string;
 
   purposeOfVisit: string;
 
