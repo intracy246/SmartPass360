@@ -99,6 +99,7 @@ model Site {
   id        String   @id @default(uuid()) @db.Uuid
   name      String
   code      String   @unique
+  logoUrl   String?  @map("logo_url")
   address   String?
   city      String?
   country   String?

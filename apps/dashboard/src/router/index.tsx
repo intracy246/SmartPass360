@@ -10,6 +10,7 @@ import { VisitorsPage } from "../pages/visitors/VisitorsPage";
 import { PassesPage } from "../pages/passes/PassesPage";
 import { AccessControlPage } from "../pages/access/AccessControlPage";
 import { OrganizationsPage } from "../pages/organizations/OrganizationsPage";
+import { SettingsPage } from "../pages/settings/SettingsPage";
 
 function EmptyModule({
   title
@@ -70,7 +71,7 @@ export function AppRouter() {
 
         <Route
           path="settings"
-          element={<EmptyModule title="Settings" />}
+          element={<SettingsPage />}
         />
       </Route>
 

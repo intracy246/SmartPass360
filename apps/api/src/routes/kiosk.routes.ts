@@ -19,6 +19,11 @@ const siteCreateSchema = z.object({
   organizationIds: z.array(z.string().uuid()).default([])
 });
 
+const siteUpdateSchema = z.object({
+  name: z.string().trim().min(2).max(160),
+  logoUrl: z.string().max(1500000).nullable().optional()
+});
+
 const kioskCreateSchema = z.object({
   siteId: z.string().uuid(),
   name: z.string().trim().min(2).max(160),
@@ -105,6 +110,37 @@ kioskRouter.post("/sites", async (request, response, next) => {
         ...site,
         organizations: site.organizations.map((item) => item.organization)
       }
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+kioskRouter.patch("/sites/:siteId/settings", async (request, response, next) => {
+  try {
+    const parsed = siteUpdateSchema.safeParse(request.body);
+
+    if (!parsed.success) {
+      return response.status(400).json({
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Invalid building settings.",
+          details: parsed.error.flatten()
+        }
+      });
+    }
+
+    const site = await prisma.site.update({
+      where: { id: request.params.siteId },
+      data: {
+        name: parsed.data.name,
+        logoUrl: parsed.data.logoUrl ?? null
+      }
+    });
+
+    return response.status(200).json({
+      success: true,
+      data: site
     });
   } catch (error) {
     return next(error);
