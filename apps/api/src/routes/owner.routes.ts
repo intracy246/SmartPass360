@@ -45,6 +45,17 @@ const changePasswordSchema = z.object({
   newPassword: z.string().min(8).max(200)
 });
 
+const updateBuildingSchema = z.object({
+  name: z.string().trim().min(2).max(160),
+  code: z.string().trim().min(2).max(40),
+  address: z.string().trim().nullable().optional(),
+  city: z.string().trim().nullable().optional(),
+  country: z.string().trim().nullable().optional(),
+  adminUsername: z.string().trim().min(3).max(120).nullable().optional(),
+  status: z.enum(["PENDING", "ACTIVE", "SUSPENDED"]).optional(),
+  isActive: z.boolean().optional()
+});
+
 ownerRouter.post("/login", async (request, response) => {
   const parsed = loginSchema.safeParse(request.body);
   if (!parsed.success) {
@@ -127,6 +138,85 @@ ownerRouter.get("/buildings", requireOwner, async (_request, response, next) => 
           kiosks: site.kiosks.length
         }
       }))
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+ownerRouter.patch("/buildings/:siteId", requireOwner, async (request, response, next) => {
+  try {
+    const parsed = updateBuildingSchema.safeParse(request.body);
+
+    if (!parsed.success) {
+      return response.status(400).json({
+        error: { code: "VALIDATION_ERROR", message: "Invalid building data.", details: parsed.error.flatten() }
+      });
+    }
+
+    const existing = await prisma.site.findUnique({ where: { id: request.params.siteId } });
+    if (!existing) {
+      return response.status(404).json({
+        error: { code: "BUILDING_NOT_FOUND", message: "Building not found." }
+      });
+    }
+
+    const updated = await prisma.site.update({
+      where: { id: existing.id },
+      data: {
+        name: parsed.data.name,
+        code: parsed.data.code.toUpperCase(),
+        address: parsed.data.address ?? null,
+        city: parsed.data.city ?? null,
+        country: parsed.data.country ?? null,
+        adminUsername: parsed.data.adminUsername === undefined ? existing.adminUsername : parsed.data.adminUsername,
+        status: parsed.data.status ?? existing.status,
+        isActive: parsed.data.isActive ?? existing.isActive
+      }
+    });
+
+    return response.status(200).json({
+      success: true,
+      data: {
+        ...updated,
+        adminPasswordHash: undefined
+      }
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+ownerRouter.delete("/buildings/:siteId", requireOwner, async (request, response, next) => {
+  try {
+    const site = await prisma.site.findUnique({
+      where: { id: request.params.siteId },
+      include: {
+        organizations: true,
+        kiosks: true
+      }
+    });
+
+    if (!site) {
+      return response.status(404).json({
+        error: { code: "BUILDING_NOT_FOUND", message: "Building not found." }
+      });
+    }
+
+    if (site.organizations.length > 0 || site.kiosks.length > 0) {
+      return response.status(409).json({
+        error: {
+          code: "BUILDING_NOT_EMPTY",
+          message: "Remove or move this building's organizations and kiosks before deleting it."
+        }
+      });
+    }
+
+    await prisma.site.delete({ where: { id: site.id } });
+
+    return response.status(200).json({
+      success: true,
+      data: { id: site.id }
     });
   } catch (error) {
     return next(error);
