@@ -108,10 +108,10 @@ export function KioskRegistrationPage() {
 
   const organizations = useMemo(
     () =>
-      (organizationsQuery.data?.data ?? []).filter(
+      (kioskConfigQuery.data?.data.organizations ?? []).filter(
         (organization) => organization.isActive
       ),
-    [organizationsQuery.data]
+    [kioskConfigQuery.data]
   );
 
   function updateField<
