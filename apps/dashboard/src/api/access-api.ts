@@ -49,3 +49,95 @@ export function scanPermanentPass(
   );
 }
 
+
+export type GateSetup = {
+  id: string;
+  code: string;
+  name: string;
+  location?: string | null;
+  direction: "ENTRY" | "EXIT" | "BIDIRECTIONAL";
+  status: "ONLINE" | "OFFLINE" | "MAINTENANCE";
+  isActive: boolean;
+  organization?: { id: string; name: string } | null;
+};
+
+export type GateDevice = {
+  id: string;
+  name: string;
+  isActive: boolean;
+  lastSeenAt?: string | null;
+  createdAt: string;
+  gate: {
+    id: string;
+    code: string;
+    name: string;
+    direction: string;
+    status: string;
+  };
+};
+
+export function getGateSetups() {
+  return apiRequest<{ success: boolean; data: GateSetup[] }>("/access/gates");
+}
+
+export function createGate(payload: {
+  organizationId: string;
+  code: string;
+  name: string;
+  location?: string;
+  direction: "ENTRY" | "EXIT" | "BIDIRECTIONAL";
+}) {
+  return apiRequest<{ success: boolean; data: GateSetup }>("/access/gates", {
+    method: "POST",
+    body: payload
+  });
+}
+
+export function updateGate(
+  gateId: string,
+  payload: Partial<Pick<GateSetup, "name" | "location" | "direction" | "status" | "isActive">>
+) {
+  return apiRequest<{ success: boolean; data: GateSetup }>(
+    `/access/gates/${encodeURIComponent(gateId)}`,
+    { method: "PATCH", body: payload }
+  );
+}
+
+export function getGateDevices() {
+  return apiRequest<{ success: boolean; data: GateDevice[] }>("/access/gate-devices");
+}
+
+export function createGateDevice(gateId: string, name: string) {
+  return apiRequest<{
+    success: boolean;
+    data: {
+      id: string;
+      name: string;
+      gateId: string;
+      isActive: boolean;
+      deviceKey: string;
+      createdAt: string;
+    };
+    message: string;
+  }>(`/access/gates/${encodeURIComponent(gateId)}/devices`, {
+    method: "POST",
+    body: { name }
+  });
+}
+
+export function setGateDeviceActive(deviceId: string, isActive: boolean) {
+  return apiRequest<{ success: boolean; data: GateDevice }>(
+    `/access/gate-devices/${encodeURIComponent(deviceId)}`,
+    { method: "PATCH", body: { isActive } }
+  );
+}
+
+export function rotateGateDeviceKey(deviceId: string) {
+  return apiRequest<{
+    success: boolean;
+    data: { id: string; name: string; deviceKey: string };
+    message: string;
+  }>(`/access/gate-devices/${encodeURIComponent(deviceId)}/rotate-key`, {
+    method: "POST"
+  });
+}
