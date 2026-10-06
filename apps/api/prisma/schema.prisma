@@ -97,6 +97,7 @@ model Organization {
   permanentPasses           PermanentPass[]
   permanentPassAccessEvents PermanentPassAccessEvent[]
   siteOrganizations         SiteOrganization[]
+  vehicleAccessEvents       VehicleAccessEvent[]
 
   @@map("organizations")
 }
@@ -119,10 +120,14 @@ model Site {
   createdAt          DateTime   @default(now()) @map("created_at")
   updatedAt          DateTime   @updatedAt @map("updated_at")
 
-  organizations SiteOrganization[]
-  kiosks        Kiosk[]
-  visits        VisitRequest[]
-  accessEvents  AccessEvent[]
+  organizations         SiteOrganization[]
+  kiosks                Kiosk[]
+  visits                VisitRequest[]
+  accessEvents          AccessEvent[]
+  authorizedVehicles    AuthorizedVehicle[]
+  gateAccessDevices     GateAccessDevice[]
+  vehicleAccessRequests VehicleAccessRequest[]
+  vehicleAccessEvents   VehicleAccessEvent[]
 
   @@index([isActive])
   @@index([status])
@@ -146,20 +151,20 @@ model SiteOrganization {
 }
 
 model Kiosk {
-  id             String   @id @default(uuid()) @db.Uuid
-  siteId         String   @map("site_id") @db.Uuid
+  id             String    @id @default(uuid()) @db.Uuid
+  siteId         String    @map("site_id") @db.Uuid
   name           String
-  code           String   @unique
+  code           String    @unique
   location       String?
-  activationCode String   @unique @map("activation_code")
-  deviceId       String?  @unique @map("device_id")
-  isActive       Boolean  @default(true) @map("is_active")
+  activationCode String    @unique @map("activation_code")
+  deviceId       String?   @unique @map("device_id")
+  isActive       Boolean   @default(true) @map("is_active")
   activatedAt    DateTime? @map("activated_at")
   lastSeenAt     DateTime? @map("last_seen_at")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
 
-  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  site   Site           @relation(fields: [siteId], references: [id], onDelete: Cascade)
   visits VisitRequest[]
 
   @@index([siteId])
@@ -261,7 +266,7 @@ model VisitRequest {
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-  site Site? @relation(fields: [siteId], references: [id], onDelete: Restrict)
+  site  Site?  @relation(fields: [siteId], references: [id], onDelete: Restrict)
   kiosk Kiosk? @relation(fields: [kioskId], references: [id], onDelete: SetNull)
 
   visitor Visitor @relation(fields: [visitorId], references: [id], onDelete: Restrict)
@@ -327,7 +332,10 @@ model Gate {
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-  accessEvents AccessEvent[]
+  accessEvents          AccessEvent[]
+  gateAccessDevices     GateAccessDevice[]
+  vehicleAccessRequests VehicleAccessRequest[]
+  vehicleAccessEvents   VehicleAccessEvent[]
 
   @@unique([organizationId, code])
   @@index([organizationId])
@@ -351,7 +359,7 @@ model AccessEvent {
   metadata        Json?
   createdAt       DateTime        @default(now()) @map("created_at")
 
-  site Site? @relation(fields: [siteId], references: [id], onDelete: Restrict)
+  site         Site?         @relation(fields: [siteId], references: [id], onDelete: Restrict)
   organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   visit VisitRequest? @relation(fields: [visitId], references: [id], onDelete: Cascade)
@@ -360,6 +368,7 @@ model AccessEvent {
 
   gate Gate? @relation(fields: [gateId], references: [id], onDelete: Restrict)
 
+  @@unique([siteId, requestId])
   @@index([organizationId])
   @@index([visitId])
   @@index([visitorPassId])
@@ -367,7 +376,6 @@ model AccessEvent {
   @@index([decision])
   @@index([scannedAt])
   @@index([siteId, scannedAt])
-  @@unique([siteId, requestId])
   @@map("access_events")
 }
 
@@ -433,7 +441,9 @@ model PermanentPass {
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-  accessEvents PermanentPassAccessEvent[]
+  accessEvents        PermanentPassAccessEvent[]
+  authorizedVehicles  AuthorizedVehicle[]
+  vehicleAccessEvents VehicleAccessEvent[]
 
   @@index([organizationId])
   @@index([status])
@@ -469,4 +479,129 @@ model PermanentPassAccessEvent {
   @@index([decision])
   @@index([occurredAt])
   @@map("permanent_pass_access_events")
+}
+
+enum VehicleAccessRequestStatus {
+  PENDING
+  APPROVED
+  DENIED
+  EXPIRED
+}
+
+enum VehicleAccessDecision {
+  AUTHORIZED
+  UNKNOWN
+  APPROVED
+  DENIED
+}
+
+enum VehicleGateAction {
+  UNLOCK
+  KEEP_LOCKED
+}
+
+model AuthorizedVehicle {
+  id                    String    @id @default(uuid()) @db.Uuid
+  siteId                String    @map("site_id") @db.Uuid
+  permanentPassId       String    @map("permanent_pass_id") @db.Uuid
+  plateNumber           String    @map("plate_number")
+  normalizedPlateNumber String    @map("normalized_plate_number")
+  isActive              Boolean   @default(true) @map("is_active")
+  isCurrentlyInside     Boolean   @default(false) @map("is_currently_inside")
+  lastEntryAt           DateTime? @map("last_entry_at")
+  lastExitAt            DateTime? @map("last_exit_at")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  site          Site                 @relation(fields: [siteId], references: [id], onDelete: Restrict)
+  permanentPass PermanentPass        @relation(fields: [permanentPassId], references: [id], onDelete: Cascade)
+  accessEvents  VehicleAccessEvent[]
+
+  @@unique([siteId, normalizedPlateNumber])
+  @@index([permanentPassId])
+  @@index([siteId, isActive])
+  @@map("authorized_vehicles")
+}
+
+model GateAccessDevice {
+  id            String    @id @default(uuid()) @db.Uuid
+  siteId        String    @map("site_id") @db.Uuid
+  gateId        String    @map("gate_id") @db.Uuid
+  name          String
+  deviceKeyHash String    @unique @map("device_key_hash")
+  isActive      Boolean   @default(true) @map("is_active")
+  lastSeenAt    DateTime? @map("last_seen_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  gate Gate @relation(fields: [gateId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, gateId, name])
+  @@index([gateId, isActive])
+  @@map("gate_access_devices")
+}
+
+model VehicleAccessRequest {
+  id                    String                     @id @default(uuid()) @db.Uuid
+  siteId                String                     @map("site_id") @db.Uuid
+  gateId                String                     @map("gate_id") @db.Uuid
+  plateNumber           String                     @map("plate_number")
+  normalizedPlateNumber String                     @map("normalized_plate_number")
+  direction             AccessDirection
+  confidence            Float?
+  snapshotUrl           String?                    @map("snapshot_url")
+  status                VehicleAccessRequestStatus @default(PENDING)
+  reason                String
+  detectedAt            DateTime                   @default(now()) @map("detected_at")
+  reviewedAt            DateTime?                  @map("reviewed_at")
+  reviewedBy            String?                    @map("reviewed_by")
+  createdAt             DateTime                   @default(now()) @map("created_at")
+  updatedAt             DateTime                   @updatedAt @map("updated_at")
+
+  site   Site                 @relation(fields: [siteId], references: [id], onDelete: Restrict)
+  gate   Gate                 @relation(fields: [gateId], references: [id], onDelete: Restrict)
+  events VehicleAccessEvent[]
+
+  @@index([siteId, status, detectedAt])
+  @@index([gateId, detectedAt])
+  @@index([siteId, normalizedPlateNumber])
+  @@map("vehicle_access_requests")
+}
+
+model VehicleAccessEvent {
+  id                     String                @id @default(uuid()) @db.Uuid
+  siteId                 String                @map("site_id") @db.Uuid
+  organizationId         String?               @map("organization_id") @db.Uuid
+  authorizedVehicleId    String?               @map("authorized_vehicle_id") @db.Uuid
+  permanentPassId        String?               @map("permanent_pass_id") @db.Uuid
+  gateId                 String                @map("gate_id") @db.Uuid
+  vehicleAccessRequestId String?               @map("vehicle_access_request_id") @db.Uuid
+  deviceRequestId        String?               @map("device_request_id")
+  plateNumber            String                @map("plate_number")
+  normalizedPlateNumber  String                @map("normalized_plate_number")
+  direction              AccessDirection
+  decision               VehicleAccessDecision
+  action                 VehicleGateAction
+  confidence             Float?
+  reason                 String
+  approvedBy             String?               @map("approved_by")
+  occurredAt             DateTime              @default(now()) @map("occurred_at")
+  metadata               Json?
+
+  site                 Site                  @relation(fields: [siteId], references: [id], onDelete: Restrict)
+  organization         Organization?         @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  authorizedVehicle    AuthorizedVehicle?    @relation(fields: [authorizedVehicleId], references: [id], onDelete: SetNull)
+  permanentPass        PermanentPass?        @relation(fields: [permanentPassId], references: [id], onDelete: SetNull)
+  gate                 Gate                  @relation(fields: [gateId], references: [id], onDelete: Restrict)
+  vehicleAccessRequest VehicleAccessRequest? @relation(fields: [vehicleAccessRequestId], references: [id], onDelete: SetNull)
+
+  @@unique([siteId, deviceRequestId])
+  @@index([siteId, occurredAt])
+  @@index([authorizedVehicleId, occurredAt])
+  @@index([permanentPassId])
+  @@index([gateId, occurredAt])
+  @@index([vehicleAccessRequestId])
+  @@index([siteId, normalizedPlateNumber, occurredAt])
+  @@map("vehicle_access_events")
 }
