@@ -40,6 +40,276 @@ accessRouter.get("/events", requireBuilding, async (request, response, next) => 
   } catch (error) { return next(error); }
 });
 
+
+const gateCreateSchema = z.object({
+  organizationId: z.string().uuid(),
+  code: z.string().trim().min(2).max(50),
+  name: z.string().trim().min(2).max(120),
+  location: z.string().trim().max(200).optional(),
+  direction: z.enum(["ENTRY", "EXIT", "BIDIRECTIONAL"]).default("BIDIRECTIONAL")
+});
+
+const gateUpdateSchema = z.object({
+  name: z.string().trim().min(2).max(120).optional(),
+  location: z.string().trim().max(200).nullable().optional(),
+  direction: z.enum(["ENTRY", "EXIT", "BIDIRECTIONAL"]).optional(),
+  status: z.enum(["ONLINE", "OFFLINE", "MAINTENANCE"]).optional(),
+  isActive: z.boolean().optional()
+}).refine(value => Object.keys(value).length > 0, {
+  message: "At least one gate field is required."
+});
+
+const deviceCreateSchema = z.object({
+  name: z.string().trim().min(2).max(120)
+});
+
+function createGateDeviceKey() {
+  return `spg_${crypto.randomBytes(32).toString("base64url")}`;
+}
+
+function hashGateDeviceKey(value: string) {
+  return crypto.createHash("sha256").update(value).digest("hex");
+}
+
+async function findBuildingGate(siteId: string, gateId: string) {
+  return prisma.gate.findFirst({
+    where: {
+      id: gateId,
+      organization: {
+        siteOrganizations: {
+          some: {
+            siteId,
+            isActive: true
+          }
+        }
+      }
+    }
+  });
+}
+
+accessRouter.post("/gates", requireBuilding, async (request, response, next) => {
+  try {
+    const parsed = gateCreateSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return response.status(400).json({
+        error: { code: "VALIDATION_ERROR", message: "Invalid gate data.", details: parsed.error.flatten() }
+      });
+    }
+
+    const user = response.locals.authUser as AuthUser;
+    const linkedOrganization = await prisma.siteOrganization.findFirst({
+      where: {
+        siteId: user.siteId!,
+        organizationId: parsed.data.organizationId,
+        isActive: true,
+        organization: { isActive: true }
+      },
+      select: { id: true }
+    });
+
+    if (!linkedOrganization) {
+      return response.status(403).json({
+        error: { code: "INVALID_ORGANIZATION", message: "The selected organization does not belong to this building." }
+      });
+    }
+
+    const gate = await prisma.gate.create({
+      data: {
+        organizationId: parsed.data.organizationId,
+        code: parsed.data.code.toUpperCase(),
+        name: parsed.data.name,
+        location: parsed.data.location || null,
+        direction: parsed.data.direction
+      }
+    });
+
+    return response.status(201).json({ success: true, data: gate });
+  } catch (error: any) {
+    if (error?.code === "P2002") {
+      return response.status(409).json({
+        error: { code: "GATE_CODE_EXISTS", message: "This gate code already exists for the organization." }
+      });
+    }
+    return next(error);
+  }
+});
+
+accessRouter.patch("/gates/:gateId", requireBuilding, async (request, response, next) => {
+  try {
+    const gateId = z.string().uuid().safeParse(request.params.gateId);
+    const parsed = gateUpdateSchema.safeParse(request.body);
+    if (!gateId.success || !parsed.success) {
+      return response.status(400).json({
+        error: { code: "VALIDATION_ERROR", message: "Invalid gate update." }
+      });
+    }
+
+    const user = response.locals.authUser as AuthUser;
+    const existing = await findBuildingGate(user.siteId!, gateId.data);
+    if (!existing) {
+      return response.status(404).json({
+        error: { code: "GATE_NOT_FOUND", message: "Gate was not found in this building." }
+      });
+    }
+
+    const gate = await prisma.gate.update({
+      where: { id: existing.id },
+      data: parsed.data
+    });
+
+    return response.json({ success: true, data: gate });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+accessRouter.get("/gate-devices", requireBuilding, async (_request, response, next) => {
+  try {
+    const user = response.locals.authUser as AuthUser;
+    const devices = await prisma.gateAccessDevice.findMany({
+      where: { siteId: user.siteId! },
+      include: {
+        gate: {
+          select: { id: true, code: true, name: true, direction: true, status: true }
+        }
+      },
+      orderBy: { createdAt: "desc" }
+    });
+
+    return response.json({
+      success: true,
+      data: devices.map(device => ({
+        id: device.id,
+        name: device.name,
+        isActive: device.isActive,
+        lastSeenAt: device.lastSeenAt,
+        createdAt: device.createdAt,
+        gate: device.gate
+      }))
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+accessRouter.post("/gates/:gateId/devices", requireBuilding, async (request, response, next) => {
+  try {
+    const gateId = z.string().uuid().safeParse(request.params.gateId);
+    const parsed = deviceCreateSchema.safeParse(request.body);
+    if (!gateId.success || !parsed.success) {
+      return response.status(400).json({
+        error: { code: "VALIDATION_ERROR", message: "A valid gate and device name are required." }
+      });
+    }
+
+    const user = response.locals.authUser as AuthUser;
+    const gate = await findBuildingGate(user.siteId!, gateId.data);
+    if (!gate) {
+      return response.status(404).json({
+        error: { code: "GATE_NOT_FOUND", message: "Gate was not found in this building." }
+      });
+    }
+
+    const deviceKey = createGateDeviceKey();
+    const device = await prisma.gateAccessDevice.create({
+      data: {
+        siteId: user.siteId!,
+        gateId: gate.id,
+        name: parsed.data.name,
+        deviceKeyHash: hashGateDeviceKey(deviceKey)
+      }
+    });
+
+    return response.status(201).json({
+      success: true,
+      data: {
+        id: device.id,
+        name: device.name,
+        gateId: device.gateId,
+        isActive: device.isActive,
+        deviceKey,
+        createdAt: device.createdAt
+      },
+      message: "Gate device created. Save the device key now; it will not be shown again."
+    });
+  } catch (error: any) {
+    if (error?.code === "P2002") {
+      return response.status(409).json({
+        error: { code: "DEVICE_NAME_EXISTS", message: "A device with this name already exists on the selected gate." }
+      });
+    }
+    return next(error);
+  }
+});
+
+accessRouter.post("/gate-devices/:deviceId/rotate-key", requireBuilding, async (request, response, next) => {
+  try {
+    const deviceId = z.string().uuid().safeParse(request.params.deviceId);
+    if (!deviceId.success) {
+      return response.status(400).json({
+        error: { code: "VALIDATION_ERROR", message: "A valid gate device ID is required." }
+      });
+    }
+
+    const user = response.locals.authUser as AuthUser;
+    const existing = await prisma.gateAccessDevice.findFirst({
+      where: { id: deviceId.data, siteId: user.siteId! }
+    });
+
+    if (!existing) {
+      return response.status(404).json({
+        error: { code: "GATE_DEVICE_NOT_FOUND", message: "Gate device was not found." }
+      });
+    }
+
+    const deviceKey = createGateDeviceKey();
+    const device = await prisma.gateAccessDevice.update({
+      where: { id: existing.id },
+      data: { deviceKeyHash: hashGateDeviceKey(deviceKey) }
+    });
+
+    return response.json({
+      success: true,
+      data: { id: device.id, name: device.name, deviceKey },
+      message: "Device key rotated. The previous key is no longer valid."
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+accessRouter.patch("/gate-devices/:deviceId", requireBuilding, async (request, response, next) => {
+  try {
+    const deviceId = z.string().uuid().safeParse(request.params.deviceId);
+    const parsed = z.object({ isActive: z.boolean() }).safeParse(request.body);
+    if (!deviceId.success || !parsed.success) {
+      return response.status(400).json({
+        error: { code: "VALIDATION_ERROR", message: "Invalid gate device update." }
+      });
+    }
+
+    const user = response.locals.authUser as AuthUser;
+    const existing = await prisma.gateAccessDevice.findFirst({
+      where: { id: deviceId.data, siteId: user.siteId! }
+    });
+
+    if (!existing) {
+      return response.status(404).json({
+        error: { code: "GATE_DEVICE_NOT_FOUND", message: "Gate device was not found." }
+      });
+    }
+
+    const device = await prisma.gateAccessDevice.update({
+      where: { id: existing.id },
+      data: { isActive: parsed.data.isActive }
+    });
+
+    return response.json({ success: true, data: device });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 const scanSchema = z.object({
   qrCode: z.string().trim().min(1).max(2000),
   gateId: z.string().uuid()
