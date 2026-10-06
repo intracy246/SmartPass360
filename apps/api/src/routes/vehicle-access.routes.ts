@@ -237,6 +237,52 @@ vehicleAccessRouter.post("/recognize", async (request, response, next) => {
     });
 
     const now = new Date();
+
+    if (vehicle && !lowConfidence) {
+      const invalidTransition =
+        (direction === "ENTRY" && vehicle.isCurrentlyInside) ||
+        (direction === "EXIT" && !vehicle.isCurrentlyInside);
+
+      if (invalidTransition) {
+        const reason = direction === "ENTRY" ? "VEHICLE_ALREADY_INSIDE" : "VEHICLE_NOT_INSIDE";
+        const event = await prisma.vehicleAccessEvent.create({
+          data: {
+            siteId,
+            organizationId: vehicle.permanentPass.organizationId,
+            authorizedVehicleId: vehicle.id,
+            permanentPassId: vehicle.permanentPass.id,
+            gateId: gate.id,
+            gateAccessDeviceId: device.id,
+            deviceRequestId: parsed.data.requestId ?? null,
+            plateNumber: parsed.data.plateNumber.trim().toUpperCase(),
+            normalizedPlateNumber,
+            direction,
+            decision: "DENIED",
+            action: "KEEP_LOCKED",
+            confidence: parsed.data.confidence ?? null,
+            reason,
+            metadata: {
+              gateDeviceId: device.id,
+              gateDeviceName: device.name,
+              expectedState: direction === "ENTRY" ? "OUTSIDE" : "INSIDE"
+            }
+          }
+        });
+
+        await prisma.gateAccessDevice.update({
+          where: { id: device.id },
+          data: { lastSeenAt: now }
+        });
+
+        return response.status(409).json({
+          decision: "DENIED",
+          action: "KEEP_LOCKED",
+          reason,
+          eventId: event.id
+        });
+      }
+    }
+
     const passCheck = vehicle
       ? passIsValid(vehicle.permanentPass, now)
       : { valid: false, reason: "UNKNOWN_VEHICLE" };
@@ -381,6 +427,48 @@ vehicleAccessRouter.post("/recognize", async (request, response, next) => {
             vehicleNumber: expectedVisit.visitor.vehicleNumber
           },
           gate: { id: gate.id, name: gate.name, direction }
+        });
+      }
+
+      const samePlateCandidates = await prisma.visitRequest.findMany({
+        where: {
+          siteId,
+          visitor: { vehicleNumber: { not: null } },
+          status: direction === "ENTRY" ? "INSIDE" : { in: ["APPROVED", "PASS_ISSUED", "READY_FOR_ENTRY", "CHECKED_OUT"] }
+        },
+        include: { visitor: { select: { vehicleNumber: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 200
+      });
+      const samePlateVisit = samePlateCandidates.find((visit) =>
+        visit.visitor.vehicleNumber &&
+        normalizePlateNumber(visit.visitor.vehicleNumber) === normalizedPlateNumber
+      ) ?? null;
+
+      if (samePlateVisit) {
+        const reason = direction === "ENTRY" ? "VISITOR_ALREADY_INSIDE" : "VISITOR_NOT_INSIDE";
+        const event = await prisma.vehicleAccessEvent.create({
+          data: {
+            siteId,
+            organizationId: samePlateVisit.organizationId,
+            gateId: gate.id,
+            gateAccessDeviceId: device.id,
+            deviceRequestId: parsed.data.requestId ?? null,
+            plateNumber: parsed.data.plateNumber.trim().toUpperCase(),
+            normalizedPlateNumber,
+            direction,
+            decision: "DENIED",
+            action: "KEEP_LOCKED",
+            confidence: parsed.data.confidence ?? null,
+            reason,
+            metadata: { visitId: samePlateVisit.id }
+          }
+        });
+        return response.status(409).json({
+          decision: "DENIED",
+          action: "KEEP_LOCKED",
+          reason,
+          eventId: event.id
         });
       }
     }
@@ -892,6 +980,45 @@ vehicleAccessRouter.post("/gate-command/:eventId/ack", async (request, response,
     if (!command) {
       return response.status(409).json({
         error: { code: "NOT_A_GATE_COMMAND", message: "This event does not contain a gate command." }
+      });
+    }
+
+    if (command.status !== "PENDING") {
+      if (command.status === parsed.data.status) {
+        return response.status(200).json({
+          success: true,
+          commandId: event.id,
+          status: command.status,
+          duplicate: true
+        });
+      }
+
+      return response.status(409).json({
+        error: {
+          code: "GATE_COMMAND_ALREADY_FINALIZED",
+          message: "This gate command has already been acknowledged with a final status."
+        }
+      });
+    }
+
+    if (typeof command.expiresAt !== "string" || new Date(command.expiresAt).getTime() <= Date.now()) {
+      const expiredMetadata = {
+        ...metadata,
+        gateCommand: {
+          ...command,
+          status: "EXPIRED",
+          expiredAt: new Date().toISOString()
+        }
+      };
+      await prisma.vehicleAccessEvent.update({
+        where: { id: event.id },
+        data: { metadata: expiredMetadata }
+      });
+      return response.status(409).json({
+        error: {
+          code: "GATE_COMMAND_EXPIRED",
+          message: "This unlock command has expired and must not be executed."
+        }
       });
     }
 
