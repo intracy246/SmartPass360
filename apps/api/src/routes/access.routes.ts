@@ -25,6 +25,135 @@ accessRouter.get("/gates", requireBuilding, async (_request, response, next) => 
   } catch (error) { return next(error); }
 });
 
+accessRouter.get("/operations-summary", requireBuilding, async (_request, response, next) => {
+  try {
+    const user = response.locals.authUser as AuthUser;
+    const siteId = user.siteId!;
+    const now = new Date();
+    const startOfDay = new Date(now);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const buildingOrganization = {
+      organization: {
+        siteOrganizations: {
+          some: { siteId, isActive: true }
+        }
+      }
+    };
+
+    const [
+      visitorsInside,
+      activeVisitorPasses,
+      activePermanentPasses,
+      visitorEventsToday,
+      permanentEventsToday,
+      vehicleEventsToday,
+      gatesOnline,
+      peopleInside,
+      recentVisitorEvents,
+      recentPermanentEvents
+    ] = await Promise.all([
+      prisma.visitRequest.count({ where: { siteId, status: "INSIDE" } }),
+      prisma.visitorPass.count({
+        where: {
+          status: "ACTIVE",
+          validFrom: { lte: now },
+          validUntil: { gt: now },
+          visit: { siteId }
+        }
+      }),
+      prisma.permanentPass.count({
+        where: {
+          status: "ACTIVE",
+          validFrom: { lte: now },
+          OR: [
+            { expiryType: "LIFETIME" },
+            { expiryType: "FIXED_DATE", expiresAt: { gt: now } }
+          ],
+          ...buildingOrganization
+        }
+      }),
+      prisma.accessEvent.count({ where: { siteId, scannedAt: { gte: startOfDay } } }),
+      prisma.permanentPassAccessEvent.count({
+        where: { occurredAt: { gte: startOfDay }, ...buildingOrganization }
+      }),
+      prisma.vehicleAccessEvent.count({ where: { siteId, occurredAt: { gte: startOfDay } } }),
+      prisma.gate.count({ where: { isActive: true, status: "ONLINE", ...buildingOrganization } }),
+      prisma.permanentPass.findMany({
+        where: { isCurrentlyInside: true, status: "ACTIVE", ...buildingOrganization },
+        select: {
+          id: true,
+          passNumber: true,
+          fullName: true,
+          department: true,
+          lastActivityAt: true,
+          organization: { select: { name: true } }
+        },
+        orderBy: { lastActivityAt: "desc" },
+        take: 8
+      }),
+      prisma.accessEvent.findMany({
+        where: { siteId },
+        include: {
+          gate: { select: { name: true } },
+          visitorPass: { select: { passNumber: true } },
+          visit: { select: { visitor: { select: { fullName: true } } } }
+        },
+        orderBy: { scannedAt: "desc" },
+        take: 8
+      }),
+      prisma.permanentPassAccessEvent.findMany({
+        where: buildingOrganization,
+        include: {
+          permanentPass: { select: { passNumber: true, fullName: true } }
+        },
+        orderBy: { occurredAt: "desc" },
+        take: 8
+      })
+    ]);
+
+    const activity = [
+      ...recentVisitorEvents.map((event) => ({
+        id: event.id,
+        kind: "VISITOR" as const,
+        name: event.visit?.visitor.fullName ?? "Visitor",
+        passNumber: event.visitorPass?.passNumber ?? null,
+        direction: event.direction,
+        decision: event.decision,
+        gateName: event.gate?.name ?? null,
+        occurredAt: event.scannedAt
+      })),
+      ...recentPermanentEvents.map((event) => ({
+        id: event.id,
+        kind: "PERMANENT_PASS" as const,
+        name: event.permanentPass.fullName,
+        passNumber: event.permanentPass.passNumber,
+        direction: event.activityType,
+        decision: event.decision,
+        gateName: null,
+        occurredAt: event.occurredAt
+      }))
+    ]
+      .sort((a, b) => b.occurredAt.getTime() - a.occurredAt.getTime())
+      .slice(0, 8);
+
+    response.setHeader("Cache-Control", "no-store");
+    return response.json({
+      success: true,
+      data: {
+        visitorsInside,
+        activePasses: activeVisitorPasses + activePermanentPasses,
+        accessEventsToday: visitorEventsToday + permanentEventsToday + vehicleEventsToday,
+        gatesOnline,
+        peopleInside,
+        recentActivity: activity
+      }
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 accessRouter.get("/events", requireBuilding, async (request, response, next) => {
   try {
     const parsed = z.object({ page: z.coerce.number().int().positive().default(1), pageSize: z.coerce.number().int().min(1).max(100).default(20) }).safeParse(request.query);
