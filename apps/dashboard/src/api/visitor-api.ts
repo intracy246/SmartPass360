@@ -49,9 +49,9 @@ export function getVisitorOperations() {
   }>("/visitors/operations");
 }
 
-export function approveAndIssueVisitor(visitId: string) {
-  return apiRequest<{ success: boolean; data: unknown }>(
-    `/visitors/${encodeURIComponent(visitId)}/approve-and-issue`,
+export function approveVisitor(visitId: string) {
+  return apiRequest<{ success: boolean; data: { id: string; status: string } }>(
+    `/visitors/${encodeURIComponent(visitId)}/approve`,
     { method: "POST" }
   );
 }
