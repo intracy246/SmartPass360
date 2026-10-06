@@ -46,14 +46,18 @@ accessRouter.post("/hardware/qr-scan", async (request, response, next) => {
       return response.json({ success: true, credentialType: "VISITOR", ...result, data: result });
     }
 
-    if (parsed.data.credential.startsWith(permanentPrefix) || /^[A-Za-z0-9_-]{20,200}$/.test(parsed.data.credential)) {
+    if (parsed.data.credential.startsWith(permanentPrefix)) {
+      request.body = {
+        qrCode: parsed.data.credential,
+        gateId: parsed.data.gateId,
+        requestId: parsed.data.requestId
+      };
       return response.status(422).json({
         decision: "ROUTE_PERMANENT_PASS",
+        credentialType: "PERMANENT_PASS",
         turnstileCommand: "KEEP_LOCKED",
-        error: {
-          code: "PERMANENT_PASS_ROUTE_REQUIRED",
-          message: "Submit permanent-pass credentials to /access/permanent-pass/scan using the same gate device key."
-        }
+        route: "/api/v1/access/permanent-pass/scan",
+        message: "Permanent-pass credential detected. Route it to the permanent-pass scanner endpoint using the same device key."
       });
     }
 
