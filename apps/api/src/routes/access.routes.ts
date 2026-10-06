@@ -17,6 +17,56 @@ accessRouter.post("/validate", requireBuilding, async (request, response, next) 
   } catch (error) { return next(error); }
 });
 
+accessRouter.post("/hardware/qr-scan", async (request, response, next) => {
+  try {
+    const parsed = visitorScanSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return response.status(400).json({
+        decision: "DENIED",
+        turnstileCommand: "KEEP_LOCKED",
+        error: { code: "VALIDATION_ERROR", message: "A QR credential and valid gate ID are required." }
+      });
+    }
+
+    const device = await authenticatePhysicalGateDevice(request, parsed.data.gateId);
+    if (!device) {
+      return response.status(401).json({
+        decision: "DENIED",
+        turnstileCommand: "KEEP_LOCKED",
+        error: { code: "UNAUTHORIZED_GATE_DEVICE", message: "A provisioned gate device credential is required." }
+      });
+    }
+
+    const visitorPrefix = "smartpass360://visitor-pass/";
+    const permanentPrefix = "smartpass360://permanent-pass/";
+
+    if (parsed.data.credential.startsWith(visitorPrefix)) {
+      const result = await validateVisitorScan(device.siteId, parsed.data);
+      await prisma.gateAccessDevice.update({ where: { id: device.id }, data: { lastSeenAt: new Date() } });
+      return response.json({ success: true, credentialType: "VISITOR", ...result, data: result });
+    }
+
+    if (parsed.data.credential.startsWith(permanentPrefix) || /^[A-Za-z0-9_-]{20,200}$/.test(parsed.data.credential)) {
+      return response.status(422).json({
+        decision: "ROUTE_PERMANENT_PASS",
+        turnstileCommand: "KEEP_LOCKED",
+        error: {
+          code: "PERMANENT_PASS_ROUTE_REQUIRED",
+          message: "Submit permanent-pass credentials to /access/permanent-pass/scan using the same gate device key."
+        }
+      });
+    }
+
+    return response.status(400).json({
+      decision: "DENIED",
+      turnstileCommand: "KEEP_LOCKED",
+      error: { code: "UNSUPPORTED_QR_CREDENTIAL", message: "The scanned QR is not a SmartPass360 access credential." }
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 accessRouter.get("/gates", requireBuilding, async (_request, response, next) => {
   try {
     const user = response.locals.authUser as AuthUser;
