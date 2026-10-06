@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { getApiHealth } from "../../api/health-api";
+import { getOperationsSummary } from "../../api/access-api";
 import {
   approveVehicleRequest,
   denyVehicleRequest,
@@ -14,6 +15,14 @@ import "./DashboardPage.css";
 export function DashboardPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const operationsQuery = useQuery({
+    queryKey: ["operations-summary"],
+    queryFn: getOperationsSummary,
+    refetchInterval: 5_000
+  });
+
+  const operations = operationsQuery.data?.data;
+
   const vehicleRequestsQuery = useQuery({
     queryKey: ["vehicle-access-requests"],
     queryFn: getVehicleRequests,
@@ -74,10 +83,10 @@ export function DashboardPage() {
             Visitors inside
           </span>
 
-          <strong className="stat-card__value">0</strong>
+          <strong className="stat-card__value">{operationsQuery.isPending ? "—" : operations?.visitorsInside ?? 0}</strong>
 
           <span className="stat-card__note">
-            Awaiting live visitor endpoint
+            {operationsQuery.isError ? "Live count unavailable" : "Currently checked in"}
           </span>
         </GlassCard>
 
@@ -86,10 +95,10 @@ export function DashboardPage() {
             Active passes
           </span>
 
-          <strong className="stat-card__value">0</strong>
+          <strong className="stat-card__value">{operationsQuery.isPending ? "—" : operations?.activePasses ?? 0}</strong>
 
           <span className="stat-card__note">
-            No pass records loaded
+            Visitor + permanent credentials valid now
           </span>
         </GlassCard>
 
@@ -98,10 +107,10 @@ export function DashboardPage() {
             Access events today
           </span>
 
-          <strong className="stat-card__value">0</strong>
+          <strong className="stat-card__value">{operationsQuery.isPending ? "—" : operations?.accessEventsToday ?? 0}</strong>
 
           <span className="stat-card__note">
-            Waiting for access API
+            Pedestrian + permanent + vehicle events
           </span>
         </GlassCard>
 
@@ -110,10 +119,10 @@ export function DashboardPage() {
             Gates online
           </span>
 
-          <strong className="stat-card__value">0</strong>
+          <strong className="stat-card__value">{operationsQuery.isPending ? "—" : operations?.gatesOnline ?? 0}</strong>
 
           <span className="stat-card__note">
-            Gate service not connected
+            Active gates reporting ONLINE
           </span>
         </GlassCard>
       </section>
@@ -181,18 +190,36 @@ export function DashboardPage() {
 
       <section className="dashboard-page__grid">
         <GlassCard
-          title="Live visitor activity"
-          subtitle="Visitor movement will appear here when the visit API is connected."
+          title="Live access activity"
+          subtitle="Latest real pedestrian access decisions in this building."
           accent="violet"
         >
-          <div className="empty-state">
-            <div className="empty-state__icon">⌁</div>
-            <strong>No live visitor records</strong>
-            <p>
-              This area does not use sample data. Records will
-              appear only after the API returns real visits.
-            </p>
-          </div>
+          {operationsQuery.isPending ? (
+            <p className="operations-activity__message">Loading live activity...</p>
+          ) : operationsQuery.isError ? (
+            <p className="operations-activity__message operations-activity__message--error">Live operations are unavailable.</p>
+          ) : !operations?.recentActivity.length ? (
+            <div className="empty-state">
+              <div className="empty-state__icon">⌁</div>
+              <strong>No access activity yet</strong>
+              <p>Real access events will appear here after a credential is scanned.</p>
+            </div>
+          ) : (
+            <div className="operations-activity__list">
+              {operations.recentActivity.map((event) => (
+                <article className="operations-activity__item" key={`${event.kind}-${event.id}`}>
+                  <div>
+                    <strong>{event.name}</strong>
+                    <span>{event.passNumber ?? event.kind.replace("_", " ")}</span>
+                  </div>
+                  <div>
+                    <strong>{event.direction} · {event.decision}</strong>
+                    <span>{event.gateName ?? "Access point"} · {new Date(event.occurredAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
         </GlassCard>
 
         <GlassCard

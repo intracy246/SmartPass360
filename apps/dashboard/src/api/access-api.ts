@@ -141,3 +141,33 @@ export function rotateGateDeviceKey(deviceId: string) {
     method: "POST"
   });
 }
+
+
+export type OperationsSummary = {
+  visitorsInside: number;
+  activePasses: number;
+  accessEventsToday: number;
+  gatesOnline: number;
+  peopleInside: Array<{
+    id: string;
+    passNumber: string;
+    fullName: string;
+    department: string;
+    lastActivityAt?: string | null;
+    organization: { name: string };
+  }>;
+  recentActivity: Array<{
+    id: string;
+    kind: "VISITOR" | "PERMANENT_PASS";
+    name: string;
+    passNumber?: string | null;
+    direction: "ENTRY" | "EXIT";
+    decision: "GRANTED" | "DENIED" | "ERROR";
+    gateName?: string | null;
+    occurredAt: string;
+  }>;
+};
+
+export function getOperationsSummary() {
+  return apiRequest<{ success: boolean; data: OperationsSummary }>("/access/operations-summary");
+}
