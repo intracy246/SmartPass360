@@ -11,6 +11,10 @@ export const ownerRouter = Router();
 
 const scrypt = promisify(crypto.scrypt);
 
+function routeParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
 async function hashPassword(password: string) {
   const salt = crypto.randomBytes(16).toString("hex");
   const derivedKey = (await scrypt(password, salt, 64)) as Buffer;
@@ -152,7 +156,7 @@ ownerRouter.get("/buildings", requireOwner, async (_request, response, next) => 
 ownerRouter.get("/buildings/:siteId", requireOwner, async (request, response, next) => {
   try {
     const site = await prisma.site.findUnique({
-      where: { id: request.params.siteId },
+      where: { id: routeParam(request.params.siteId) },
       include: {
         organizations: {
           where: { isActive: true },
@@ -194,7 +198,7 @@ ownerRouter.post("/buildings/:siteId/reset-credentials", requireOwner, async (re
       });
     }
 
-    const existing = await prisma.site.findUnique({ where: { id: request.params.siteId } });
+    const existing = await prisma.site.findUnique({ where: { id: routeParam(request.params.siteId) } });
     if (!existing) {
       return response.status(404).json({
         error: { code: "BUILDING_NOT_FOUND", message: "Building not found." }
@@ -238,7 +242,7 @@ ownerRouter.patch("/buildings/:siteId", requireOwner, async (request, response, 
       });
     }
 
-    const existing = await prisma.site.findUnique({ where: { id: request.params.siteId } });
+    const existing = await prisma.site.findUnique({ where: { id: routeParam(request.params.siteId) } });
     if (!existing) {
       return response.status(404).json({
         error: { code: "BUILDING_NOT_FOUND", message: "Building not found." }
@@ -274,7 +278,7 @@ ownerRouter.patch("/buildings/:siteId", requireOwner, async (request, response, 
 ownerRouter.delete("/buildings/:siteId", requireOwner, async (request, response, next) => {
   try {
     const site = await prisma.site.findUnique({
-      where: { id: request.params.siteId },
+      where: { id: routeParam(request.params.siteId) },
       include: {
         organizations: true,
         kiosks: true

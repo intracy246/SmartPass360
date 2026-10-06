@@ -461,7 +461,7 @@ permanentPassRouter.patch("/:permanentPassId", async (request, response, next) =
         ? normalizePlateNumber(input.vehiclePlateNumber)
         : null;
 
-      if (input.vehiclePlateNumber && normalizedPlateNumber.length < 4) {
+      if (input.vehiclePlateNumber && normalizedPlateNumber !== null && normalizedPlateNumber.length < 4) {
         return validationError(response, {
           vehiclePlateNumber: ["Enter a valid vehicle plate number."]
         });
