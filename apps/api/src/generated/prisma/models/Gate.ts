@@ -224,6 +224,9 @@ export type GateWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Gate"> | Date | string
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
   accessEvents?: Prisma.AccessEventListRelationFilter
+  gateAccessDevices?: Prisma.GateAccessDeviceListRelationFilter
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestListRelationFilter
+  vehicleAccessEvents?: Prisma.VehicleAccessEventListRelationFilter
 }
 
 export type GateOrderByWithRelationInput = {
@@ -239,6 +242,9 @@ export type GateOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   organization?: Prisma.OrganizationOrderByWithRelationInput
   accessEvents?: Prisma.AccessEventOrderByRelationAggregateInput
+  gateAccessDevices?: Prisma.GateAccessDeviceOrderByRelationAggregateInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestOrderByRelationAggregateInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventOrderByRelationAggregateInput
 }
 
 export type GateWhereUniqueInput = Prisma.AtLeast<{
@@ -258,6 +264,9 @@ export type GateWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Gate"> | Date | string
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
   accessEvents?: Prisma.AccessEventListRelationFilter
+  gateAccessDevices?: Prisma.GateAccessDeviceListRelationFilter
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestListRelationFilter
+  vehicleAccessEvents?: Prisma.VehicleAccessEventListRelationFilter
 }, "id" | "organizationId_code">
 
 export type GateOrderByWithAggregationInput = {
@@ -304,6 +313,9 @@ export type GateCreateInput = {
   updatedAt?: Date | string
   organization: Prisma.OrganizationCreateNestedOneWithoutGatesInput
   accessEvents?: Prisma.AccessEventCreateNestedManyWithoutGateInput
+  gateAccessDevices?: Prisma.GateAccessDeviceCreateNestedManyWithoutGateInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestCreateNestedManyWithoutGateInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutGateInput
 }
 
 export type GateUncheckedCreateInput = {
@@ -318,6 +330,9 @@ export type GateUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accessEvents?: Prisma.AccessEventUncheckedCreateNestedManyWithoutGateInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedCreateNestedManyWithoutGateInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedCreateNestedManyWithoutGateInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutGateInput
 }
 
 export type GateUpdateInput = {
@@ -332,6 +347,9 @@ export type GateUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutGatesNestedInput
   accessEvents?: Prisma.AccessEventUpdateManyWithoutGateNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUpdateManyWithoutGateNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUpdateManyWithoutGateNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutGateNestedInput
 }
 
 export type GateUncheckedUpdateInput = {
@@ -346,6 +364,9 @@ export type GateUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accessEvents?: Prisma.AccessEventUncheckedUpdateManyWithoutGateNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedUpdateManyWithoutGateNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedUpdateManyWithoutGateNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutGateNestedInput
 }
 
 export type GateCreateManyInput = {
@@ -445,6 +466,11 @@ export type GateNullableScalarRelationFilter = {
   isNot?: Prisma.GateWhereInput | null
 }
 
+export type GateScalarRelationFilter = {
+  is?: Prisma.GateWhereInput
+  isNot?: Prisma.GateWhereInput
+}
+
 export type GateCreateNestedManyWithoutOrganizationInput = {
   create?: Prisma.XOR<Prisma.GateCreateWithoutOrganizationInput, Prisma.GateUncheckedCreateWithoutOrganizationInput> | Prisma.GateCreateWithoutOrganizationInput[] | Prisma.GateUncheckedCreateWithoutOrganizationInput[]
   connectOrCreate?: Prisma.GateCreateOrConnectWithoutOrganizationInput | Prisma.GateCreateOrConnectWithoutOrganizationInput[]
@@ -511,6 +537,48 @@ export type GateUpdateOneWithoutAccessEventsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.GateUpdateToOneWithWhereWithoutAccessEventsInput, Prisma.GateUpdateWithoutAccessEventsInput>, Prisma.GateUncheckedUpdateWithoutAccessEventsInput>
 }
 
+export type GateCreateNestedOneWithoutGateAccessDevicesInput = {
+  create?: Prisma.XOR<Prisma.GateCreateWithoutGateAccessDevicesInput, Prisma.GateUncheckedCreateWithoutGateAccessDevicesInput>
+  connectOrCreate?: Prisma.GateCreateOrConnectWithoutGateAccessDevicesInput
+  connect?: Prisma.GateWhereUniqueInput
+}
+
+export type GateUpdateOneRequiredWithoutGateAccessDevicesNestedInput = {
+  create?: Prisma.XOR<Prisma.GateCreateWithoutGateAccessDevicesInput, Prisma.GateUncheckedCreateWithoutGateAccessDevicesInput>
+  connectOrCreate?: Prisma.GateCreateOrConnectWithoutGateAccessDevicesInput
+  upsert?: Prisma.GateUpsertWithoutGateAccessDevicesInput
+  connect?: Prisma.GateWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.GateUpdateToOneWithWhereWithoutGateAccessDevicesInput, Prisma.GateUpdateWithoutGateAccessDevicesInput>, Prisma.GateUncheckedUpdateWithoutGateAccessDevicesInput>
+}
+
+export type GateCreateNestedOneWithoutVehicleAccessRequestsInput = {
+  create?: Prisma.XOR<Prisma.GateCreateWithoutVehicleAccessRequestsInput, Prisma.GateUncheckedCreateWithoutVehicleAccessRequestsInput>
+  connectOrCreate?: Prisma.GateCreateOrConnectWithoutVehicleAccessRequestsInput
+  connect?: Prisma.GateWhereUniqueInput
+}
+
+export type GateUpdateOneRequiredWithoutVehicleAccessRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.GateCreateWithoutVehicleAccessRequestsInput, Prisma.GateUncheckedCreateWithoutVehicleAccessRequestsInput>
+  connectOrCreate?: Prisma.GateCreateOrConnectWithoutVehicleAccessRequestsInput
+  upsert?: Prisma.GateUpsertWithoutVehicleAccessRequestsInput
+  connect?: Prisma.GateWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.GateUpdateToOneWithWhereWithoutVehicleAccessRequestsInput, Prisma.GateUpdateWithoutVehicleAccessRequestsInput>, Prisma.GateUncheckedUpdateWithoutVehicleAccessRequestsInput>
+}
+
+export type GateCreateNestedOneWithoutVehicleAccessEventsInput = {
+  create?: Prisma.XOR<Prisma.GateCreateWithoutVehicleAccessEventsInput, Prisma.GateUncheckedCreateWithoutVehicleAccessEventsInput>
+  connectOrCreate?: Prisma.GateCreateOrConnectWithoutVehicleAccessEventsInput
+  connect?: Prisma.GateWhereUniqueInput
+}
+
+export type GateUpdateOneRequiredWithoutVehicleAccessEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.GateCreateWithoutVehicleAccessEventsInput, Prisma.GateUncheckedCreateWithoutVehicleAccessEventsInput>
+  connectOrCreate?: Prisma.GateCreateOrConnectWithoutVehicleAccessEventsInput
+  upsert?: Prisma.GateUpsertWithoutVehicleAccessEventsInput
+  connect?: Prisma.GateWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.GateUpdateToOneWithWhereWithoutVehicleAccessEventsInput, Prisma.GateUpdateWithoutVehicleAccessEventsInput>, Prisma.GateUncheckedUpdateWithoutVehicleAccessEventsInput>
+}
+
 export type GateCreateWithoutOrganizationInput = {
   id?: string
   code: string
@@ -522,6 +590,9 @@ export type GateCreateWithoutOrganizationInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accessEvents?: Prisma.AccessEventCreateNestedManyWithoutGateInput
+  gateAccessDevices?: Prisma.GateAccessDeviceCreateNestedManyWithoutGateInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestCreateNestedManyWithoutGateInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutGateInput
 }
 
 export type GateUncheckedCreateWithoutOrganizationInput = {
@@ -535,6 +606,9 @@ export type GateUncheckedCreateWithoutOrganizationInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accessEvents?: Prisma.AccessEventUncheckedCreateNestedManyWithoutGateInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedCreateNestedManyWithoutGateInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedCreateNestedManyWithoutGateInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutGateInput
 }
 
 export type GateCreateOrConnectWithoutOrganizationInput = {
@@ -590,6 +664,9 @@ export type GateCreateWithoutAccessEventsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   organization: Prisma.OrganizationCreateNestedOneWithoutGatesInput
+  gateAccessDevices?: Prisma.GateAccessDeviceCreateNestedManyWithoutGateInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestCreateNestedManyWithoutGateInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutGateInput
 }
 
 export type GateUncheckedCreateWithoutAccessEventsInput = {
@@ -603,6 +680,9 @@ export type GateUncheckedCreateWithoutAccessEventsInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedCreateNestedManyWithoutGateInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedCreateNestedManyWithoutGateInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutGateInput
 }
 
 export type GateCreateOrConnectWithoutAccessEventsInput = {
@@ -632,6 +712,9 @@ export type GateUpdateWithoutAccessEventsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutGatesNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUpdateManyWithoutGateNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUpdateManyWithoutGateNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutGateNestedInput
 }
 
 export type GateUncheckedUpdateWithoutAccessEventsInput = {
@@ -645,6 +728,249 @@ export type GateUncheckedUpdateWithoutAccessEventsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedUpdateManyWithoutGateNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedUpdateManyWithoutGateNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutGateNestedInput
+}
+
+export type GateCreateWithoutGateAccessDevicesInput = {
+  id?: string
+  code: string
+  name: string
+  location?: string | null
+  direction?: $Enums.GateDirection
+  status?: $Enums.GateStatus
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutGatesInput
+  accessEvents?: Prisma.AccessEventCreateNestedManyWithoutGateInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestCreateNestedManyWithoutGateInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutGateInput
+}
+
+export type GateUncheckedCreateWithoutGateAccessDevicesInput = {
+  id?: string
+  organizationId: string
+  code: string
+  name: string
+  location?: string | null
+  direction?: $Enums.GateDirection
+  status?: $Enums.GateStatus
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accessEvents?: Prisma.AccessEventUncheckedCreateNestedManyWithoutGateInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedCreateNestedManyWithoutGateInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutGateInput
+}
+
+export type GateCreateOrConnectWithoutGateAccessDevicesInput = {
+  where: Prisma.GateWhereUniqueInput
+  create: Prisma.XOR<Prisma.GateCreateWithoutGateAccessDevicesInput, Prisma.GateUncheckedCreateWithoutGateAccessDevicesInput>
+}
+
+export type GateUpsertWithoutGateAccessDevicesInput = {
+  update: Prisma.XOR<Prisma.GateUpdateWithoutGateAccessDevicesInput, Prisma.GateUncheckedUpdateWithoutGateAccessDevicesInput>
+  create: Prisma.XOR<Prisma.GateCreateWithoutGateAccessDevicesInput, Prisma.GateUncheckedCreateWithoutGateAccessDevicesInput>
+  where?: Prisma.GateWhereInput
+}
+
+export type GateUpdateToOneWithWhereWithoutGateAccessDevicesInput = {
+  where?: Prisma.GateWhereInput
+  data: Prisma.XOR<Prisma.GateUpdateWithoutGateAccessDevicesInput, Prisma.GateUncheckedUpdateWithoutGateAccessDevicesInput>
+}
+
+export type GateUpdateWithoutGateAccessDevicesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  direction?: Prisma.EnumGateDirectionFieldUpdateOperationsInput | $Enums.GateDirection
+  status?: Prisma.EnumGateStatusFieldUpdateOperationsInput | $Enums.GateStatus
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutGatesNestedInput
+  accessEvents?: Prisma.AccessEventUpdateManyWithoutGateNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUpdateManyWithoutGateNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutGateNestedInput
+}
+
+export type GateUncheckedUpdateWithoutGateAccessDevicesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  direction?: Prisma.EnumGateDirectionFieldUpdateOperationsInput | $Enums.GateDirection
+  status?: Prisma.EnumGateStatusFieldUpdateOperationsInput | $Enums.GateStatus
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accessEvents?: Prisma.AccessEventUncheckedUpdateManyWithoutGateNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedUpdateManyWithoutGateNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutGateNestedInput
+}
+
+export type GateCreateWithoutVehicleAccessRequestsInput = {
+  id?: string
+  code: string
+  name: string
+  location?: string | null
+  direction?: $Enums.GateDirection
+  status?: $Enums.GateStatus
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutGatesInput
+  accessEvents?: Prisma.AccessEventCreateNestedManyWithoutGateInput
+  gateAccessDevices?: Prisma.GateAccessDeviceCreateNestedManyWithoutGateInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutGateInput
+}
+
+export type GateUncheckedCreateWithoutVehicleAccessRequestsInput = {
+  id?: string
+  organizationId: string
+  code: string
+  name: string
+  location?: string | null
+  direction?: $Enums.GateDirection
+  status?: $Enums.GateStatus
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accessEvents?: Prisma.AccessEventUncheckedCreateNestedManyWithoutGateInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedCreateNestedManyWithoutGateInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutGateInput
+}
+
+export type GateCreateOrConnectWithoutVehicleAccessRequestsInput = {
+  where: Prisma.GateWhereUniqueInput
+  create: Prisma.XOR<Prisma.GateCreateWithoutVehicleAccessRequestsInput, Prisma.GateUncheckedCreateWithoutVehicleAccessRequestsInput>
+}
+
+export type GateUpsertWithoutVehicleAccessRequestsInput = {
+  update: Prisma.XOR<Prisma.GateUpdateWithoutVehicleAccessRequestsInput, Prisma.GateUncheckedUpdateWithoutVehicleAccessRequestsInput>
+  create: Prisma.XOR<Prisma.GateCreateWithoutVehicleAccessRequestsInput, Prisma.GateUncheckedCreateWithoutVehicleAccessRequestsInput>
+  where?: Prisma.GateWhereInput
+}
+
+export type GateUpdateToOneWithWhereWithoutVehicleAccessRequestsInput = {
+  where?: Prisma.GateWhereInput
+  data: Prisma.XOR<Prisma.GateUpdateWithoutVehicleAccessRequestsInput, Prisma.GateUncheckedUpdateWithoutVehicleAccessRequestsInput>
+}
+
+export type GateUpdateWithoutVehicleAccessRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  direction?: Prisma.EnumGateDirectionFieldUpdateOperationsInput | $Enums.GateDirection
+  status?: Prisma.EnumGateStatusFieldUpdateOperationsInput | $Enums.GateStatus
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutGatesNestedInput
+  accessEvents?: Prisma.AccessEventUpdateManyWithoutGateNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUpdateManyWithoutGateNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutGateNestedInput
+}
+
+export type GateUncheckedUpdateWithoutVehicleAccessRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  direction?: Prisma.EnumGateDirectionFieldUpdateOperationsInput | $Enums.GateDirection
+  status?: Prisma.EnumGateStatusFieldUpdateOperationsInput | $Enums.GateStatus
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accessEvents?: Prisma.AccessEventUncheckedUpdateManyWithoutGateNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedUpdateManyWithoutGateNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutGateNestedInput
+}
+
+export type GateCreateWithoutVehicleAccessEventsInput = {
+  id?: string
+  code: string
+  name: string
+  location?: string | null
+  direction?: $Enums.GateDirection
+  status?: $Enums.GateStatus
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutGatesInput
+  accessEvents?: Prisma.AccessEventCreateNestedManyWithoutGateInput
+  gateAccessDevices?: Prisma.GateAccessDeviceCreateNestedManyWithoutGateInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestCreateNestedManyWithoutGateInput
+}
+
+export type GateUncheckedCreateWithoutVehicleAccessEventsInput = {
+  id?: string
+  organizationId: string
+  code: string
+  name: string
+  location?: string | null
+  direction?: $Enums.GateDirection
+  status?: $Enums.GateStatus
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accessEvents?: Prisma.AccessEventUncheckedCreateNestedManyWithoutGateInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedCreateNestedManyWithoutGateInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedCreateNestedManyWithoutGateInput
+}
+
+export type GateCreateOrConnectWithoutVehicleAccessEventsInput = {
+  where: Prisma.GateWhereUniqueInput
+  create: Prisma.XOR<Prisma.GateCreateWithoutVehicleAccessEventsInput, Prisma.GateUncheckedCreateWithoutVehicleAccessEventsInput>
+}
+
+export type GateUpsertWithoutVehicleAccessEventsInput = {
+  update: Prisma.XOR<Prisma.GateUpdateWithoutVehicleAccessEventsInput, Prisma.GateUncheckedUpdateWithoutVehicleAccessEventsInput>
+  create: Prisma.XOR<Prisma.GateCreateWithoutVehicleAccessEventsInput, Prisma.GateUncheckedCreateWithoutVehicleAccessEventsInput>
+  where?: Prisma.GateWhereInput
+}
+
+export type GateUpdateToOneWithWhereWithoutVehicleAccessEventsInput = {
+  where?: Prisma.GateWhereInput
+  data: Prisma.XOR<Prisma.GateUpdateWithoutVehicleAccessEventsInput, Prisma.GateUncheckedUpdateWithoutVehicleAccessEventsInput>
+}
+
+export type GateUpdateWithoutVehicleAccessEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  direction?: Prisma.EnumGateDirectionFieldUpdateOperationsInput | $Enums.GateDirection
+  status?: Prisma.EnumGateStatusFieldUpdateOperationsInput | $Enums.GateStatus
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutGatesNestedInput
+  accessEvents?: Prisma.AccessEventUpdateManyWithoutGateNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUpdateManyWithoutGateNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUpdateManyWithoutGateNestedInput
+}
+
+export type GateUncheckedUpdateWithoutVehicleAccessEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  direction?: Prisma.EnumGateDirectionFieldUpdateOperationsInput | $Enums.GateDirection
+  status?: Prisma.EnumGateStatusFieldUpdateOperationsInput | $Enums.GateStatus
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accessEvents?: Prisma.AccessEventUncheckedUpdateManyWithoutGateNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedUpdateManyWithoutGateNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedUpdateManyWithoutGateNestedInput
 }
 
 export type GateCreateManyOrganizationInput = {
@@ -670,6 +996,9 @@ export type GateUpdateWithoutOrganizationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accessEvents?: Prisma.AccessEventUpdateManyWithoutGateNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUpdateManyWithoutGateNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUpdateManyWithoutGateNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutGateNestedInput
 }
 
 export type GateUncheckedUpdateWithoutOrganizationInput = {
@@ -683,6 +1012,9 @@ export type GateUncheckedUpdateWithoutOrganizationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accessEvents?: Prisma.AccessEventUncheckedUpdateManyWithoutGateNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedUpdateManyWithoutGateNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedUpdateManyWithoutGateNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutGateNestedInput
 }
 
 export type GateUncheckedUpdateManyWithoutOrganizationInput = {
@@ -704,10 +1036,16 @@ export type GateUncheckedUpdateManyWithoutOrganizationInput = {
 
 export type GateCountOutputType = {
   accessEvents: number
+  gateAccessDevices: number
+  vehicleAccessRequests: number
+  vehicleAccessEvents: number
 }
 
 export type GateCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accessEvents?: boolean | GateCountOutputTypeCountAccessEventsArgs
+  gateAccessDevices?: boolean | GateCountOutputTypeCountGateAccessDevicesArgs
+  vehicleAccessRequests?: boolean | GateCountOutputTypeCountVehicleAccessRequestsArgs
+  vehicleAccessEvents?: boolean | GateCountOutputTypeCountVehicleAccessEventsArgs
 }
 
 /**
@@ -727,6 +1065,27 @@ export type GateCountOutputTypeCountAccessEventsArgs<ExtArgs extends runtime.Typ
   where?: Prisma.AccessEventWhereInput
 }
 
+/**
+ * GateCountOutputType without action
+ */
+export type GateCountOutputTypeCountGateAccessDevicesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.GateAccessDeviceWhereInput
+}
+
+/**
+ * GateCountOutputType without action
+ */
+export type GateCountOutputTypeCountVehicleAccessRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VehicleAccessRequestWhereInput
+}
+
+/**
+ * GateCountOutputType without action
+ */
+export type GateCountOutputTypeCountVehicleAccessEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VehicleAccessEventWhereInput
+}
+
 
 export type GateSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -741,6 +1100,9 @@ export type GateSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   updatedAt?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   accessEvents?: boolean | Prisma.Gate$accessEventsArgs<ExtArgs>
+  gateAccessDevices?: boolean | Prisma.Gate$gateAccessDevicesArgs<ExtArgs>
+  vehicleAccessRequests?: boolean | Prisma.Gate$vehicleAccessRequestsArgs<ExtArgs>
+  vehicleAccessEvents?: boolean | Prisma.Gate$vehicleAccessEventsArgs<ExtArgs>
   _count?: boolean | Prisma.GateCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["gate"]>
 
@@ -789,6 +1151,9 @@ export type GateOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = run
 export type GateInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   accessEvents?: boolean | Prisma.Gate$accessEventsArgs<ExtArgs>
+  gateAccessDevices?: boolean | Prisma.Gate$gateAccessDevicesArgs<ExtArgs>
+  vehicleAccessRequests?: boolean | Prisma.Gate$vehicleAccessRequestsArgs<ExtArgs>
+  vehicleAccessEvents?: boolean | Prisma.Gate$vehicleAccessEventsArgs<ExtArgs>
   _count?: boolean | Prisma.GateCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type GateIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -803,6 +1168,9 @@ export type $GatePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     organization: Prisma.$OrganizationPayload<ExtArgs>
     accessEvents: Prisma.$AccessEventPayload<ExtArgs>[]
+    gateAccessDevices: Prisma.$GateAccessDevicePayload<ExtArgs>[]
+    vehicleAccessRequests: Prisma.$VehicleAccessRequestPayload<ExtArgs>[]
+    vehicleAccessEvents: Prisma.$VehicleAccessEventPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1211,6 +1579,9 @@ export interface Prisma__GateClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   organization<T extends Prisma.OrganizationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrganizationDefaultArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   accessEvents<T extends Prisma.Gate$accessEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Gate$accessEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccessEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  gateAccessDevices<T extends Prisma.Gate$gateAccessDevicesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Gate$gateAccessDevicesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GateAccessDevicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  vehicleAccessRequests<T extends Prisma.Gate$vehicleAccessRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Gate$vehicleAccessRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleAccessRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  vehicleAccessEvents<T extends Prisma.Gate$vehicleAccessEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Gate$vehicleAccessEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleAccessEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1672,6 +2043,78 @@ export type Gate$accessEventsArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.AccessEventScalarFieldEnum | Prisma.AccessEventScalarFieldEnum[]
+}
+
+/**
+ * Gate.gateAccessDevices
+ */
+export type Gate$gateAccessDevicesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the GateAccessDevice
+   */
+  select?: Prisma.GateAccessDeviceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the GateAccessDevice
+   */
+  omit?: Prisma.GateAccessDeviceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GateAccessDeviceInclude<ExtArgs> | null
+  where?: Prisma.GateAccessDeviceWhereInput
+  orderBy?: Prisma.GateAccessDeviceOrderByWithRelationInput | Prisma.GateAccessDeviceOrderByWithRelationInput[]
+  cursor?: Prisma.GateAccessDeviceWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.GateAccessDeviceScalarFieldEnum | Prisma.GateAccessDeviceScalarFieldEnum[]
+}
+
+/**
+ * Gate.vehicleAccessRequests
+ */
+export type Gate$vehicleAccessRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VehicleAccessRequest
+   */
+  select?: Prisma.VehicleAccessRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VehicleAccessRequest
+   */
+  omit?: Prisma.VehicleAccessRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VehicleAccessRequestInclude<ExtArgs> | null
+  where?: Prisma.VehicleAccessRequestWhereInput
+  orderBy?: Prisma.VehicleAccessRequestOrderByWithRelationInput | Prisma.VehicleAccessRequestOrderByWithRelationInput[]
+  cursor?: Prisma.VehicleAccessRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VehicleAccessRequestScalarFieldEnum | Prisma.VehicleAccessRequestScalarFieldEnum[]
+}
+
+/**
+ * Gate.vehicleAccessEvents
+ */
+export type Gate$vehicleAccessEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VehicleAccessEvent
+   */
+  select?: Prisma.VehicleAccessEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VehicleAccessEvent
+   */
+  omit?: Prisma.VehicleAccessEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VehicleAccessEventInclude<ExtArgs> | null
+  where?: Prisma.VehicleAccessEventWhereInput
+  orderBy?: Prisma.VehicleAccessEventOrderByWithRelationInput | Prisma.VehicleAccessEventOrderByWithRelationInput[]
+  cursor?: Prisma.VehicleAccessEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VehicleAccessEventScalarFieldEnum | Prisma.VehicleAccessEventScalarFieldEnum[]
 }
 
 /**

@@ -63,7 +63,11 @@ export const ModelName = {
   Gate: 'Gate',
   AccessEvent: 'AccessEvent',
   PermanentPass: 'PermanentPass',
-  PermanentPassAccessEvent: 'PermanentPassAccessEvent'
+  PermanentPassAccessEvent: 'PermanentPassAccessEvent',
+  AuthorizedVehicle: 'AuthorizedVehicle',
+  GateAccessDevice: 'GateAccessDevice',
+  VehicleAccessRequest: 'VehicleAccessRequest',
+  VehicleAccessEvent: 'VehicleAccessEvent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -293,6 +297,7 @@ export const PermanentPassScalarFieldEnum = {
   organizationId: 'organizationId',
   passNumber: 'passNumber',
   qrTokenHash: 'qrTokenHash',
+  qrTokenEncrypted: 'qrTokenEncrypted',
   fullName: 'fullName',
   staffNumber: 'staffNumber',
   department: 'department',
@@ -332,6 +337,84 @@ export const PermanentPassAccessEventScalarFieldEnum = {
 } as const
 
 export type PermanentPassAccessEventScalarFieldEnum = (typeof PermanentPassAccessEventScalarFieldEnum)[keyof typeof PermanentPassAccessEventScalarFieldEnum]
+
+
+export const AuthorizedVehicleScalarFieldEnum = {
+  id: 'id',
+  siteId: 'siteId',
+  permanentPassId: 'permanentPassId',
+  plateNumber: 'plateNumber',
+  normalizedPlateNumber: 'normalizedPlateNumber',
+  isActive: 'isActive',
+  isCurrentlyInside: 'isCurrentlyInside',
+  lastEntryAt: 'lastEntryAt',
+  lastExitAt: 'lastExitAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AuthorizedVehicleScalarFieldEnum = (typeof AuthorizedVehicleScalarFieldEnum)[keyof typeof AuthorizedVehicleScalarFieldEnum]
+
+
+export const GateAccessDeviceScalarFieldEnum = {
+  id: 'id',
+  siteId: 'siteId',
+  gateId: 'gateId',
+  name: 'name',
+  deviceKeyHash: 'deviceKeyHash',
+  isActive: 'isActive',
+  lastSeenAt: 'lastSeenAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type GateAccessDeviceScalarFieldEnum = (typeof GateAccessDeviceScalarFieldEnum)[keyof typeof GateAccessDeviceScalarFieldEnum]
+
+
+export const VehicleAccessRequestScalarFieldEnum = {
+  id: 'id',
+  siteId: 'siteId',
+  gateId: 'gateId',
+  plateNumber: 'plateNumber',
+  normalizedPlateNumber: 'normalizedPlateNumber',
+  direction: 'direction',
+  confidence: 'confidence',
+  snapshotUrl: 'snapshotUrl',
+  status: 'status',
+  reason: 'reason',
+  detectedAt: 'detectedAt',
+  reviewedAt: 'reviewedAt',
+  reviewedBy: 'reviewedBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VehicleAccessRequestScalarFieldEnum = (typeof VehicleAccessRequestScalarFieldEnum)[keyof typeof VehicleAccessRequestScalarFieldEnum]
+
+
+export const VehicleAccessEventScalarFieldEnum = {
+  id: 'id',
+  siteId: 'siteId',
+  organizationId: 'organizationId',
+  authorizedVehicleId: 'authorizedVehicleId',
+  permanentPassId: 'permanentPassId',
+  gateId: 'gateId',
+  gateAccessDeviceId: 'gateAccessDeviceId',
+  vehicleAccessRequestId: 'vehicleAccessRequestId',
+  deviceRequestId: 'deviceRequestId',
+  plateNumber: 'plateNumber',
+  normalizedPlateNumber: 'normalizedPlateNumber',
+  direction: 'direction',
+  decision: 'decision',
+  action: 'action',
+  confidence: 'confidence',
+  reason: 'reason',
+  approvedBy: 'approvedBy',
+  occurredAt: 'occurredAt',
+  metadata: 'metadata'
+} as const
+
+export type VehicleAccessEventScalarFieldEnum = (typeof VehicleAccessEventScalarFieldEnum)[keyof typeof VehicleAccessEventScalarFieldEnum]
 
 
 export const SortOrder = {

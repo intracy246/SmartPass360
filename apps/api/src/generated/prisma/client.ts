@@ -106,3 +106,23 @@ export type PermanentPass = Prisma.PermanentPassModel
  * 
  */
 export type PermanentPassAccessEvent = Prisma.PermanentPassAccessEventModel
+/**
+ * Model AuthorizedVehicle
+ * 
+ */
+export type AuthorizedVehicle = Prisma.AuthorizedVehicleModel
+/**
+ * Model GateAccessDevice
+ * 
+ */
+export type GateAccessDevice = Prisma.GateAccessDeviceModel
+/**
+ * Model VehicleAccessRequest
+ * 
+ */
+export type VehicleAccessRequest = Prisma.VehicleAccessRequestModel
+/**
+ * Model VehicleAccessEvent
+ * 
+ */
+export type VehicleAccessEvent = Prisma.VehicleAccessEventModel

@@ -1,0 +1,2 @@
+﻿-- RenameIndex
+ALTER INDEX "vehicle_access_events_site_id_normalized_plate_number_occurred_" RENAME TO "vehicle_access_events_site_id_normalized_plate_number_occur_idx";

@@ -29,6 +29,7 @@ export type PermanentPassMinAggregateOutputType = {
   organizationId: string | null
   passNumber: string | null
   qrTokenHash: string | null
+  qrTokenEncrypted: string | null
   fullName: string | null
   staffNumber: string | null
   department: string | null
@@ -55,6 +56,7 @@ export type PermanentPassMaxAggregateOutputType = {
   organizationId: string | null
   passNumber: string | null
   qrTokenHash: string | null
+  qrTokenEncrypted: string | null
   fullName: string | null
   staffNumber: string | null
   department: string | null
@@ -81,6 +83,7 @@ export type PermanentPassCountAggregateOutputType = {
   organizationId: number
   passNumber: number
   qrTokenHash: number
+  qrTokenEncrypted: number
   fullName: number
   staffNumber: number
   department: number
@@ -109,6 +112,7 @@ export type PermanentPassMinAggregateInputType = {
   organizationId?: true
   passNumber?: true
   qrTokenHash?: true
+  qrTokenEncrypted?: true
   fullName?: true
   staffNumber?: true
   department?: true
@@ -135,6 +139,7 @@ export type PermanentPassMaxAggregateInputType = {
   organizationId?: true
   passNumber?: true
   qrTokenHash?: true
+  qrTokenEncrypted?: true
   fullName?: true
   staffNumber?: true
   department?: true
@@ -161,6 +166,7 @@ export type PermanentPassCountAggregateInputType = {
   organizationId?: true
   passNumber?: true
   qrTokenHash?: true
+  qrTokenEncrypted?: true
   fullName?: true
   staffNumber?: true
   department?: true
@@ -260,6 +266,7 @@ export type PermanentPassGroupByOutputType = {
   organizationId: string
   passNumber: string
   qrTokenHash: string
+  qrTokenEncrypted: string | null
   fullName: string
   staffNumber: string | null
   department: string
@@ -307,6 +314,7 @@ export type PermanentPassWhereInput = {
   organizationId?: Prisma.UuidFilter<"PermanentPass"> | string
   passNumber?: Prisma.StringFilter<"PermanentPass"> | string
   qrTokenHash?: Prisma.StringFilter<"PermanentPass"> | string
+  qrTokenEncrypted?: Prisma.StringNullableFilter<"PermanentPass"> | string | null
   fullName?: Prisma.StringFilter<"PermanentPass"> | string
   staffNumber?: Prisma.StringNullableFilter<"PermanentPass"> | string | null
   department?: Prisma.StringFilter<"PermanentPass"> | string
@@ -328,6 +336,8 @@ export type PermanentPassWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"PermanentPass"> | Date | string
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
   accessEvents?: Prisma.PermanentPassAccessEventListRelationFilter
+  authorizedVehicles?: Prisma.AuthorizedVehicleListRelationFilter
+  vehicleAccessEvents?: Prisma.VehicleAccessEventListRelationFilter
 }
 
 export type PermanentPassOrderByWithRelationInput = {
@@ -335,6 +345,7 @@ export type PermanentPassOrderByWithRelationInput = {
   organizationId?: Prisma.SortOrder
   passNumber?: Prisma.SortOrder
   qrTokenHash?: Prisma.SortOrder
+  qrTokenEncrypted?: Prisma.SortOrderInput | Prisma.SortOrder
   fullName?: Prisma.SortOrder
   staffNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   department?: Prisma.SortOrder
@@ -356,6 +367,8 @@ export type PermanentPassOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   organization?: Prisma.OrganizationOrderByWithRelationInput
   accessEvents?: Prisma.PermanentPassAccessEventOrderByRelationAggregateInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleOrderByRelationAggregateInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventOrderByRelationAggregateInput
 }
 
 export type PermanentPassWhereUniqueInput = Prisma.AtLeast<{
@@ -366,6 +379,7 @@ export type PermanentPassWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.PermanentPassWhereInput[]
   NOT?: Prisma.PermanentPassWhereInput | Prisma.PermanentPassWhereInput[]
   organizationId?: Prisma.UuidFilter<"PermanentPass"> | string
+  qrTokenEncrypted?: Prisma.StringNullableFilter<"PermanentPass"> | string | null
   fullName?: Prisma.StringFilter<"PermanentPass"> | string
   staffNumber?: Prisma.StringNullableFilter<"PermanentPass"> | string | null
   department?: Prisma.StringFilter<"PermanentPass"> | string
@@ -387,6 +401,8 @@ export type PermanentPassWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"PermanentPass"> | Date | string
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
   accessEvents?: Prisma.PermanentPassAccessEventListRelationFilter
+  authorizedVehicles?: Prisma.AuthorizedVehicleListRelationFilter
+  vehicleAccessEvents?: Prisma.VehicleAccessEventListRelationFilter
 }, "id" | "passNumber" | "qrTokenHash">
 
 export type PermanentPassOrderByWithAggregationInput = {
@@ -394,6 +410,7 @@ export type PermanentPassOrderByWithAggregationInput = {
   organizationId?: Prisma.SortOrder
   passNumber?: Prisma.SortOrder
   qrTokenHash?: Prisma.SortOrder
+  qrTokenEncrypted?: Prisma.SortOrderInput | Prisma.SortOrder
   fullName?: Prisma.SortOrder
   staffNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   department?: Prisma.SortOrder
@@ -426,6 +443,7 @@ export type PermanentPassScalarWhereWithAggregatesInput = {
   organizationId?: Prisma.UuidWithAggregatesFilter<"PermanentPass"> | string
   passNumber?: Prisma.StringWithAggregatesFilter<"PermanentPass"> | string
   qrTokenHash?: Prisma.StringWithAggregatesFilter<"PermanentPass"> | string
+  qrTokenEncrypted?: Prisma.StringNullableWithAggregatesFilter<"PermanentPass"> | string | null
   fullName?: Prisma.StringWithAggregatesFilter<"PermanentPass"> | string
   staffNumber?: Prisma.StringNullableWithAggregatesFilter<"PermanentPass"> | string | null
   department?: Prisma.StringWithAggregatesFilter<"PermanentPass"> | string
@@ -451,6 +469,7 @@ export type PermanentPassCreateInput = {
   id?: string
   passNumber: string
   qrTokenHash: string
+  qrTokenEncrypted?: string | null
   fullName: string
   staffNumber?: string | null
   department: string
@@ -472,6 +491,8 @@ export type PermanentPassCreateInput = {
   updatedAt?: Date | string
   organization: Prisma.OrganizationCreateNestedOneWithoutPermanentPassesInput
   accessEvents?: Prisma.PermanentPassAccessEventCreateNestedManyWithoutPermanentPassInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleCreateNestedManyWithoutPermanentPassInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutPermanentPassInput
 }
 
 export type PermanentPassUncheckedCreateInput = {
@@ -479,6 +500,7 @@ export type PermanentPassUncheckedCreateInput = {
   organizationId: string
   passNumber: string
   qrTokenHash: string
+  qrTokenEncrypted?: string | null
   fullName: string
   staffNumber?: string | null
   department: string
@@ -499,12 +521,15 @@ export type PermanentPassUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accessEvents?: Prisma.PermanentPassAccessEventUncheckedCreateNestedManyWithoutPermanentPassInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedCreateNestedManyWithoutPermanentPassInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutPermanentPassInput
 }
 
 export type PermanentPassUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   passNumber?: Prisma.StringFieldUpdateOperationsInput | string
   qrTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  qrTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   staffNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   department?: Prisma.StringFieldUpdateOperationsInput | string
@@ -526,6 +551,8 @@ export type PermanentPassUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutPermanentPassesNestedInput
   accessEvents?: Prisma.PermanentPassAccessEventUpdateManyWithoutPermanentPassNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUpdateManyWithoutPermanentPassNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutPermanentPassNestedInput
 }
 
 export type PermanentPassUncheckedUpdateInput = {
@@ -533,6 +560,7 @@ export type PermanentPassUncheckedUpdateInput = {
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   passNumber?: Prisma.StringFieldUpdateOperationsInput | string
   qrTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  qrTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   staffNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   department?: Prisma.StringFieldUpdateOperationsInput | string
@@ -553,6 +581,8 @@ export type PermanentPassUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accessEvents?: Prisma.PermanentPassAccessEventUncheckedUpdateManyWithoutPermanentPassNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedUpdateManyWithoutPermanentPassNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutPermanentPassNestedInput
 }
 
 export type PermanentPassCreateManyInput = {
@@ -560,6 +590,7 @@ export type PermanentPassCreateManyInput = {
   organizationId: string
   passNumber: string
   qrTokenHash: string
+  qrTokenEncrypted?: string | null
   fullName: string
   staffNumber?: string | null
   department: string
@@ -585,6 +616,7 @@ export type PermanentPassUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   passNumber?: Prisma.StringFieldUpdateOperationsInput | string
   qrTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  qrTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   staffNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   department?: Prisma.StringFieldUpdateOperationsInput | string
@@ -611,6 +643,7 @@ export type PermanentPassUncheckedUpdateManyInput = {
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   passNumber?: Prisma.StringFieldUpdateOperationsInput | string
   qrTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  qrTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   staffNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   department?: Prisma.StringFieldUpdateOperationsInput | string
@@ -647,6 +680,7 @@ export type PermanentPassCountOrderByAggregateInput = {
   organizationId?: Prisma.SortOrder
   passNumber?: Prisma.SortOrder
   qrTokenHash?: Prisma.SortOrder
+  qrTokenEncrypted?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
   staffNumber?: Prisma.SortOrder
   department?: Prisma.SortOrder
@@ -673,6 +707,7 @@ export type PermanentPassMaxOrderByAggregateInput = {
   organizationId?: Prisma.SortOrder
   passNumber?: Prisma.SortOrder
   qrTokenHash?: Prisma.SortOrder
+  qrTokenEncrypted?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
   staffNumber?: Prisma.SortOrder
   department?: Prisma.SortOrder
@@ -699,6 +734,7 @@ export type PermanentPassMinOrderByAggregateInput = {
   organizationId?: Prisma.SortOrder
   passNumber?: Prisma.SortOrder
   qrTokenHash?: Prisma.SortOrder
+  qrTokenEncrypted?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
   staffNumber?: Prisma.SortOrder
   department?: Prisma.SortOrder
@@ -723,6 +759,11 @@ export type PermanentPassMinOrderByAggregateInput = {
 export type PermanentPassScalarRelationFilter = {
   is?: Prisma.PermanentPassWhereInput
   isNot?: Prisma.PermanentPassWhereInput
+}
+
+export type PermanentPassNullableScalarRelationFilter = {
+  is?: Prisma.PermanentPassWhereInput | null
+  isNot?: Prisma.PermanentPassWhereInput | null
 }
 
 export type PermanentPassCreateNestedManyWithoutOrganizationInput = {
@@ -797,10 +838,41 @@ export type PermanentPassUpdateOneRequiredWithoutAccessEventsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PermanentPassUpdateToOneWithWhereWithoutAccessEventsInput, Prisma.PermanentPassUpdateWithoutAccessEventsInput>, Prisma.PermanentPassUncheckedUpdateWithoutAccessEventsInput>
 }
 
+export type PermanentPassCreateNestedOneWithoutAuthorizedVehiclesInput = {
+  create?: Prisma.XOR<Prisma.PermanentPassCreateWithoutAuthorizedVehiclesInput, Prisma.PermanentPassUncheckedCreateWithoutAuthorizedVehiclesInput>
+  connectOrCreate?: Prisma.PermanentPassCreateOrConnectWithoutAuthorizedVehiclesInput
+  connect?: Prisma.PermanentPassWhereUniqueInput
+}
+
+export type PermanentPassUpdateOneRequiredWithoutAuthorizedVehiclesNestedInput = {
+  create?: Prisma.XOR<Prisma.PermanentPassCreateWithoutAuthorizedVehiclesInput, Prisma.PermanentPassUncheckedCreateWithoutAuthorizedVehiclesInput>
+  connectOrCreate?: Prisma.PermanentPassCreateOrConnectWithoutAuthorizedVehiclesInput
+  upsert?: Prisma.PermanentPassUpsertWithoutAuthorizedVehiclesInput
+  connect?: Prisma.PermanentPassWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PermanentPassUpdateToOneWithWhereWithoutAuthorizedVehiclesInput, Prisma.PermanentPassUpdateWithoutAuthorizedVehiclesInput>, Prisma.PermanentPassUncheckedUpdateWithoutAuthorizedVehiclesInput>
+}
+
+export type PermanentPassCreateNestedOneWithoutVehicleAccessEventsInput = {
+  create?: Prisma.XOR<Prisma.PermanentPassCreateWithoutVehicleAccessEventsInput, Prisma.PermanentPassUncheckedCreateWithoutVehicleAccessEventsInput>
+  connectOrCreate?: Prisma.PermanentPassCreateOrConnectWithoutVehicleAccessEventsInput
+  connect?: Prisma.PermanentPassWhereUniqueInput
+}
+
+export type PermanentPassUpdateOneWithoutVehicleAccessEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.PermanentPassCreateWithoutVehicleAccessEventsInput, Prisma.PermanentPassUncheckedCreateWithoutVehicleAccessEventsInput>
+  connectOrCreate?: Prisma.PermanentPassCreateOrConnectWithoutVehicleAccessEventsInput
+  upsert?: Prisma.PermanentPassUpsertWithoutVehicleAccessEventsInput
+  disconnect?: Prisma.PermanentPassWhereInput | boolean
+  delete?: Prisma.PermanentPassWhereInput | boolean
+  connect?: Prisma.PermanentPassWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PermanentPassUpdateToOneWithWhereWithoutVehicleAccessEventsInput, Prisma.PermanentPassUpdateWithoutVehicleAccessEventsInput>, Prisma.PermanentPassUncheckedUpdateWithoutVehicleAccessEventsInput>
+}
+
 export type PermanentPassCreateWithoutOrganizationInput = {
   id?: string
   passNumber: string
   qrTokenHash: string
+  qrTokenEncrypted?: string | null
   fullName: string
   staffNumber?: string | null
   department: string
@@ -821,12 +893,15 @@ export type PermanentPassCreateWithoutOrganizationInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accessEvents?: Prisma.PermanentPassAccessEventCreateNestedManyWithoutPermanentPassInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleCreateNestedManyWithoutPermanentPassInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutPermanentPassInput
 }
 
 export type PermanentPassUncheckedCreateWithoutOrganizationInput = {
   id?: string
   passNumber: string
   qrTokenHash: string
+  qrTokenEncrypted?: string | null
   fullName: string
   staffNumber?: string | null
   department: string
@@ -847,6 +922,8 @@ export type PermanentPassUncheckedCreateWithoutOrganizationInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   accessEvents?: Prisma.PermanentPassAccessEventUncheckedCreateNestedManyWithoutPermanentPassInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedCreateNestedManyWithoutPermanentPassInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutPermanentPassInput
 }
 
 export type PermanentPassCreateOrConnectWithoutOrganizationInput = {
@@ -883,6 +960,7 @@ export type PermanentPassScalarWhereInput = {
   organizationId?: Prisma.UuidFilter<"PermanentPass"> | string
   passNumber?: Prisma.StringFilter<"PermanentPass"> | string
   qrTokenHash?: Prisma.StringFilter<"PermanentPass"> | string
+  qrTokenEncrypted?: Prisma.StringNullableFilter<"PermanentPass"> | string | null
   fullName?: Prisma.StringFilter<"PermanentPass"> | string
   staffNumber?: Prisma.StringNullableFilter<"PermanentPass"> | string | null
   department?: Prisma.StringFilter<"PermanentPass"> | string
@@ -908,6 +986,7 @@ export type PermanentPassCreateWithoutAccessEventsInput = {
   id?: string
   passNumber: string
   qrTokenHash: string
+  qrTokenEncrypted?: string | null
   fullName: string
   staffNumber?: string | null
   department: string
@@ -928,6 +1007,8 @@ export type PermanentPassCreateWithoutAccessEventsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   organization: Prisma.OrganizationCreateNestedOneWithoutPermanentPassesInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleCreateNestedManyWithoutPermanentPassInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutPermanentPassInput
 }
 
 export type PermanentPassUncheckedCreateWithoutAccessEventsInput = {
@@ -935,6 +1016,7 @@ export type PermanentPassUncheckedCreateWithoutAccessEventsInput = {
   organizationId: string
   passNumber: string
   qrTokenHash: string
+  qrTokenEncrypted?: string | null
   fullName: string
   staffNumber?: string | null
   department: string
@@ -954,6 +1036,8 @@ export type PermanentPassUncheckedCreateWithoutAccessEventsInput = {
   revocationReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedCreateNestedManyWithoutPermanentPassInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutPermanentPassInput
 }
 
 export type PermanentPassCreateOrConnectWithoutAccessEventsInput = {
@@ -976,6 +1060,7 @@ export type PermanentPassUpdateWithoutAccessEventsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   passNumber?: Prisma.StringFieldUpdateOperationsInput | string
   qrTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  qrTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   staffNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   department?: Prisma.StringFieldUpdateOperationsInput | string
@@ -996,6 +1081,8 @@ export type PermanentPassUpdateWithoutAccessEventsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutPermanentPassesNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUpdateManyWithoutPermanentPassNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutPermanentPassNestedInput
 }
 
 export type PermanentPassUncheckedUpdateWithoutAccessEventsInput = {
@@ -1003,6 +1090,7 @@ export type PermanentPassUncheckedUpdateWithoutAccessEventsInput = {
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   passNumber?: Prisma.StringFieldUpdateOperationsInput | string
   qrTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  qrTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   staffNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   department?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1022,12 +1110,279 @@ export type PermanentPassUncheckedUpdateWithoutAccessEventsInput = {
   revocationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedUpdateManyWithoutPermanentPassNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutPermanentPassNestedInput
+}
+
+export type PermanentPassCreateWithoutAuthorizedVehiclesInput = {
+  id?: string
+  passNumber: string
+  qrTokenHash: string
+  qrTokenEncrypted?: string | null
+  fullName: string
+  staffNumber?: string | null
+  department: string
+  position?: string | null
+  holderType: $Enums.PermanentPassHolderType
+  phone?: string | null
+  email?: string | null
+  photoUrl?: string | null
+  status?: $Enums.PermanentPassStatus
+  validFrom: Date | string
+  expiryType: $Enums.PermanentPassExpiryType
+  expiresAt?: Date | string | null
+  isCurrentlyInside?: boolean
+  lastActivityType?: $Enums.PermanentPassActivityType | null
+  lastActivityAt?: Date | string | null
+  revokedAt?: Date | string | null
+  revocationReason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutPermanentPassesInput
+  accessEvents?: Prisma.PermanentPassAccessEventCreateNestedManyWithoutPermanentPassInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutPermanentPassInput
+}
+
+export type PermanentPassUncheckedCreateWithoutAuthorizedVehiclesInput = {
+  id?: string
+  organizationId: string
+  passNumber: string
+  qrTokenHash: string
+  qrTokenEncrypted?: string | null
+  fullName: string
+  staffNumber?: string | null
+  department: string
+  position?: string | null
+  holderType: $Enums.PermanentPassHolderType
+  phone?: string | null
+  email?: string | null
+  photoUrl?: string | null
+  status?: $Enums.PermanentPassStatus
+  validFrom: Date | string
+  expiryType: $Enums.PermanentPassExpiryType
+  expiresAt?: Date | string | null
+  isCurrentlyInside?: boolean
+  lastActivityType?: $Enums.PermanentPassActivityType | null
+  lastActivityAt?: Date | string | null
+  revokedAt?: Date | string | null
+  revocationReason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accessEvents?: Prisma.PermanentPassAccessEventUncheckedCreateNestedManyWithoutPermanentPassInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutPermanentPassInput
+}
+
+export type PermanentPassCreateOrConnectWithoutAuthorizedVehiclesInput = {
+  where: Prisma.PermanentPassWhereUniqueInput
+  create: Prisma.XOR<Prisma.PermanentPassCreateWithoutAuthorizedVehiclesInput, Prisma.PermanentPassUncheckedCreateWithoutAuthorizedVehiclesInput>
+}
+
+export type PermanentPassUpsertWithoutAuthorizedVehiclesInput = {
+  update: Prisma.XOR<Prisma.PermanentPassUpdateWithoutAuthorizedVehiclesInput, Prisma.PermanentPassUncheckedUpdateWithoutAuthorizedVehiclesInput>
+  create: Prisma.XOR<Prisma.PermanentPassCreateWithoutAuthorizedVehiclesInput, Prisma.PermanentPassUncheckedCreateWithoutAuthorizedVehiclesInput>
+  where?: Prisma.PermanentPassWhereInput
+}
+
+export type PermanentPassUpdateToOneWithWhereWithoutAuthorizedVehiclesInput = {
+  where?: Prisma.PermanentPassWhereInput
+  data: Prisma.XOR<Prisma.PermanentPassUpdateWithoutAuthorizedVehiclesInput, Prisma.PermanentPassUncheckedUpdateWithoutAuthorizedVehiclesInput>
+}
+
+export type PermanentPassUpdateWithoutAuthorizedVehiclesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  passNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  qrTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  qrTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  staffNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  holderType?: Prisma.EnumPermanentPassHolderTypeFieldUpdateOperationsInput | $Enums.PermanentPassHolderType
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumPermanentPassStatusFieldUpdateOperationsInput | $Enums.PermanentPassStatus
+  validFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiryType?: Prisma.EnumPermanentPassExpiryTypeFieldUpdateOperationsInput | $Enums.PermanentPassExpiryType
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isCurrentlyInside?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastActivityType?: Prisma.NullableEnumPermanentPassActivityTypeFieldUpdateOperationsInput | $Enums.PermanentPassActivityType | null
+  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revocationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutPermanentPassesNestedInput
+  accessEvents?: Prisma.PermanentPassAccessEventUpdateManyWithoutPermanentPassNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutPermanentPassNestedInput
+}
+
+export type PermanentPassUncheckedUpdateWithoutAuthorizedVehiclesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  passNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  qrTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  qrTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  staffNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  holderType?: Prisma.EnumPermanentPassHolderTypeFieldUpdateOperationsInput | $Enums.PermanentPassHolderType
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumPermanentPassStatusFieldUpdateOperationsInput | $Enums.PermanentPassStatus
+  validFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiryType?: Prisma.EnumPermanentPassExpiryTypeFieldUpdateOperationsInput | $Enums.PermanentPassExpiryType
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isCurrentlyInside?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastActivityType?: Prisma.NullableEnumPermanentPassActivityTypeFieldUpdateOperationsInput | $Enums.PermanentPassActivityType | null
+  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revocationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accessEvents?: Prisma.PermanentPassAccessEventUncheckedUpdateManyWithoutPermanentPassNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutPermanentPassNestedInput
+}
+
+export type PermanentPassCreateWithoutVehicleAccessEventsInput = {
+  id?: string
+  passNumber: string
+  qrTokenHash: string
+  qrTokenEncrypted?: string | null
+  fullName: string
+  staffNumber?: string | null
+  department: string
+  position?: string | null
+  holderType: $Enums.PermanentPassHolderType
+  phone?: string | null
+  email?: string | null
+  photoUrl?: string | null
+  status?: $Enums.PermanentPassStatus
+  validFrom: Date | string
+  expiryType: $Enums.PermanentPassExpiryType
+  expiresAt?: Date | string | null
+  isCurrentlyInside?: boolean
+  lastActivityType?: $Enums.PermanentPassActivityType | null
+  lastActivityAt?: Date | string | null
+  revokedAt?: Date | string | null
+  revocationReason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutPermanentPassesInput
+  accessEvents?: Prisma.PermanentPassAccessEventCreateNestedManyWithoutPermanentPassInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleCreateNestedManyWithoutPermanentPassInput
+}
+
+export type PermanentPassUncheckedCreateWithoutVehicleAccessEventsInput = {
+  id?: string
+  organizationId: string
+  passNumber: string
+  qrTokenHash: string
+  qrTokenEncrypted?: string | null
+  fullName: string
+  staffNumber?: string | null
+  department: string
+  position?: string | null
+  holderType: $Enums.PermanentPassHolderType
+  phone?: string | null
+  email?: string | null
+  photoUrl?: string | null
+  status?: $Enums.PermanentPassStatus
+  validFrom: Date | string
+  expiryType: $Enums.PermanentPassExpiryType
+  expiresAt?: Date | string | null
+  isCurrentlyInside?: boolean
+  lastActivityType?: $Enums.PermanentPassActivityType | null
+  lastActivityAt?: Date | string | null
+  revokedAt?: Date | string | null
+  revocationReason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accessEvents?: Prisma.PermanentPassAccessEventUncheckedCreateNestedManyWithoutPermanentPassInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedCreateNestedManyWithoutPermanentPassInput
+}
+
+export type PermanentPassCreateOrConnectWithoutVehicleAccessEventsInput = {
+  where: Prisma.PermanentPassWhereUniqueInput
+  create: Prisma.XOR<Prisma.PermanentPassCreateWithoutVehicleAccessEventsInput, Prisma.PermanentPassUncheckedCreateWithoutVehicleAccessEventsInput>
+}
+
+export type PermanentPassUpsertWithoutVehicleAccessEventsInput = {
+  update: Prisma.XOR<Prisma.PermanentPassUpdateWithoutVehicleAccessEventsInput, Prisma.PermanentPassUncheckedUpdateWithoutVehicleAccessEventsInput>
+  create: Prisma.XOR<Prisma.PermanentPassCreateWithoutVehicleAccessEventsInput, Prisma.PermanentPassUncheckedCreateWithoutVehicleAccessEventsInput>
+  where?: Prisma.PermanentPassWhereInput
+}
+
+export type PermanentPassUpdateToOneWithWhereWithoutVehicleAccessEventsInput = {
+  where?: Prisma.PermanentPassWhereInput
+  data: Prisma.XOR<Prisma.PermanentPassUpdateWithoutVehicleAccessEventsInput, Prisma.PermanentPassUncheckedUpdateWithoutVehicleAccessEventsInput>
+}
+
+export type PermanentPassUpdateWithoutVehicleAccessEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  passNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  qrTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  qrTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  staffNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  holderType?: Prisma.EnumPermanentPassHolderTypeFieldUpdateOperationsInput | $Enums.PermanentPassHolderType
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumPermanentPassStatusFieldUpdateOperationsInput | $Enums.PermanentPassStatus
+  validFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiryType?: Prisma.EnumPermanentPassExpiryTypeFieldUpdateOperationsInput | $Enums.PermanentPassExpiryType
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isCurrentlyInside?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastActivityType?: Prisma.NullableEnumPermanentPassActivityTypeFieldUpdateOperationsInput | $Enums.PermanentPassActivityType | null
+  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revocationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutPermanentPassesNestedInput
+  accessEvents?: Prisma.PermanentPassAccessEventUpdateManyWithoutPermanentPassNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUpdateManyWithoutPermanentPassNestedInput
+}
+
+export type PermanentPassUncheckedUpdateWithoutVehicleAccessEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  passNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  qrTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  qrTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  staffNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  holderType?: Prisma.EnumPermanentPassHolderTypeFieldUpdateOperationsInput | $Enums.PermanentPassHolderType
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumPermanentPassStatusFieldUpdateOperationsInput | $Enums.PermanentPassStatus
+  validFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiryType?: Prisma.EnumPermanentPassExpiryTypeFieldUpdateOperationsInput | $Enums.PermanentPassExpiryType
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isCurrentlyInside?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastActivityType?: Prisma.NullableEnumPermanentPassActivityTypeFieldUpdateOperationsInput | $Enums.PermanentPassActivityType | null
+  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revokedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revocationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accessEvents?: Prisma.PermanentPassAccessEventUncheckedUpdateManyWithoutPermanentPassNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedUpdateManyWithoutPermanentPassNestedInput
 }
 
 export type PermanentPassCreateManyOrganizationInput = {
   id?: string
   passNumber: string
   qrTokenHash: string
+  qrTokenEncrypted?: string | null
   fullName: string
   staffNumber?: string | null
   department: string
@@ -1053,6 +1408,7 @@ export type PermanentPassUpdateWithoutOrganizationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   passNumber?: Prisma.StringFieldUpdateOperationsInput | string
   qrTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  qrTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   staffNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   department?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1073,12 +1429,15 @@ export type PermanentPassUpdateWithoutOrganizationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accessEvents?: Prisma.PermanentPassAccessEventUpdateManyWithoutPermanentPassNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUpdateManyWithoutPermanentPassNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutPermanentPassNestedInput
 }
 
 export type PermanentPassUncheckedUpdateWithoutOrganizationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   passNumber?: Prisma.StringFieldUpdateOperationsInput | string
   qrTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  qrTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   staffNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   department?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1099,12 +1458,15 @@ export type PermanentPassUncheckedUpdateWithoutOrganizationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accessEvents?: Prisma.PermanentPassAccessEventUncheckedUpdateManyWithoutPermanentPassNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedUpdateManyWithoutPermanentPassNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutPermanentPassNestedInput
 }
 
 export type PermanentPassUncheckedUpdateManyWithoutOrganizationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   passNumber?: Prisma.StringFieldUpdateOperationsInput | string
   qrTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  qrTokenEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   staffNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   department?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1133,10 +1495,14 @@ export type PermanentPassUncheckedUpdateManyWithoutOrganizationInput = {
 
 export type PermanentPassCountOutputType = {
   accessEvents: number
+  authorizedVehicles: number
+  vehicleAccessEvents: number
 }
 
 export type PermanentPassCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accessEvents?: boolean | PermanentPassCountOutputTypeCountAccessEventsArgs
+  authorizedVehicles?: boolean | PermanentPassCountOutputTypeCountAuthorizedVehiclesArgs
+  vehicleAccessEvents?: boolean | PermanentPassCountOutputTypeCountVehicleAccessEventsArgs
 }
 
 /**
@@ -1156,12 +1522,27 @@ export type PermanentPassCountOutputTypeCountAccessEventsArgs<ExtArgs extends ru
   where?: Prisma.PermanentPassAccessEventWhereInput
 }
 
+/**
+ * PermanentPassCountOutputType without action
+ */
+export type PermanentPassCountOutputTypeCountAuthorizedVehiclesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AuthorizedVehicleWhereInput
+}
+
+/**
+ * PermanentPassCountOutputType without action
+ */
+export type PermanentPassCountOutputTypeCountVehicleAccessEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VehicleAccessEventWhereInput
+}
+
 
 export type PermanentPassSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   organizationId?: boolean
   passNumber?: boolean
   qrTokenHash?: boolean
+  qrTokenEncrypted?: boolean
   fullName?: boolean
   staffNumber?: boolean
   department?: boolean
@@ -1183,6 +1564,8 @@ export type PermanentPassSelect<ExtArgs extends runtime.Types.Extensions.Interna
   updatedAt?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   accessEvents?: boolean | Prisma.PermanentPass$accessEventsArgs<ExtArgs>
+  authorizedVehicles?: boolean | Prisma.PermanentPass$authorizedVehiclesArgs<ExtArgs>
+  vehicleAccessEvents?: boolean | Prisma.PermanentPass$vehicleAccessEventsArgs<ExtArgs>
   _count?: boolean | Prisma.PermanentPassCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["permanentPass"]>
 
@@ -1191,6 +1574,7 @@ export type PermanentPassSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   organizationId?: boolean
   passNumber?: boolean
   qrTokenHash?: boolean
+  qrTokenEncrypted?: boolean
   fullName?: boolean
   staffNumber?: boolean
   department?: boolean
@@ -1218,6 +1602,7 @@ export type PermanentPassSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   organizationId?: boolean
   passNumber?: boolean
   qrTokenHash?: boolean
+  qrTokenEncrypted?: boolean
   fullName?: boolean
   staffNumber?: boolean
   department?: boolean
@@ -1245,6 +1630,7 @@ export type PermanentPassSelectScalar = {
   organizationId?: boolean
   passNumber?: boolean
   qrTokenHash?: boolean
+  qrTokenEncrypted?: boolean
   fullName?: boolean
   staffNumber?: boolean
   department?: boolean
@@ -1266,10 +1652,12 @@ export type PermanentPassSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PermanentPassOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "passNumber" | "qrTokenHash" | "fullName" | "staffNumber" | "department" | "position" | "holderType" | "phone" | "email" | "photoUrl" | "status" | "validFrom" | "expiryType" | "expiresAt" | "isCurrentlyInside" | "lastActivityType" | "lastActivityAt" | "revokedAt" | "revocationReason" | "createdAt" | "updatedAt", ExtArgs["result"]["permanentPass"]>
+export type PermanentPassOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "passNumber" | "qrTokenHash" | "qrTokenEncrypted" | "fullName" | "staffNumber" | "department" | "position" | "holderType" | "phone" | "email" | "photoUrl" | "status" | "validFrom" | "expiryType" | "expiresAt" | "isCurrentlyInside" | "lastActivityType" | "lastActivityAt" | "revokedAt" | "revocationReason" | "createdAt" | "updatedAt", ExtArgs["result"]["permanentPass"]>
 export type PermanentPassInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   accessEvents?: boolean | Prisma.PermanentPass$accessEventsArgs<ExtArgs>
+  authorizedVehicles?: boolean | Prisma.PermanentPass$authorizedVehiclesArgs<ExtArgs>
+  vehicleAccessEvents?: boolean | Prisma.PermanentPass$vehicleAccessEventsArgs<ExtArgs>
   _count?: boolean | Prisma.PermanentPassCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PermanentPassIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1284,12 +1672,15 @@ export type $PermanentPassPayload<ExtArgs extends runtime.Types.Extensions.Inter
   objects: {
     organization: Prisma.$OrganizationPayload<ExtArgs>
     accessEvents: Prisma.$PermanentPassAccessEventPayload<ExtArgs>[]
+    authorizedVehicles: Prisma.$AuthorizedVehiclePayload<ExtArgs>[]
+    vehicleAccessEvents: Prisma.$VehicleAccessEventPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     organizationId: string
     passNumber: string
     qrTokenHash: string
+    qrTokenEncrypted: string | null
     fullName: string
     staffNumber: string | null
     department: string
@@ -1705,6 +2096,8 @@ export interface Prisma__PermanentPassClient<T, Null = never, ExtArgs extends ru
   readonly [Symbol.toStringTag]: "PrismaPromise"
   organization<T extends Prisma.OrganizationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrganizationDefaultArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   accessEvents<T extends Prisma.PermanentPass$accessEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PermanentPass$accessEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PermanentPassAccessEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  authorizedVehicles<T extends Prisma.PermanentPass$authorizedVehiclesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PermanentPass$authorizedVehiclesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuthorizedVehiclePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  vehicleAccessEvents<T extends Prisma.PermanentPass$vehicleAccessEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PermanentPass$vehicleAccessEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleAccessEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1738,6 +2131,7 @@ export interface PermanentPassFieldRefs {
   readonly organizationId: Prisma.FieldRef<"PermanentPass", 'String'>
   readonly passNumber: Prisma.FieldRef<"PermanentPass", 'String'>
   readonly qrTokenHash: Prisma.FieldRef<"PermanentPass", 'String'>
+  readonly qrTokenEncrypted: Prisma.FieldRef<"PermanentPass", 'String'>
   readonly fullName: Prisma.FieldRef<"PermanentPass", 'String'>
   readonly staffNumber: Prisma.FieldRef<"PermanentPass", 'String'>
   readonly department: Prisma.FieldRef<"PermanentPass", 'String'>
@@ -2179,6 +2573,54 @@ export type PermanentPass$accessEventsArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.PermanentPassAccessEventScalarFieldEnum | Prisma.PermanentPassAccessEventScalarFieldEnum[]
+}
+
+/**
+ * PermanentPass.authorizedVehicles
+ */
+export type PermanentPass$authorizedVehiclesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AuthorizedVehicle
+   */
+  select?: Prisma.AuthorizedVehicleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AuthorizedVehicle
+   */
+  omit?: Prisma.AuthorizedVehicleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuthorizedVehicleInclude<ExtArgs> | null
+  where?: Prisma.AuthorizedVehicleWhereInput
+  orderBy?: Prisma.AuthorizedVehicleOrderByWithRelationInput | Prisma.AuthorizedVehicleOrderByWithRelationInput[]
+  cursor?: Prisma.AuthorizedVehicleWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AuthorizedVehicleScalarFieldEnum | Prisma.AuthorizedVehicleScalarFieldEnum[]
+}
+
+/**
+ * PermanentPass.vehicleAccessEvents
+ */
+export type PermanentPass$vehicleAccessEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VehicleAccessEvent
+   */
+  select?: Prisma.VehicleAccessEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VehicleAccessEvent
+   */
+  omit?: Prisma.VehicleAccessEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VehicleAccessEventInclude<ExtArgs> | null
+  where?: Prisma.VehicleAccessEventWhereInput
+  orderBy?: Prisma.VehicleAccessEventOrderByWithRelationInput | Prisma.VehicleAccessEventOrderByWithRelationInput[]
+  cursor?: Prisma.VehicleAccessEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VehicleAccessEventScalarFieldEnum | Prisma.VehicleAccessEventScalarFieldEnum[]
 }
 
 /**

@@ -409,7 +409,11 @@ export const ModelName = {
   Gate: 'Gate',
   AccessEvent: 'AccessEvent',
   PermanentPass: 'PermanentPass',
-  PermanentPassAccessEvent: 'PermanentPassAccessEvent'
+  PermanentPassAccessEvent: 'PermanentPassAccessEvent',
+  AuthorizedVehicle: 'AuthorizedVehicle',
+  GateAccessDevice: 'GateAccessDevice',
+  VehicleAccessRequest: 'VehicleAccessRequest',
+  VehicleAccessEvent: 'VehicleAccessEvent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -425,7 +429,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "organization" | "site" | "siteOrganization" | "kiosk" | "department" | "host" | "visitor" | "visitRequest" | "visitorPass" | "gate" | "accessEvent" | "permanentPass" | "permanentPassAccessEvent"
+    modelProps: "organization" | "site" | "siteOrganization" | "kiosk" | "department" | "host" | "visitor" | "visitRequest" | "visitorPass" | "gate" | "accessEvent" | "permanentPass" | "permanentPassAccessEvent" | "authorizedVehicle" | "gateAccessDevice" | "vehicleAccessRequest" | "vehicleAccessEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1391,6 +1395,302 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AuthorizedVehicle: {
+      payload: Prisma.$AuthorizedVehiclePayload<ExtArgs>
+      fields: Prisma.AuthorizedVehicleFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AuthorizedVehicleFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthorizedVehiclePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AuthorizedVehicleFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthorizedVehiclePayload>
+        }
+        findFirst: {
+          args: Prisma.AuthorizedVehicleFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthorizedVehiclePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AuthorizedVehicleFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthorizedVehiclePayload>
+        }
+        findMany: {
+          args: Prisma.AuthorizedVehicleFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthorizedVehiclePayload>[]
+        }
+        create: {
+          args: Prisma.AuthorizedVehicleCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthorizedVehiclePayload>
+        }
+        createMany: {
+          args: Prisma.AuthorizedVehicleCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AuthorizedVehicleCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthorizedVehiclePayload>[]
+        }
+        delete: {
+          args: Prisma.AuthorizedVehicleDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthorizedVehiclePayload>
+        }
+        update: {
+          args: Prisma.AuthorizedVehicleUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthorizedVehiclePayload>
+        }
+        deleteMany: {
+          args: Prisma.AuthorizedVehicleDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AuthorizedVehicleUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AuthorizedVehicleUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthorizedVehiclePayload>[]
+        }
+        upsert: {
+          args: Prisma.AuthorizedVehicleUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthorizedVehiclePayload>
+        }
+        aggregate: {
+          args: Prisma.AuthorizedVehicleAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAuthorizedVehicle>
+        }
+        groupBy: {
+          args: Prisma.AuthorizedVehicleGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AuthorizedVehicleGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AuthorizedVehicleCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AuthorizedVehicleCountAggregateOutputType> | number
+        }
+      }
+    }
+    GateAccessDevice: {
+      payload: Prisma.$GateAccessDevicePayload<ExtArgs>
+      fields: Prisma.GateAccessDeviceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.GateAccessDeviceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GateAccessDevicePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.GateAccessDeviceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GateAccessDevicePayload>
+        }
+        findFirst: {
+          args: Prisma.GateAccessDeviceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GateAccessDevicePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.GateAccessDeviceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GateAccessDevicePayload>
+        }
+        findMany: {
+          args: Prisma.GateAccessDeviceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GateAccessDevicePayload>[]
+        }
+        create: {
+          args: Prisma.GateAccessDeviceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GateAccessDevicePayload>
+        }
+        createMany: {
+          args: Prisma.GateAccessDeviceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.GateAccessDeviceCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GateAccessDevicePayload>[]
+        }
+        delete: {
+          args: Prisma.GateAccessDeviceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GateAccessDevicePayload>
+        }
+        update: {
+          args: Prisma.GateAccessDeviceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GateAccessDevicePayload>
+        }
+        deleteMany: {
+          args: Prisma.GateAccessDeviceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.GateAccessDeviceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.GateAccessDeviceUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GateAccessDevicePayload>[]
+        }
+        upsert: {
+          args: Prisma.GateAccessDeviceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GateAccessDevicePayload>
+        }
+        aggregate: {
+          args: Prisma.GateAccessDeviceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGateAccessDevice>
+        }
+        groupBy: {
+          args: Prisma.GateAccessDeviceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GateAccessDeviceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.GateAccessDeviceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GateAccessDeviceCountAggregateOutputType> | number
+        }
+      }
+    }
+    VehicleAccessRequest: {
+      payload: Prisma.$VehicleAccessRequestPayload<ExtArgs>
+      fields: Prisma.VehicleAccessRequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VehicleAccessRequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleAccessRequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VehicleAccessRequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleAccessRequestPayload>
+        }
+        findFirst: {
+          args: Prisma.VehicleAccessRequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleAccessRequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VehicleAccessRequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleAccessRequestPayload>
+        }
+        findMany: {
+          args: Prisma.VehicleAccessRequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleAccessRequestPayload>[]
+        }
+        create: {
+          args: Prisma.VehicleAccessRequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleAccessRequestPayload>
+        }
+        createMany: {
+          args: Prisma.VehicleAccessRequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VehicleAccessRequestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleAccessRequestPayload>[]
+        }
+        delete: {
+          args: Prisma.VehicleAccessRequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleAccessRequestPayload>
+        }
+        update: {
+          args: Prisma.VehicleAccessRequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleAccessRequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.VehicleAccessRequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VehicleAccessRequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VehicleAccessRequestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleAccessRequestPayload>[]
+        }
+        upsert: {
+          args: Prisma.VehicleAccessRequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleAccessRequestPayload>
+        }
+        aggregate: {
+          args: Prisma.VehicleAccessRequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVehicleAccessRequest>
+        }
+        groupBy: {
+          args: Prisma.VehicleAccessRequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VehicleAccessRequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VehicleAccessRequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VehicleAccessRequestCountAggregateOutputType> | number
+        }
+      }
+    }
+    VehicleAccessEvent: {
+      payload: Prisma.$VehicleAccessEventPayload<ExtArgs>
+      fields: Prisma.VehicleAccessEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VehicleAccessEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleAccessEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VehicleAccessEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleAccessEventPayload>
+        }
+        findFirst: {
+          args: Prisma.VehicleAccessEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleAccessEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VehicleAccessEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleAccessEventPayload>
+        }
+        findMany: {
+          args: Prisma.VehicleAccessEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleAccessEventPayload>[]
+        }
+        create: {
+          args: Prisma.VehicleAccessEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleAccessEventPayload>
+        }
+        createMany: {
+          args: Prisma.VehicleAccessEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VehicleAccessEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleAccessEventPayload>[]
+        }
+        delete: {
+          args: Prisma.VehicleAccessEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleAccessEventPayload>
+        }
+        update: {
+          args: Prisma.VehicleAccessEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleAccessEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.VehicleAccessEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VehicleAccessEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VehicleAccessEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleAccessEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.VehicleAccessEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VehicleAccessEventPayload>
+        }
+        aggregate: {
+          args: Prisma.VehicleAccessEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVehicleAccessEvent>
+        }
+        groupBy: {
+          args: Prisma.VehicleAccessEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VehicleAccessEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VehicleAccessEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VehicleAccessEventCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1641,6 +1941,7 @@ export const PermanentPassScalarFieldEnum = {
   organizationId: 'organizationId',
   passNumber: 'passNumber',
   qrTokenHash: 'qrTokenHash',
+  qrTokenEncrypted: 'qrTokenEncrypted',
   fullName: 'fullName',
   staffNumber: 'staffNumber',
   department: 'department',
@@ -1680,6 +1981,84 @@ export const PermanentPassAccessEventScalarFieldEnum = {
 } as const
 
 export type PermanentPassAccessEventScalarFieldEnum = (typeof PermanentPassAccessEventScalarFieldEnum)[keyof typeof PermanentPassAccessEventScalarFieldEnum]
+
+
+export const AuthorizedVehicleScalarFieldEnum = {
+  id: 'id',
+  siteId: 'siteId',
+  permanentPassId: 'permanentPassId',
+  plateNumber: 'plateNumber',
+  normalizedPlateNumber: 'normalizedPlateNumber',
+  isActive: 'isActive',
+  isCurrentlyInside: 'isCurrentlyInside',
+  lastEntryAt: 'lastEntryAt',
+  lastExitAt: 'lastExitAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AuthorizedVehicleScalarFieldEnum = (typeof AuthorizedVehicleScalarFieldEnum)[keyof typeof AuthorizedVehicleScalarFieldEnum]
+
+
+export const GateAccessDeviceScalarFieldEnum = {
+  id: 'id',
+  siteId: 'siteId',
+  gateId: 'gateId',
+  name: 'name',
+  deviceKeyHash: 'deviceKeyHash',
+  isActive: 'isActive',
+  lastSeenAt: 'lastSeenAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type GateAccessDeviceScalarFieldEnum = (typeof GateAccessDeviceScalarFieldEnum)[keyof typeof GateAccessDeviceScalarFieldEnum]
+
+
+export const VehicleAccessRequestScalarFieldEnum = {
+  id: 'id',
+  siteId: 'siteId',
+  gateId: 'gateId',
+  plateNumber: 'plateNumber',
+  normalizedPlateNumber: 'normalizedPlateNumber',
+  direction: 'direction',
+  confidence: 'confidence',
+  snapshotUrl: 'snapshotUrl',
+  status: 'status',
+  reason: 'reason',
+  detectedAt: 'detectedAt',
+  reviewedAt: 'reviewedAt',
+  reviewedBy: 'reviewedBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type VehicleAccessRequestScalarFieldEnum = (typeof VehicleAccessRequestScalarFieldEnum)[keyof typeof VehicleAccessRequestScalarFieldEnum]
+
+
+export const VehicleAccessEventScalarFieldEnum = {
+  id: 'id',
+  siteId: 'siteId',
+  organizationId: 'organizationId',
+  authorizedVehicleId: 'authorizedVehicleId',
+  permanentPassId: 'permanentPassId',
+  gateId: 'gateId',
+  gateAccessDeviceId: 'gateAccessDeviceId',
+  vehicleAccessRequestId: 'vehicleAccessRequestId',
+  deviceRequestId: 'deviceRequestId',
+  plateNumber: 'plateNumber',
+  normalizedPlateNumber: 'normalizedPlateNumber',
+  direction: 'direction',
+  decision: 'decision',
+  action: 'action',
+  confidence: 'confidence',
+  reason: 'reason',
+  approvedBy: 'approvedBy',
+  occurredAt: 'occurredAt',
+  metadata: 'metadata'
+} as const
+
+export type VehicleAccessEventScalarFieldEnum = (typeof VehicleAccessEventScalarFieldEnum)[keyof typeof VehicleAccessEventScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1973,6 +2352,48 @@ export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, '
 export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
+
+/**
+ * Reference to a field of type 'VehicleAccessRequestStatus'
+ */
+export type EnumVehicleAccessRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VehicleAccessRequestStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'VehicleAccessRequestStatus[]'
+ */
+export type ListEnumVehicleAccessRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VehicleAccessRequestStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'VehicleAccessDecision'
+ */
+export type EnumVehicleAccessDecisionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VehicleAccessDecision'>
+    
+
+
+/**
+ * Reference to a field of type 'VehicleAccessDecision[]'
+ */
+export type ListEnumVehicleAccessDecisionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VehicleAccessDecision[]'>
+    
+
+
+/**
+ * Reference to a field of type 'VehicleGateAction'
+ */
+export type EnumVehicleGateActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VehicleGateAction'>
+    
+
+
+/**
+ * Reference to a field of type 'VehicleGateAction[]'
+ */
+export type ListEnumVehicleGateActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VehicleGateAction[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -2137,6 +2558,10 @@ export type GlobalOmitConfig = {
   accessEvent?: Prisma.AccessEventOmit
   permanentPass?: Prisma.PermanentPassOmit
   permanentPassAccessEvent?: Prisma.PermanentPassAccessEventOmit
+  authorizedVehicle?: Prisma.AuthorizedVehicleOmit
+  gateAccessDevice?: Prisma.GateAccessDeviceOmit
+  vehicleAccessRequest?: Prisma.VehicleAccessRequestOmit
+  vehicleAccessEvent?: Prisma.VehicleAccessEventOmit
 }
 
 /* Types for Logging */

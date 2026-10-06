@@ -274,6 +274,10 @@ export type SiteWhereInput = {
   kiosks?: Prisma.KioskListRelationFilter
   visits?: Prisma.VisitRequestListRelationFilter
   accessEvents?: Prisma.AccessEventListRelationFilter
+  authorizedVehicles?: Prisma.AuthorizedVehicleListRelationFilter
+  gateAccessDevices?: Prisma.GateAccessDeviceListRelationFilter
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestListRelationFilter
+  vehicleAccessEvents?: Prisma.VehicleAccessEventListRelationFilter
 }
 
 export type SiteOrderByWithRelationInput = {
@@ -297,6 +301,10 @@ export type SiteOrderByWithRelationInput = {
   kiosks?: Prisma.KioskOrderByRelationAggregateInput
   visits?: Prisma.VisitRequestOrderByRelationAggregateInput
   accessEvents?: Prisma.AccessEventOrderByRelationAggregateInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleOrderByRelationAggregateInput
+  gateAccessDevices?: Prisma.GateAccessDeviceOrderByRelationAggregateInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestOrderByRelationAggregateInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventOrderByRelationAggregateInput
 }
 
 export type SiteWhereUniqueInput = Prisma.AtLeast<{
@@ -323,6 +331,10 @@ export type SiteWhereUniqueInput = Prisma.AtLeast<{
   kiosks?: Prisma.KioskListRelationFilter
   visits?: Prisma.VisitRequestListRelationFilter
   accessEvents?: Prisma.AccessEventListRelationFilter
+  authorizedVehicles?: Prisma.AuthorizedVehicleListRelationFilter
+  gateAccessDevices?: Prisma.GateAccessDeviceListRelationFilter
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestListRelationFilter
+  vehicleAccessEvents?: Prisma.VehicleAccessEventListRelationFilter
 }, "id" | "code" | "adminUsername">
 
 export type SiteOrderByWithAggregationInput = {
@@ -390,6 +402,10 @@ export type SiteCreateInput = {
   kiosks?: Prisma.KioskCreateNestedManyWithoutSiteInput
   visits?: Prisma.VisitRequestCreateNestedManyWithoutSiteInput
   accessEvents?: Prisma.AccessEventCreateNestedManyWithoutSiteInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleCreateNestedManyWithoutSiteInput
+  gateAccessDevices?: Prisma.GateAccessDeviceCreateNestedManyWithoutSiteInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestCreateNestedManyWithoutSiteInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutSiteInput
 }
 
 export type SiteUncheckedCreateInput = {
@@ -413,6 +429,10 @@ export type SiteUncheckedCreateInput = {
   kiosks?: Prisma.KioskUncheckedCreateNestedManyWithoutSiteInput
   visits?: Prisma.VisitRequestUncheckedCreateNestedManyWithoutSiteInput
   accessEvents?: Prisma.AccessEventUncheckedCreateNestedManyWithoutSiteInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedCreateNestedManyWithoutSiteInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedCreateNestedManyWithoutSiteInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedCreateNestedManyWithoutSiteInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutSiteInput
 }
 
 export type SiteUpdateInput = {
@@ -436,6 +456,10 @@ export type SiteUpdateInput = {
   kiosks?: Prisma.KioskUpdateManyWithoutSiteNestedInput
   visits?: Prisma.VisitRequestUpdateManyWithoutSiteNestedInput
   accessEvents?: Prisma.AccessEventUpdateManyWithoutSiteNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUpdateManyWithoutSiteNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUpdateManyWithoutSiteNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUpdateManyWithoutSiteNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutSiteNestedInput
 }
 
 export type SiteUncheckedUpdateInput = {
@@ -459,6 +483,10 @@ export type SiteUncheckedUpdateInput = {
   kiosks?: Prisma.KioskUncheckedUpdateManyWithoutSiteNestedInput
   visits?: Prisma.VisitRequestUncheckedUpdateManyWithoutSiteNestedInput
   accessEvents?: Prisma.AccessEventUncheckedUpdateManyWithoutSiteNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedUpdateManyWithoutSiteNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedUpdateManyWithoutSiteNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedUpdateManyWithoutSiteNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutSiteNestedInput
 }
 
 export type SiteCreateManyInput = {
@@ -653,6 +681,62 @@ export type SiteUpdateOneWithoutAccessEventsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SiteUpdateToOneWithWhereWithoutAccessEventsInput, Prisma.SiteUpdateWithoutAccessEventsInput>, Prisma.SiteUncheckedUpdateWithoutAccessEventsInput>
 }
 
+export type SiteCreateNestedOneWithoutAuthorizedVehiclesInput = {
+  create?: Prisma.XOR<Prisma.SiteCreateWithoutAuthorizedVehiclesInput, Prisma.SiteUncheckedCreateWithoutAuthorizedVehiclesInput>
+  connectOrCreate?: Prisma.SiteCreateOrConnectWithoutAuthorizedVehiclesInput
+  connect?: Prisma.SiteWhereUniqueInput
+}
+
+export type SiteUpdateOneRequiredWithoutAuthorizedVehiclesNestedInput = {
+  create?: Prisma.XOR<Prisma.SiteCreateWithoutAuthorizedVehiclesInput, Prisma.SiteUncheckedCreateWithoutAuthorizedVehiclesInput>
+  connectOrCreate?: Prisma.SiteCreateOrConnectWithoutAuthorizedVehiclesInput
+  upsert?: Prisma.SiteUpsertWithoutAuthorizedVehiclesInput
+  connect?: Prisma.SiteWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SiteUpdateToOneWithWhereWithoutAuthorizedVehiclesInput, Prisma.SiteUpdateWithoutAuthorizedVehiclesInput>, Prisma.SiteUncheckedUpdateWithoutAuthorizedVehiclesInput>
+}
+
+export type SiteCreateNestedOneWithoutGateAccessDevicesInput = {
+  create?: Prisma.XOR<Prisma.SiteCreateWithoutGateAccessDevicesInput, Prisma.SiteUncheckedCreateWithoutGateAccessDevicesInput>
+  connectOrCreate?: Prisma.SiteCreateOrConnectWithoutGateAccessDevicesInput
+  connect?: Prisma.SiteWhereUniqueInput
+}
+
+export type SiteUpdateOneRequiredWithoutGateAccessDevicesNestedInput = {
+  create?: Prisma.XOR<Prisma.SiteCreateWithoutGateAccessDevicesInput, Prisma.SiteUncheckedCreateWithoutGateAccessDevicesInput>
+  connectOrCreate?: Prisma.SiteCreateOrConnectWithoutGateAccessDevicesInput
+  upsert?: Prisma.SiteUpsertWithoutGateAccessDevicesInput
+  connect?: Prisma.SiteWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SiteUpdateToOneWithWhereWithoutGateAccessDevicesInput, Prisma.SiteUpdateWithoutGateAccessDevicesInput>, Prisma.SiteUncheckedUpdateWithoutGateAccessDevicesInput>
+}
+
+export type SiteCreateNestedOneWithoutVehicleAccessRequestsInput = {
+  create?: Prisma.XOR<Prisma.SiteCreateWithoutVehicleAccessRequestsInput, Prisma.SiteUncheckedCreateWithoutVehicleAccessRequestsInput>
+  connectOrCreate?: Prisma.SiteCreateOrConnectWithoutVehicleAccessRequestsInput
+  connect?: Prisma.SiteWhereUniqueInput
+}
+
+export type SiteUpdateOneRequiredWithoutVehicleAccessRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.SiteCreateWithoutVehicleAccessRequestsInput, Prisma.SiteUncheckedCreateWithoutVehicleAccessRequestsInput>
+  connectOrCreate?: Prisma.SiteCreateOrConnectWithoutVehicleAccessRequestsInput
+  upsert?: Prisma.SiteUpsertWithoutVehicleAccessRequestsInput
+  connect?: Prisma.SiteWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SiteUpdateToOneWithWhereWithoutVehicleAccessRequestsInput, Prisma.SiteUpdateWithoutVehicleAccessRequestsInput>, Prisma.SiteUncheckedUpdateWithoutVehicleAccessRequestsInput>
+}
+
+export type SiteCreateNestedOneWithoutVehicleAccessEventsInput = {
+  create?: Prisma.XOR<Prisma.SiteCreateWithoutVehicleAccessEventsInput, Prisma.SiteUncheckedCreateWithoutVehicleAccessEventsInput>
+  connectOrCreate?: Prisma.SiteCreateOrConnectWithoutVehicleAccessEventsInput
+  connect?: Prisma.SiteWhereUniqueInput
+}
+
+export type SiteUpdateOneRequiredWithoutVehicleAccessEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.SiteCreateWithoutVehicleAccessEventsInput, Prisma.SiteUncheckedCreateWithoutVehicleAccessEventsInput>
+  connectOrCreate?: Prisma.SiteCreateOrConnectWithoutVehicleAccessEventsInput
+  upsert?: Prisma.SiteUpsertWithoutVehicleAccessEventsInput
+  connect?: Prisma.SiteWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SiteUpdateToOneWithWhereWithoutVehicleAccessEventsInput, Prisma.SiteUpdateWithoutVehicleAccessEventsInput>, Prisma.SiteUncheckedUpdateWithoutVehicleAccessEventsInput>
+}
+
 export type SiteCreateWithoutOrganizationsInput = {
   id?: string
   name: string
@@ -673,6 +757,10 @@ export type SiteCreateWithoutOrganizationsInput = {
   kiosks?: Prisma.KioskCreateNestedManyWithoutSiteInput
   visits?: Prisma.VisitRequestCreateNestedManyWithoutSiteInput
   accessEvents?: Prisma.AccessEventCreateNestedManyWithoutSiteInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleCreateNestedManyWithoutSiteInput
+  gateAccessDevices?: Prisma.GateAccessDeviceCreateNestedManyWithoutSiteInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestCreateNestedManyWithoutSiteInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutSiteInput
 }
 
 export type SiteUncheckedCreateWithoutOrganizationsInput = {
@@ -695,6 +783,10 @@ export type SiteUncheckedCreateWithoutOrganizationsInput = {
   kiosks?: Prisma.KioskUncheckedCreateNestedManyWithoutSiteInput
   visits?: Prisma.VisitRequestUncheckedCreateNestedManyWithoutSiteInput
   accessEvents?: Prisma.AccessEventUncheckedCreateNestedManyWithoutSiteInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedCreateNestedManyWithoutSiteInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedCreateNestedManyWithoutSiteInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedCreateNestedManyWithoutSiteInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutSiteInput
 }
 
 export type SiteCreateOrConnectWithoutOrganizationsInput = {
@@ -733,6 +825,10 @@ export type SiteUpdateWithoutOrganizationsInput = {
   kiosks?: Prisma.KioskUpdateManyWithoutSiteNestedInput
   visits?: Prisma.VisitRequestUpdateManyWithoutSiteNestedInput
   accessEvents?: Prisma.AccessEventUpdateManyWithoutSiteNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUpdateManyWithoutSiteNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUpdateManyWithoutSiteNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUpdateManyWithoutSiteNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutSiteNestedInput
 }
 
 export type SiteUncheckedUpdateWithoutOrganizationsInput = {
@@ -755,6 +851,10 @@ export type SiteUncheckedUpdateWithoutOrganizationsInput = {
   kiosks?: Prisma.KioskUncheckedUpdateManyWithoutSiteNestedInput
   visits?: Prisma.VisitRequestUncheckedUpdateManyWithoutSiteNestedInput
   accessEvents?: Prisma.AccessEventUncheckedUpdateManyWithoutSiteNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedUpdateManyWithoutSiteNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedUpdateManyWithoutSiteNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedUpdateManyWithoutSiteNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutSiteNestedInput
 }
 
 export type SiteCreateWithoutKiosksInput = {
@@ -777,6 +877,10 @@ export type SiteCreateWithoutKiosksInput = {
   organizations?: Prisma.SiteOrganizationCreateNestedManyWithoutSiteInput
   visits?: Prisma.VisitRequestCreateNestedManyWithoutSiteInput
   accessEvents?: Prisma.AccessEventCreateNestedManyWithoutSiteInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleCreateNestedManyWithoutSiteInput
+  gateAccessDevices?: Prisma.GateAccessDeviceCreateNestedManyWithoutSiteInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestCreateNestedManyWithoutSiteInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutSiteInput
 }
 
 export type SiteUncheckedCreateWithoutKiosksInput = {
@@ -799,6 +903,10 @@ export type SiteUncheckedCreateWithoutKiosksInput = {
   organizations?: Prisma.SiteOrganizationUncheckedCreateNestedManyWithoutSiteInput
   visits?: Prisma.VisitRequestUncheckedCreateNestedManyWithoutSiteInput
   accessEvents?: Prisma.AccessEventUncheckedCreateNestedManyWithoutSiteInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedCreateNestedManyWithoutSiteInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedCreateNestedManyWithoutSiteInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedCreateNestedManyWithoutSiteInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutSiteInput
 }
 
 export type SiteCreateOrConnectWithoutKiosksInput = {
@@ -837,6 +945,10 @@ export type SiteUpdateWithoutKiosksInput = {
   organizations?: Prisma.SiteOrganizationUpdateManyWithoutSiteNestedInput
   visits?: Prisma.VisitRequestUpdateManyWithoutSiteNestedInput
   accessEvents?: Prisma.AccessEventUpdateManyWithoutSiteNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUpdateManyWithoutSiteNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUpdateManyWithoutSiteNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUpdateManyWithoutSiteNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutSiteNestedInput
 }
 
 export type SiteUncheckedUpdateWithoutKiosksInput = {
@@ -859,6 +971,10 @@ export type SiteUncheckedUpdateWithoutKiosksInput = {
   organizations?: Prisma.SiteOrganizationUncheckedUpdateManyWithoutSiteNestedInput
   visits?: Prisma.VisitRequestUncheckedUpdateManyWithoutSiteNestedInput
   accessEvents?: Prisma.AccessEventUncheckedUpdateManyWithoutSiteNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedUpdateManyWithoutSiteNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedUpdateManyWithoutSiteNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedUpdateManyWithoutSiteNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutSiteNestedInput
 }
 
 export type SiteCreateWithoutVisitsInput = {
@@ -881,6 +997,10 @@ export type SiteCreateWithoutVisitsInput = {
   organizations?: Prisma.SiteOrganizationCreateNestedManyWithoutSiteInput
   kiosks?: Prisma.KioskCreateNestedManyWithoutSiteInput
   accessEvents?: Prisma.AccessEventCreateNestedManyWithoutSiteInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleCreateNestedManyWithoutSiteInput
+  gateAccessDevices?: Prisma.GateAccessDeviceCreateNestedManyWithoutSiteInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestCreateNestedManyWithoutSiteInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutSiteInput
 }
 
 export type SiteUncheckedCreateWithoutVisitsInput = {
@@ -903,6 +1023,10 @@ export type SiteUncheckedCreateWithoutVisitsInput = {
   organizations?: Prisma.SiteOrganizationUncheckedCreateNestedManyWithoutSiteInput
   kiosks?: Prisma.KioskUncheckedCreateNestedManyWithoutSiteInput
   accessEvents?: Prisma.AccessEventUncheckedCreateNestedManyWithoutSiteInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedCreateNestedManyWithoutSiteInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedCreateNestedManyWithoutSiteInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedCreateNestedManyWithoutSiteInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutSiteInput
 }
 
 export type SiteCreateOrConnectWithoutVisitsInput = {
@@ -941,6 +1065,10 @@ export type SiteUpdateWithoutVisitsInput = {
   organizations?: Prisma.SiteOrganizationUpdateManyWithoutSiteNestedInput
   kiosks?: Prisma.KioskUpdateManyWithoutSiteNestedInput
   accessEvents?: Prisma.AccessEventUpdateManyWithoutSiteNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUpdateManyWithoutSiteNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUpdateManyWithoutSiteNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUpdateManyWithoutSiteNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutSiteNestedInput
 }
 
 export type SiteUncheckedUpdateWithoutVisitsInput = {
@@ -963,6 +1091,10 @@ export type SiteUncheckedUpdateWithoutVisitsInput = {
   organizations?: Prisma.SiteOrganizationUncheckedUpdateManyWithoutSiteNestedInput
   kiosks?: Prisma.KioskUncheckedUpdateManyWithoutSiteNestedInput
   accessEvents?: Prisma.AccessEventUncheckedUpdateManyWithoutSiteNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedUpdateManyWithoutSiteNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedUpdateManyWithoutSiteNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedUpdateManyWithoutSiteNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutSiteNestedInput
 }
 
 export type SiteCreateWithoutAccessEventsInput = {
@@ -985,6 +1117,10 @@ export type SiteCreateWithoutAccessEventsInput = {
   organizations?: Prisma.SiteOrganizationCreateNestedManyWithoutSiteInput
   kiosks?: Prisma.KioskCreateNestedManyWithoutSiteInput
   visits?: Prisma.VisitRequestCreateNestedManyWithoutSiteInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleCreateNestedManyWithoutSiteInput
+  gateAccessDevices?: Prisma.GateAccessDeviceCreateNestedManyWithoutSiteInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestCreateNestedManyWithoutSiteInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutSiteInput
 }
 
 export type SiteUncheckedCreateWithoutAccessEventsInput = {
@@ -1007,6 +1143,10 @@ export type SiteUncheckedCreateWithoutAccessEventsInput = {
   organizations?: Prisma.SiteOrganizationUncheckedCreateNestedManyWithoutSiteInput
   kiosks?: Prisma.KioskUncheckedCreateNestedManyWithoutSiteInput
   visits?: Prisma.VisitRequestUncheckedCreateNestedManyWithoutSiteInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedCreateNestedManyWithoutSiteInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedCreateNestedManyWithoutSiteInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedCreateNestedManyWithoutSiteInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutSiteInput
 }
 
 export type SiteCreateOrConnectWithoutAccessEventsInput = {
@@ -1045,6 +1185,10 @@ export type SiteUpdateWithoutAccessEventsInput = {
   organizations?: Prisma.SiteOrganizationUpdateManyWithoutSiteNestedInput
   kiosks?: Prisma.KioskUpdateManyWithoutSiteNestedInput
   visits?: Prisma.VisitRequestUpdateManyWithoutSiteNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUpdateManyWithoutSiteNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUpdateManyWithoutSiteNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUpdateManyWithoutSiteNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutSiteNestedInput
 }
 
 export type SiteUncheckedUpdateWithoutAccessEventsInput = {
@@ -1067,6 +1211,490 @@ export type SiteUncheckedUpdateWithoutAccessEventsInput = {
   organizations?: Prisma.SiteOrganizationUncheckedUpdateManyWithoutSiteNestedInput
   kiosks?: Prisma.KioskUncheckedUpdateManyWithoutSiteNestedInput
   visits?: Prisma.VisitRequestUncheckedUpdateManyWithoutSiteNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedUpdateManyWithoutSiteNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedUpdateManyWithoutSiteNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedUpdateManyWithoutSiteNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutSiteNestedInput
+}
+
+export type SiteCreateWithoutAuthorizedVehiclesInput = {
+  id?: string
+  name: string
+  code: string
+  logoUrl?: string | null
+  address?: string | null
+  city?: string | null
+  country?: string | null
+  adminUsername?: string | null
+  adminPasswordHash?: string | null
+  mustChangePassword?: boolean
+  status?: $Enums.SiteStatus
+  isActive?: boolean
+  provisionedAt?: Date | string | null
+  activatedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organizations?: Prisma.SiteOrganizationCreateNestedManyWithoutSiteInput
+  kiosks?: Prisma.KioskCreateNestedManyWithoutSiteInput
+  visits?: Prisma.VisitRequestCreateNestedManyWithoutSiteInput
+  accessEvents?: Prisma.AccessEventCreateNestedManyWithoutSiteInput
+  gateAccessDevices?: Prisma.GateAccessDeviceCreateNestedManyWithoutSiteInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestCreateNestedManyWithoutSiteInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutSiteInput
+}
+
+export type SiteUncheckedCreateWithoutAuthorizedVehiclesInput = {
+  id?: string
+  name: string
+  code: string
+  logoUrl?: string | null
+  address?: string | null
+  city?: string | null
+  country?: string | null
+  adminUsername?: string | null
+  adminPasswordHash?: string | null
+  mustChangePassword?: boolean
+  status?: $Enums.SiteStatus
+  isActive?: boolean
+  provisionedAt?: Date | string | null
+  activatedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organizations?: Prisma.SiteOrganizationUncheckedCreateNestedManyWithoutSiteInput
+  kiosks?: Prisma.KioskUncheckedCreateNestedManyWithoutSiteInput
+  visits?: Prisma.VisitRequestUncheckedCreateNestedManyWithoutSiteInput
+  accessEvents?: Prisma.AccessEventUncheckedCreateNestedManyWithoutSiteInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedCreateNestedManyWithoutSiteInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedCreateNestedManyWithoutSiteInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutSiteInput
+}
+
+export type SiteCreateOrConnectWithoutAuthorizedVehiclesInput = {
+  where: Prisma.SiteWhereUniqueInput
+  create: Prisma.XOR<Prisma.SiteCreateWithoutAuthorizedVehiclesInput, Prisma.SiteUncheckedCreateWithoutAuthorizedVehiclesInput>
+}
+
+export type SiteUpsertWithoutAuthorizedVehiclesInput = {
+  update: Prisma.XOR<Prisma.SiteUpdateWithoutAuthorizedVehiclesInput, Prisma.SiteUncheckedUpdateWithoutAuthorizedVehiclesInput>
+  create: Prisma.XOR<Prisma.SiteCreateWithoutAuthorizedVehiclesInput, Prisma.SiteUncheckedCreateWithoutAuthorizedVehiclesInput>
+  where?: Prisma.SiteWhereInput
+}
+
+export type SiteUpdateToOneWithWhereWithoutAuthorizedVehiclesInput = {
+  where?: Prisma.SiteWhereInput
+  data: Prisma.XOR<Prisma.SiteUpdateWithoutAuthorizedVehiclesInput, Prisma.SiteUncheckedUpdateWithoutAuthorizedVehiclesInput>
+}
+
+export type SiteUpdateWithoutAuthorizedVehiclesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminPasswordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  provisionedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organizations?: Prisma.SiteOrganizationUpdateManyWithoutSiteNestedInput
+  kiosks?: Prisma.KioskUpdateManyWithoutSiteNestedInput
+  visits?: Prisma.VisitRequestUpdateManyWithoutSiteNestedInput
+  accessEvents?: Prisma.AccessEventUpdateManyWithoutSiteNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUpdateManyWithoutSiteNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUpdateManyWithoutSiteNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutSiteNestedInput
+}
+
+export type SiteUncheckedUpdateWithoutAuthorizedVehiclesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminPasswordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  provisionedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organizations?: Prisma.SiteOrganizationUncheckedUpdateManyWithoutSiteNestedInput
+  kiosks?: Prisma.KioskUncheckedUpdateManyWithoutSiteNestedInput
+  visits?: Prisma.VisitRequestUncheckedUpdateManyWithoutSiteNestedInput
+  accessEvents?: Prisma.AccessEventUncheckedUpdateManyWithoutSiteNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedUpdateManyWithoutSiteNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedUpdateManyWithoutSiteNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutSiteNestedInput
+}
+
+export type SiteCreateWithoutGateAccessDevicesInput = {
+  id?: string
+  name: string
+  code: string
+  logoUrl?: string | null
+  address?: string | null
+  city?: string | null
+  country?: string | null
+  adminUsername?: string | null
+  adminPasswordHash?: string | null
+  mustChangePassword?: boolean
+  status?: $Enums.SiteStatus
+  isActive?: boolean
+  provisionedAt?: Date | string | null
+  activatedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organizations?: Prisma.SiteOrganizationCreateNestedManyWithoutSiteInput
+  kiosks?: Prisma.KioskCreateNestedManyWithoutSiteInput
+  visits?: Prisma.VisitRequestCreateNestedManyWithoutSiteInput
+  accessEvents?: Prisma.AccessEventCreateNestedManyWithoutSiteInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleCreateNestedManyWithoutSiteInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestCreateNestedManyWithoutSiteInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutSiteInput
+}
+
+export type SiteUncheckedCreateWithoutGateAccessDevicesInput = {
+  id?: string
+  name: string
+  code: string
+  logoUrl?: string | null
+  address?: string | null
+  city?: string | null
+  country?: string | null
+  adminUsername?: string | null
+  adminPasswordHash?: string | null
+  mustChangePassword?: boolean
+  status?: $Enums.SiteStatus
+  isActive?: boolean
+  provisionedAt?: Date | string | null
+  activatedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organizations?: Prisma.SiteOrganizationUncheckedCreateNestedManyWithoutSiteInput
+  kiosks?: Prisma.KioskUncheckedCreateNestedManyWithoutSiteInput
+  visits?: Prisma.VisitRequestUncheckedCreateNestedManyWithoutSiteInput
+  accessEvents?: Prisma.AccessEventUncheckedCreateNestedManyWithoutSiteInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedCreateNestedManyWithoutSiteInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedCreateNestedManyWithoutSiteInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutSiteInput
+}
+
+export type SiteCreateOrConnectWithoutGateAccessDevicesInput = {
+  where: Prisma.SiteWhereUniqueInput
+  create: Prisma.XOR<Prisma.SiteCreateWithoutGateAccessDevicesInput, Prisma.SiteUncheckedCreateWithoutGateAccessDevicesInput>
+}
+
+export type SiteUpsertWithoutGateAccessDevicesInput = {
+  update: Prisma.XOR<Prisma.SiteUpdateWithoutGateAccessDevicesInput, Prisma.SiteUncheckedUpdateWithoutGateAccessDevicesInput>
+  create: Prisma.XOR<Prisma.SiteCreateWithoutGateAccessDevicesInput, Prisma.SiteUncheckedCreateWithoutGateAccessDevicesInput>
+  where?: Prisma.SiteWhereInput
+}
+
+export type SiteUpdateToOneWithWhereWithoutGateAccessDevicesInput = {
+  where?: Prisma.SiteWhereInput
+  data: Prisma.XOR<Prisma.SiteUpdateWithoutGateAccessDevicesInput, Prisma.SiteUncheckedUpdateWithoutGateAccessDevicesInput>
+}
+
+export type SiteUpdateWithoutGateAccessDevicesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminPasswordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  provisionedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organizations?: Prisma.SiteOrganizationUpdateManyWithoutSiteNestedInput
+  kiosks?: Prisma.KioskUpdateManyWithoutSiteNestedInput
+  visits?: Prisma.VisitRequestUpdateManyWithoutSiteNestedInput
+  accessEvents?: Prisma.AccessEventUpdateManyWithoutSiteNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUpdateManyWithoutSiteNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUpdateManyWithoutSiteNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutSiteNestedInput
+}
+
+export type SiteUncheckedUpdateWithoutGateAccessDevicesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminPasswordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  provisionedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organizations?: Prisma.SiteOrganizationUncheckedUpdateManyWithoutSiteNestedInput
+  kiosks?: Prisma.KioskUncheckedUpdateManyWithoutSiteNestedInput
+  visits?: Prisma.VisitRequestUncheckedUpdateManyWithoutSiteNestedInput
+  accessEvents?: Prisma.AccessEventUncheckedUpdateManyWithoutSiteNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedUpdateManyWithoutSiteNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedUpdateManyWithoutSiteNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutSiteNestedInput
+}
+
+export type SiteCreateWithoutVehicleAccessRequestsInput = {
+  id?: string
+  name: string
+  code: string
+  logoUrl?: string | null
+  address?: string | null
+  city?: string | null
+  country?: string | null
+  adminUsername?: string | null
+  adminPasswordHash?: string | null
+  mustChangePassword?: boolean
+  status?: $Enums.SiteStatus
+  isActive?: boolean
+  provisionedAt?: Date | string | null
+  activatedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organizations?: Prisma.SiteOrganizationCreateNestedManyWithoutSiteInput
+  kiosks?: Prisma.KioskCreateNestedManyWithoutSiteInput
+  visits?: Prisma.VisitRequestCreateNestedManyWithoutSiteInput
+  accessEvents?: Prisma.AccessEventCreateNestedManyWithoutSiteInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleCreateNestedManyWithoutSiteInput
+  gateAccessDevices?: Prisma.GateAccessDeviceCreateNestedManyWithoutSiteInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutSiteInput
+}
+
+export type SiteUncheckedCreateWithoutVehicleAccessRequestsInput = {
+  id?: string
+  name: string
+  code: string
+  logoUrl?: string | null
+  address?: string | null
+  city?: string | null
+  country?: string | null
+  adminUsername?: string | null
+  adminPasswordHash?: string | null
+  mustChangePassword?: boolean
+  status?: $Enums.SiteStatus
+  isActive?: boolean
+  provisionedAt?: Date | string | null
+  activatedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organizations?: Prisma.SiteOrganizationUncheckedCreateNestedManyWithoutSiteInput
+  kiosks?: Prisma.KioskUncheckedCreateNestedManyWithoutSiteInput
+  visits?: Prisma.VisitRequestUncheckedCreateNestedManyWithoutSiteInput
+  accessEvents?: Prisma.AccessEventUncheckedCreateNestedManyWithoutSiteInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedCreateNestedManyWithoutSiteInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedCreateNestedManyWithoutSiteInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutSiteInput
+}
+
+export type SiteCreateOrConnectWithoutVehicleAccessRequestsInput = {
+  where: Prisma.SiteWhereUniqueInput
+  create: Prisma.XOR<Prisma.SiteCreateWithoutVehicleAccessRequestsInput, Prisma.SiteUncheckedCreateWithoutVehicleAccessRequestsInput>
+}
+
+export type SiteUpsertWithoutVehicleAccessRequestsInput = {
+  update: Prisma.XOR<Prisma.SiteUpdateWithoutVehicleAccessRequestsInput, Prisma.SiteUncheckedUpdateWithoutVehicleAccessRequestsInput>
+  create: Prisma.XOR<Prisma.SiteCreateWithoutVehicleAccessRequestsInput, Prisma.SiteUncheckedCreateWithoutVehicleAccessRequestsInput>
+  where?: Prisma.SiteWhereInput
+}
+
+export type SiteUpdateToOneWithWhereWithoutVehicleAccessRequestsInput = {
+  where?: Prisma.SiteWhereInput
+  data: Prisma.XOR<Prisma.SiteUpdateWithoutVehicleAccessRequestsInput, Prisma.SiteUncheckedUpdateWithoutVehicleAccessRequestsInput>
+}
+
+export type SiteUpdateWithoutVehicleAccessRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminPasswordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  provisionedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organizations?: Prisma.SiteOrganizationUpdateManyWithoutSiteNestedInput
+  kiosks?: Prisma.KioskUpdateManyWithoutSiteNestedInput
+  visits?: Prisma.VisitRequestUpdateManyWithoutSiteNestedInput
+  accessEvents?: Prisma.AccessEventUpdateManyWithoutSiteNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUpdateManyWithoutSiteNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUpdateManyWithoutSiteNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutSiteNestedInput
+}
+
+export type SiteUncheckedUpdateWithoutVehicleAccessRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminPasswordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  provisionedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organizations?: Prisma.SiteOrganizationUncheckedUpdateManyWithoutSiteNestedInput
+  kiosks?: Prisma.KioskUncheckedUpdateManyWithoutSiteNestedInput
+  visits?: Prisma.VisitRequestUncheckedUpdateManyWithoutSiteNestedInput
+  accessEvents?: Prisma.AccessEventUncheckedUpdateManyWithoutSiteNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedUpdateManyWithoutSiteNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedUpdateManyWithoutSiteNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutSiteNestedInput
+}
+
+export type SiteCreateWithoutVehicleAccessEventsInput = {
+  id?: string
+  name: string
+  code: string
+  logoUrl?: string | null
+  address?: string | null
+  city?: string | null
+  country?: string | null
+  adminUsername?: string | null
+  adminPasswordHash?: string | null
+  mustChangePassword?: boolean
+  status?: $Enums.SiteStatus
+  isActive?: boolean
+  provisionedAt?: Date | string | null
+  activatedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organizations?: Prisma.SiteOrganizationCreateNestedManyWithoutSiteInput
+  kiosks?: Prisma.KioskCreateNestedManyWithoutSiteInput
+  visits?: Prisma.VisitRequestCreateNestedManyWithoutSiteInput
+  accessEvents?: Prisma.AccessEventCreateNestedManyWithoutSiteInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleCreateNestedManyWithoutSiteInput
+  gateAccessDevices?: Prisma.GateAccessDeviceCreateNestedManyWithoutSiteInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestCreateNestedManyWithoutSiteInput
+}
+
+export type SiteUncheckedCreateWithoutVehicleAccessEventsInput = {
+  id?: string
+  name: string
+  code: string
+  logoUrl?: string | null
+  address?: string | null
+  city?: string | null
+  country?: string | null
+  adminUsername?: string | null
+  adminPasswordHash?: string | null
+  mustChangePassword?: boolean
+  status?: $Enums.SiteStatus
+  isActive?: boolean
+  provisionedAt?: Date | string | null
+  activatedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organizations?: Prisma.SiteOrganizationUncheckedCreateNestedManyWithoutSiteInput
+  kiosks?: Prisma.KioskUncheckedCreateNestedManyWithoutSiteInput
+  visits?: Prisma.VisitRequestUncheckedCreateNestedManyWithoutSiteInput
+  accessEvents?: Prisma.AccessEventUncheckedCreateNestedManyWithoutSiteInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedCreateNestedManyWithoutSiteInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedCreateNestedManyWithoutSiteInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedCreateNestedManyWithoutSiteInput
+}
+
+export type SiteCreateOrConnectWithoutVehicleAccessEventsInput = {
+  where: Prisma.SiteWhereUniqueInput
+  create: Prisma.XOR<Prisma.SiteCreateWithoutVehicleAccessEventsInput, Prisma.SiteUncheckedCreateWithoutVehicleAccessEventsInput>
+}
+
+export type SiteUpsertWithoutVehicleAccessEventsInput = {
+  update: Prisma.XOR<Prisma.SiteUpdateWithoutVehicleAccessEventsInput, Prisma.SiteUncheckedUpdateWithoutVehicleAccessEventsInput>
+  create: Prisma.XOR<Prisma.SiteCreateWithoutVehicleAccessEventsInput, Prisma.SiteUncheckedCreateWithoutVehicleAccessEventsInput>
+  where?: Prisma.SiteWhereInput
+}
+
+export type SiteUpdateToOneWithWhereWithoutVehicleAccessEventsInput = {
+  where?: Prisma.SiteWhereInput
+  data: Prisma.XOR<Prisma.SiteUpdateWithoutVehicleAccessEventsInput, Prisma.SiteUncheckedUpdateWithoutVehicleAccessEventsInput>
+}
+
+export type SiteUpdateWithoutVehicleAccessEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminPasswordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  provisionedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organizations?: Prisma.SiteOrganizationUpdateManyWithoutSiteNestedInput
+  kiosks?: Prisma.KioskUpdateManyWithoutSiteNestedInput
+  visits?: Prisma.VisitRequestUpdateManyWithoutSiteNestedInput
+  accessEvents?: Prisma.AccessEventUpdateManyWithoutSiteNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUpdateManyWithoutSiteNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUpdateManyWithoutSiteNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUpdateManyWithoutSiteNestedInput
+}
+
+export type SiteUncheckedUpdateWithoutVehicleAccessEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminPasswordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  provisionedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organizations?: Prisma.SiteOrganizationUncheckedUpdateManyWithoutSiteNestedInput
+  kiosks?: Prisma.KioskUncheckedUpdateManyWithoutSiteNestedInput
+  visits?: Prisma.VisitRequestUncheckedUpdateManyWithoutSiteNestedInput
+  accessEvents?: Prisma.AccessEventUncheckedUpdateManyWithoutSiteNestedInput
+  authorizedVehicles?: Prisma.AuthorizedVehicleUncheckedUpdateManyWithoutSiteNestedInput
+  gateAccessDevices?: Prisma.GateAccessDeviceUncheckedUpdateManyWithoutSiteNestedInput
+  vehicleAccessRequests?: Prisma.VehicleAccessRequestUncheckedUpdateManyWithoutSiteNestedInput
 }
 
 
@@ -1079,6 +1707,10 @@ export type SiteCountOutputType = {
   kiosks: number
   visits: number
   accessEvents: number
+  authorizedVehicles: number
+  gateAccessDevices: number
+  vehicleAccessRequests: number
+  vehicleAccessEvents: number
 }
 
 export type SiteCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1086,6 +1718,10 @@ export type SiteCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   kiosks?: boolean | SiteCountOutputTypeCountKiosksArgs
   visits?: boolean | SiteCountOutputTypeCountVisitsArgs
   accessEvents?: boolean | SiteCountOutputTypeCountAccessEventsArgs
+  authorizedVehicles?: boolean | SiteCountOutputTypeCountAuthorizedVehiclesArgs
+  gateAccessDevices?: boolean | SiteCountOutputTypeCountGateAccessDevicesArgs
+  vehicleAccessRequests?: boolean | SiteCountOutputTypeCountVehicleAccessRequestsArgs
+  vehicleAccessEvents?: boolean | SiteCountOutputTypeCountVehicleAccessEventsArgs
 }
 
 /**
@@ -1126,6 +1762,34 @@ export type SiteCountOutputTypeCountAccessEventsArgs<ExtArgs extends runtime.Typ
   where?: Prisma.AccessEventWhereInput
 }
 
+/**
+ * SiteCountOutputType without action
+ */
+export type SiteCountOutputTypeCountAuthorizedVehiclesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AuthorizedVehicleWhereInput
+}
+
+/**
+ * SiteCountOutputType without action
+ */
+export type SiteCountOutputTypeCountGateAccessDevicesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.GateAccessDeviceWhereInput
+}
+
+/**
+ * SiteCountOutputType without action
+ */
+export type SiteCountOutputTypeCountVehicleAccessRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VehicleAccessRequestWhereInput
+}
+
+/**
+ * SiteCountOutputType without action
+ */
+export type SiteCountOutputTypeCountVehicleAccessEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VehicleAccessEventWhereInput
+}
+
 
 export type SiteSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1148,6 +1812,10 @@ export type SiteSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   kiosks?: boolean | Prisma.Site$kiosksArgs<ExtArgs>
   visits?: boolean | Prisma.Site$visitsArgs<ExtArgs>
   accessEvents?: boolean | Prisma.Site$accessEventsArgs<ExtArgs>
+  authorizedVehicles?: boolean | Prisma.Site$authorizedVehiclesArgs<ExtArgs>
+  gateAccessDevices?: boolean | Prisma.Site$gateAccessDevicesArgs<ExtArgs>
+  vehicleAccessRequests?: boolean | Prisma.Site$vehicleAccessRequestsArgs<ExtArgs>
+  vehicleAccessEvents?: boolean | Prisma.Site$vehicleAccessEventsArgs<ExtArgs>
   _count?: boolean | Prisma.SiteCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["site"]>
 
@@ -1214,6 +1882,10 @@ export type SiteInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   kiosks?: boolean | Prisma.Site$kiosksArgs<ExtArgs>
   visits?: boolean | Prisma.Site$visitsArgs<ExtArgs>
   accessEvents?: boolean | Prisma.Site$accessEventsArgs<ExtArgs>
+  authorizedVehicles?: boolean | Prisma.Site$authorizedVehiclesArgs<ExtArgs>
+  gateAccessDevices?: boolean | Prisma.Site$gateAccessDevicesArgs<ExtArgs>
+  vehicleAccessRequests?: boolean | Prisma.Site$vehicleAccessRequestsArgs<ExtArgs>
+  vehicleAccessEvents?: boolean | Prisma.Site$vehicleAccessEventsArgs<ExtArgs>
   _count?: boolean | Prisma.SiteCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SiteIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1226,6 +1898,10 @@ export type $SitePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     kiosks: Prisma.$KioskPayload<ExtArgs>[]
     visits: Prisma.$VisitRequestPayload<ExtArgs>[]
     accessEvents: Prisma.$AccessEventPayload<ExtArgs>[]
+    authorizedVehicles: Prisma.$AuthorizedVehiclePayload<ExtArgs>[]
+    gateAccessDevices: Prisma.$GateAccessDevicePayload<ExtArgs>[]
+    vehicleAccessRequests: Prisma.$VehicleAccessRequestPayload<ExtArgs>[]
+    vehicleAccessEvents: Prisma.$VehicleAccessEventPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1642,6 +2318,10 @@ export interface Prisma__SiteClient<T, Null = never, ExtArgs extends runtime.Typ
   kiosks<T extends Prisma.Site$kiosksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Site$kiosksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KioskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   visits<T extends Prisma.Site$visitsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Site$visitsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VisitRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   accessEvents<T extends Prisma.Site$accessEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Site$accessEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccessEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  authorizedVehicles<T extends Prisma.Site$authorizedVehiclesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Site$authorizedVehiclesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuthorizedVehiclePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  gateAccessDevices<T extends Prisma.Site$gateAccessDevicesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Site$gateAccessDevicesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GateAccessDevicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  vehicleAccessRequests<T extends Prisma.Site$vehicleAccessRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Site$vehicleAccessRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleAccessRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  vehicleAccessEvents<T extends Prisma.Site$vehicleAccessEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Site$vehicleAccessEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleAccessEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2173,6 +2853,102 @@ export type Site$accessEventsArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.AccessEventScalarFieldEnum | Prisma.AccessEventScalarFieldEnum[]
+}
+
+/**
+ * Site.authorizedVehicles
+ */
+export type Site$authorizedVehiclesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AuthorizedVehicle
+   */
+  select?: Prisma.AuthorizedVehicleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AuthorizedVehicle
+   */
+  omit?: Prisma.AuthorizedVehicleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuthorizedVehicleInclude<ExtArgs> | null
+  where?: Prisma.AuthorizedVehicleWhereInput
+  orderBy?: Prisma.AuthorizedVehicleOrderByWithRelationInput | Prisma.AuthorizedVehicleOrderByWithRelationInput[]
+  cursor?: Prisma.AuthorizedVehicleWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AuthorizedVehicleScalarFieldEnum | Prisma.AuthorizedVehicleScalarFieldEnum[]
+}
+
+/**
+ * Site.gateAccessDevices
+ */
+export type Site$gateAccessDevicesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the GateAccessDevice
+   */
+  select?: Prisma.GateAccessDeviceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the GateAccessDevice
+   */
+  omit?: Prisma.GateAccessDeviceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GateAccessDeviceInclude<ExtArgs> | null
+  where?: Prisma.GateAccessDeviceWhereInput
+  orderBy?: Prisma.GateAccessDeviceOrderByWithRelationInput | Prisma.GateAccessDeviceOrderByWithRelationInput[]
+  cursor?: Prisma.GateAccessDeviceWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.GateAccessDeviceScalarFieldEnum | Prisma.GateAccessDeviceScalarFieldEnum[]
+}
+
+/**
+ * Site.vehicleAccessRequests
+ */
+export type Site$vehicleAccessRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VehicleAccessRequest
+   */
+  select?: Prisma.VehicleAccessRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VehicleAccessRequest
+   */
+  omit?: Prisma.VehicleAccessRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VehicleAccessRequestInclude<ExtArgs> | null
+  where?: Prisma.VehicleAccessRequestWhereInput
+  orderBy?: Prisma.VehicleAccessRequestOrderByWithRelationInput | Prisma.VehicleAccessRequestOrderByWithRelationInput[]
+  cursor?: Prisma.VehicleAccessRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VehicleAccessRequestScalarFieldEnum | Prisma.VehicleAccessRequestScalarFieldEnum[]
+}
+
+/**
+ * Site.vehicleAccessEvents
+ */
+export type Site$vehicleAccessEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VehicleAccessEvent
+   */
+  select?: Prisma.VehicleAccessEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VehicleAccessEvent
+   */
+  omit?: Prisma.VehicleAccessEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VehicleAccessEventInclude<ExtArgs> | null
+  where?: Prisma.VehicleAccessEventWhereInput
+  orderBy?: Prisma.VehicleAccessEventOrderByWithRelationInput | Prisma.VehicleAccessEventOrderByWithRelationInput[]
+  cursor?: Prisma.VehicleAccessEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VehicleAccessEventScalarFieldEnum | Prisma.VehicleAccessEventScalarFieldEnum[]
 }
 
 /**

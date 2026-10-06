@@ -133,3 +133,31 @@ export const PermanentPassActivityType = {
 } as const
 
 export type PermanentPassActivityType = (typeof PermanentPassActivityType)[keyof typeof PermanentPassActivityType]
+
+
+export const VehicleAccessRequestStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  DENIED: 'DENIED',
+  EXPIRED: 'EXPIRED'
+} as const
+
+export type VehicleAccessRequestStatus = (typeof VehicleAccessRequestStatus)[keyof typeof VehicleAccessRequestStatus]
+
+
+export const VehicleAccessDecision = {
+  AUTHORIZED: 'AUTHORIZED',
+  UNKNOWN: 'UNKNOWN',
+  APPROVED: 'APPROVED',
+  DENIED: 'DENIED'
+} as const
+
+export type VehicleAccessDecision = (typeof VehicleAccessDecision)[keyof typeof VehicleAccessDecision]
+
+
+export const VehicleGateAction = {
+  UNLOCK: 'UNLOCK',
+  KEEP_LOCKED: 'KEEP_LOCKED'
+} as const
+
+export type VehicleGateAction = (typeof VehicleGateAction)[keyof typeof VehicleGateAction]

@@ -272,6 +272,7 @@ export type OrganizationWhereInput = {
   permanentPasses?: Prisma.PermanentPassListRelationFilter
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventListRelationFilter
   siteOrganizations?: Prisma.SiteOrganizationListRelationFilter
+  vehicleAccessEvents?: Prisma.VehicleAccessEventListRelationFilter
 }
 
 export type OrganizationOrderByWithRelationInput = {
@@ -300,6 +301,7 @@ export type OrganizationOrderByWithRelationInput = {
   permanentPasses?: Prisma.PermanentPassOrderByRelationAggregateInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventOrderByRelationAggregateInput
   siteOrganizations?: Prisma.SiteOrganizationOrderByRelationAggregateInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventOrderByRelationAggregateInput
 }
 
 export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
@@ -331,6 +333,7 @@ export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
   permanentPasses?: Prisma.PermanentPassListRelationFilter
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventListRelationFilter
   siteOrganizations?: Prisma.SiteOrganizationListRelationFilter
+  vehicleAccessEvents?: Prisma.VehicleAccessEventListRelationFilter
 }, "id" | "code">
 
 export type OrganizationOrderByWithAggregationInput = {
@@ -401,6 +404,7 @@ export type OrganizationCreateInput = {
   permanentPasses?: Prisma.PermanentPassCreateNestedManyWithoutOrganizationInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventCreateNestedManyWithoutOrganizationInput
   siteOrganizations?: Prisma.SiteOrganizationCreateNestedManyWithoutOrganizationInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateInput = {
@@ -429,6 +433,7 @@ export type OrganizationUncheckedCreateInput = {
   permanentPasses?: Prisma.PermanentPassUncheckedCreateNestedManyWithoutOrganizationInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUncheckedCreateNestedManyWithoutOrganizationInput
   siteOrganizations?: Prisma.SiteOrganizationUncheckedCreateNestedManyWithoutOrganizationInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUpdateInput = {
@@ -457,6 +462,7 @@ export type OrganizationUpdateInput = {
   permanentPasses?: Prisma.PermanentPassUpdateManyWithoutOrganizationNestedInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUpdateManyWithoutOrganizationNestedInput
   siteOrganizations?: Prisma.SiteOrganizationUpdateManyWithoutOrganizationNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateInput = {
@@ -485,6 +491,7 @@ export type OrganizationUncheckedUpdateInput = {
   permanentPasses?: Prisma.PermanentPassUncheckedUpdateManyWithoutOrganizationNestedInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
   siteOrganizations?: Prisma.SiteOrganizationUncheckedUpdateManyWithoutOrganizationNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateManyInput = {
@@ -763,6 +770,22 @@ export type OrganizationUpdateOneRequiredWithoutPermanentPassAccessEventsNestedI
   update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutPermanentPassAccessEventsInput, Prisma.OrganizationUpdateWithoutPermanentPassAccessEventsInput>, Prisma.OrganizationUncheckedUpdateWithoutPermanentPassAccessEventsInput>
 }
 
+export type OrganizationCreateNestedOneWithoutVehicleAccessEventsInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutVehicleAccessEventsInput, Prisma.OrganizationUncheckedCreateWithoutVehicleAccessEventsInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutVehicleAccessEventsInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+}
+
+export type OrganizationUpdateOneWithoutVehicleAccessEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutVehicleAccessEventsInput, Prisma.OrganizationUncheckedCreateWithoutVehicleAccessEventsInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutVehicleAccessEventsInput
+  upsert?: Prisma.OrganizationUpsertWithoutVehicleAccessEventsInput
+  disconnect?: Prisma.OrganizationWhereInput | boolean
+  delete?: Prisma.OrganizationWhereInput | boolean
+  connect?: Prisma.OrganizationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutVehicleAccessEventsInput, Prisma.OrganizationUpdateWithoutVehicleAccessEventsInput>, Prisma.OrganizationUncheckedUpdateWithoutVehicleAccessEventsInput>
+}
+
 export type OrganizationCreateWithoutSiteOrganizationsInput = {
   id?: string
   name: string
@@ -788,6 +811,7 @@ export type OrganizationCreateWithoutSiteOrganizationsInput = {
   accessEvents?: Prisma.AccessEventCreateNestedManyWithoutOrganizationInput
   permanentPasses?: Prisma.PermanentPassCreateNestedManyWithoutOrganizationInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventCreateNestedManyWithoutOrganizationInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutSiteOrganizationsInput = {
@@ -815,6 +839,7 @@ export type OrganizationUncheckedCreateWithoutSiteOrganizationsInput = {
   accessEvents?: Prisma.AccessEventUncheckedCreateNestedManyWithoutOrganizationInput
   permanentPasses?: Prisma.PermanentPassUncheckedCreateNestedManyWithoutOrganizationInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUncheckedCreateNestedManyWithoutOrganizationInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutSiteOrganizationsInput = {
@@ -858,6 +883,7 @@ export type OrganizationUpdateWithoutSiteOrganizationsInput = {
   accessEvents?: Prisma.AccessEventUpdateManyWithoutOrganizationNestedInput
   permanentPasses?: Prisma.PermanentPassUpdateManyWithoutOrganizationNestedInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUpdateManyWithoutOrganizationNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutSiteOrganizationsInput = {
@@ -885,6 +911,7 @@ export type OrganizationUncheckedUpdateWithoutSiteOrganizationsInput = {
   accessEvents?: Prisma.AccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
   permanentPasses?: Prisma.PermanentPassUncheckedUpdateManyWithoutOrganizationNestedInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutDepartmentsInput = {
@@ -912,6 +939,7 @@ export type OrganizationCreateWithoutDepartmentsInput = {
   permanentPasses?: Prisma.PermanentPassCreateNestedManyWithoutOrganizationInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventCreateNestedManyWithoutOrganizationInput
   siteOrganizations?: Prisma.SiteOrganizationCreateNestedManyWithoutOrganizationInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutDepartmentsInput = {
@@ -939,6 +967,7 @@ export type OrganizationUncheckedCreateWithoutDepartmentsInput = {
   permanentPasses?: Prisma.PermanentPassUncheckedCreateNestedManyWithoutOrganizationInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUncheckedCreateNestedManyWithoutOrganizationInput
   siteOrganizations?: Prisma.SiteOrganizationUncheckedCreateNestedManyWithoutOrganizationInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutDepartmentsInput = {
@@ -982,6 +1011,7 @@ export type OrganizationUpdateWithoutDepartmentsInput = {
   permanentPasses?: Prisma.PermanentPassUpdateManyWithoutOrganizationNestedInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUpdateManyWithoutOrganizationNestedInput
   siteOrganizations?: Prisma.SiteOrganizationUpdateManyWithoutOrganizationNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutDepartmentsInput = {
@@ -1009,6 +1039,7 @@ export type OrganizationUncheckedUpdateWithoutDepartmentsInput = {
   permanentPasses?: Prisma.PermanentPassUncheckedUpdateManyWithoutOrganizationNestedInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
   siteOrganizations?: Prisma.SiteOrganizationUncheckedUpdateManyWithoutOrganizationNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutHostsInput = {
@@ -1036,6 +1067,7 @@ export type OrganizationCreateWithoutHostsInput = {
   permanentPasses?: Prisma.PermanentPassCreateNestedManyWithoutOrganizationInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventCreateNestedManyWithoutOrganizationInput
   siteOrganizations?: Prisma.SiteOrganizationCreateNestedManyWithoutOrganizationInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutHostsInput = {
@@ -1063,6 +1095,7 @@ export type OrganizationUncheckedCreateWithoutHostsInput = {
   permanentPasses?: Prisma.PermanentPassUncheckedCreateNestedManyWithoutOrganizationInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUncheckedCreateNestedManyWithoutOrganizationInput
   siteOrganizations?: Prisma.SiteOrganizationUncheckedCreateNestedManyWithoutOrganizationInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutHostsInput = {
@@ -1106,6 +1139,7 @@ export type OrganizationUpdateWithoutHostsInput = {
   permanentPasses?: Prisma.PermanentPassUpdateManyWithoutOrganizationNestedInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUpdateManyWithoutOrganizationNestedInput
   siteOrganizations?: Prisma.SiteOrganizationUpdateManyWithoutOrganizationNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutHostsInput = {
@@ -1133,6 +1167,7 @@ export type OrganizationUncheckedUpdateWithoutHostsInput = {
   permanentPasses?: Prisma.PermanentPassUncheckedUpdateManyWithoutOrganizationNestedInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
   siteOrganizations?: Prisma.SiteOrganizationUncheckedUpdateManyWithoutOrganizationNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutVisitorsInput = {
@@ -1160,6 +1195,7 @@ export type OrganizationCreateWithoutVisitorsInput = {
   permanentPasses?: Prisma.PermanentPassCreateNestedManyWithoutOrganizationInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventCreateNestedManyWithoutOrganizationInput
   siteOrganizations?: Prisma.SiteOrganizationCreateNestedManyWithoutOrganizationInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutVisitorsInput = {
@@ -1187,6 +1223,7 @@ export type OrganizationUncheckedCreateWithoutVisitorsInput = {
   permanentPasses?: Prisma.PermanentPassUncheckedCreateNestedManyWithoutOrganizationInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUncheckedCreateNestedManyWithoutOrganizationInput
   siteOrganizations?: Prisma.SiteOrganizationUncheckedCreateNestedManyWithoutOrganizationInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutVisitorsInput = {
@@ -1230,6 +1267,7 @@ export type OrganizationUpdateWithoutVisitorsInput = {
   permanentPasses?: Prisma.PermanentPassUpdateManyWithoutOrganizationNestedInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUpdateManyWithoutOrganizationNestedInput
   siteOrganizations?: Prisma.SiteOrganizationUpdateManyWithoutOrganizationNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutVisitorsInput = {
@@ -1257,6 +1295,7 @@ export type OrganizationUncheckedUpdateWithoutVisitorsInput = {
   permanentPasses?: Prisma.PermanentPassUncheckedUpdateManyWithoutOrganizationNestedInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
   siteOrganizations?: Prisma.SiteOrganizationUncheckedUpdateManyWithoutOrganizationNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutVisitsInput = {
@@ -1284,6 +1323,7 @@ export type OrganizationCreateWithoutVisitsInput = {
   permanentPasses?: Prisma.PermanentPassCreateNestedManyWithoutOrganizationInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventCreateNestedManyWithoutOrganizationInput
   siteOrganizations?: Prisma.SiteOrganizationCreateNestedManyWithoutOrganizationInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutVisitsInput = {
@@ -1311,6 +1351,7 @@ export type OrganizationUncheckedCreateWithoutVisitsInput = {
   permanentPasses?: Prisma.PermanentPassUncheckedCreateNestedManyWithoutOrganizationInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUncheckedCreateNestedManyWithoutOrganizationInput
   siteOrganizations?: Prisma.SiteOrganizationUncheckedCreateNestedManyWithoutOrganizationInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutVisitsInput = {
@@ -1354,6 +1395,7 @@ export type OrganizationUpdateWithoutVisitsInput = {
   permanentPasses?: Prisma.PermanentPassUpdateManyWithoutOrganizationNestedInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUpdateManyWithoutOrganizationNestedInput
   siteOrganizations?: Prisma.SiteOrganizationUpdateManyWithoutOrganizationNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutVisitsInput = {
@@ -1381,6 +1423,7 @@ export type OrganizationUncheckedUpdateWithoutVisitsInput = {
   permanentPasses?: Prisma.PermanentPassUncheckedUpdateManyWithoutOrganizationNestedInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
   siteOrganizations?: Prisma.SiteOrganizationUncheckedUpdateManyWithoutOrganizationNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutPassesInput = {
@@ -1408,6 +1451,7 @@ export type OrganizationCreateWithoutPassesInput = {
   permanentPasses?: Prisma.PermanentPassCreateNestedManyWithoutOrganizationInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventCreateNestedManyWithoutOrganizationInput
   siteOrganizations?: Prisma.SiteOrganizationCreateNestedManyWithoutOrganizationInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutPassesInput = {
@@ -1435,6 +1479,7 @@ export type OrganizationUncheckedCreateWithoutPassesInput = {
   permanentPasses?: Prisma.PermanentPassUncheckedCreateNestedManyWithoutOrganizationInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUncheckedCreateNestedManyWithoutOrganizationInput
   siteOrganizations?: Prisma.SiteOrganizationUncheckedCreateNestedManyWithoutOrganizationInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutPassesInput = {
@@ -1478,6 +1523,7 @@ export type OrganizationUpdateWithoutPassesInput = {
   permanentPasses?: Prisma.PermanentPassUpdateManyWithoutOrganizationNestedInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUpdateManyWithoutOrganizationNestedInput
   siteOrganizations?: Prisma.SiteOrganizationUpdateManyWithoutOrganizationNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutPassesInput = {
@@ -1505,6 +1551,7 @@ export type OrganizationUncheckedUpdateWithoutPassesInput = {
   permanentPasses?: Prisma.PermanentPassUncheckedUpdateManyWithoutOrganizationNestedInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
   siteOrganizations?: Prisma.SiteOrganizationUncheckedUpdateManyWithoutOrganizationNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutGatesInput = {
@@ -1532,6 +1579,7 @@ export type OrganizationCreateWithoutGatesInput = {
   permanentPasses?: Prisma.PermanentPassCreateNestedManyWithoutOrganizationInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventCreateNestedManyWithoutOrganizationInput
   siteOrganizations?: Prisma.SiteOrganizationCreateNestedManyWithoutOrganizationInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutGatesInput = {
@@ -1559,6 +1607,7 @@ export type OrganizationUncheckedCreateWithoutGatesInput = {
   permanentPasses?: Prisma.PermanentPassUncheckedCreateNestedManyWithoutOrganizationInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUncheckedCreateNestedManyWithoutOrganizationInput
   siteOrganizations?: Prisma.SiteOrganizationUncheckedCreateNestedManyWithoutOrganizationInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutGatesInput = {
@@ -1602,6 +1651,7 @@ export type OrganizationUpdateWithoutGatesInput = {
   permanentPasses?: Prisma.PermanentPassUpdateManyWithoutOrganizationNestedInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUpdateManyWithoutOrganizationNestedInput
   siteOrganizations?: Prisma.SiteOrganizationUpdateManyWithoutOrganizationNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutGatesInput = {
@@ -1629,6 +1679,7 @@ export type OrganizationUncheckedUpdateWithoutGatesInput = {
   permanentPasses?: Prisma.PermanentPassUncheckedUpdateManyWithoutOrganizationNestedInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
   siteOrganizations?: Prisma.SiteOrganizationUncheckedUpdateManyWithoutOrganizationNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutAccessEventsInput = {
@@ -1656,6 +1707,7 @@ export type OrganizationCreateWithoutAccessEventsInput = {
   permanentPasses?: Prisma.PermanentPassCreateNestedManyWithoutOrganizationInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventCreateNestedManyWithoutOrganizationInput
   siteOrganizations?: Prisma.SiteOrganizationCreateNestedManyWithoutOrganizationInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutAccessEventsInput = {
@@ -1683,6 +1735,7 @@ export type OrganizationUncheckedCreateWithoutAccessEventsInput = {
   permanentPasses?: Prisma.PermanentPassUncheckedCreateNestedManyWithoutOrganizationInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUncheckedCreateNestedManyWithoutOrganizationInput
   siteOrganizations?: Prisma.SiteOrganizationUncheckedCreateNestedManyWithoutOrganizationInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutAccessEventsInput = {
@@ -1726,6 +1779,7 @@ export type OrganizationUpdateWithoutAccessEventsInput = {
   permanentPasses?: Prisma.PermanentPassUpdateManyWithoutOrganizationNestedInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUpdateManyWithoutOrganizationNestedInput
   siteOrganizations?: Prisma.SiteOrganizationUpdateManyWithoutOrganizationNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutAccessEventsInput = {
@@ -1753,6 +1807,7 @@ export type OrganizationUncheckedUpdateWithoutAccessEventsInput = {
   permanentPasses?: Prisma.PermanentPassUncheckedUpdateManyWithoutOrganizationNestedInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
   siteOrganizations?: Prisma.SiteOrganizationUncheckedUpdateManyWithoutOrganizationNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutPermanentPassesInput = {
@@ -1780,6 +1835,7 @@ export type OrganizationCreateWithoutPermanentPassesInput = {
   accessEvents?: Prisma.AccessEventCreateNestedManyWithoutOrganizationInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventCreateNestedManyWithoutOrganizationInput
   siteOrganizations?: Prisma.SiteOrganizationCreateNestedManyWithoutOrganizationInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutPermanentPassesInput = {
@@ -1807,6 +1863,7 @@ export type OrganizationUncheckedCreateWithoutPermanentPassesInput = {
   accessEvents?: Prisma.AccessEventUncheckedCreateNestedManyWithoutOrganizationInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUncheckedCreateNestedManyWithoutOrganizationInput
   siteOrganizations?: Prisma.SiteOrganizationUncheckedCreateNestedManyWithoutOrganizationInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutPermanentPassesInput = {
@@ -1850,6 +1907,7 @@ export type OrganizationUpdateWithoutPermanentPassesInput = {
   accessEvents?: Prisma.AccessEventUpdateManyWithoutOrganizationNestedInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUpdateManyWithoutOrganizationNestedInput
   siteOrganizations?: Prisma.SiteOrganizationUpdateManyWithoutOrganizationNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutPermanentPassesInput = {
@@ -1877,6 +1935,7 @@ export type OrganizationUncheckedUpdateWithoutPermanentPassesInput = {
   accessEvents?: Prisma.AccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
   permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
   siteOrganizations?: Prisma.SiteOrganizationUncheckedUpdateManyWithoutOrganizationNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutPermanentPassAccessEventsInput = {
@@ -1904,6 +1963,7 @@ export type OrganizationCreateWithoutPermanentPassAccessEventsInput = {
   accessEvents?: Prisma.AccessEventCreateNestedManyWithoutOrganizationInput
   permanentPasses?: Prisma.PermanentPassCreateNestedManyWithoutOrganizationInput
   siteOrganizations?: Prisma.SiteOrganizationCreateNestedManyWithoutOrganizationInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutPermanentPassAccessEventsInput = {
@@ -1931,6 +1991,7 @@ export type OrganizationUncheckedCreateWithoutPermanentPassAccessEventsInput = {
   accessEvents?: Prisma.AccessEventUncheckedCreateNestedManyWithoutOrganizationInput
   permanentPasses?: Prisma.PermanentPassUncheckedCreateNestedManyWithoutOrganizationInput
   siteOrganizations?: Prisma.SiteOrganizationUncheckedCreateNestedManyWithoutOrganizationInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutPermanentPassAccessEventsInput = {
@@ -1974,6 +2035,7 @@ export type OrganizationUpdateWithoutPermanentPassAccessEventsInput = {
   accessEvents?: Prisma.AccessEventUpdateManyWithoutOrganizationNestedInput
   permanentPasses?: Prisma.PermanentPassUpdateManyWithoutOrganizationNestedInput
   siteOrganizations?: Prisma.SiteOrganizationUpdateManyWithoutOrganizationNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutPermanentPassAccessEventsInput = {
@@ -2001,6 +2063,135 @@ export type OrganizationUncheckedUpdateWithoutPermanentPassAccessEventsInput = {
   accessEvents?: Prisma.AccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
   permanentPasses?: Prisma.PermanentPassUncheckedUpdateManyWithoutOrganizationNestedInput
   siteOrganizations?: Prisma.SiteOrganizationUncheckedUpdateManyWithoutOrganizationNestedInput
+  vehicleAccessEvents?: Prisma.VehicleAccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
+}
+
+export type OrganizationCreateWithoutVehicleAccessEventsInput = {
+  id?: string
+  name: string
+  code: string
+  shortName?: string | null
+  organizationType?: string
+  email?: string | null
+  phone?: string | null
+  website?: string | null
+  logoUrl?: string | null
+  address?: string | null
+  city?: string | null
+  country?: string | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  departments?: Prisma.DepartmentCreateNestedManyWithoutOrganizationInput
+  hosts?: Prisma.HostCreateNestedManyWithoutOrganizationInput
+  visitors?: Prisma.VisitorCreateNestedManyWithoutOrganizationInput
+  visits?: Prisma.VisitRequestCreateNestedManyWithoutOrganizationInput
+  passes?: Prisma.VisitorPassCreateNestedManyWithoutOrganizationInput
+  gates?: Prisma.GateCreateNestedManyWithoutOrganizationInput
+  accessEvents?: Prisma.AccessEventCreateNestedManyWithoutOrganizationInput
+  permanentPasses?: Prisma.PermanentPassCreateNestedManyWithoutOrganizationInput
+  permanentPassAccessEvents?: Prisma.PermanentPassAccessEventCreateNestedManyWithoutOrganizationInput
+  siteOrganizations?: Prisma.SiteOrganizationCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationUncheckedCreateWithoutVehicleAccessEventsInput = {
+  id?: string
+  name: string
+  code: string
+  shortName?: string | null
+  organizationType?: string
+  email?: string | null
+  phone?: string | null
+  website?: string | null
+  logoUrl?: string | null
+  address?: string | null
+  city?: string | null
+  country?: string | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  departments?: Prisma.DepartmentUncheckedCreateNestedManyWithoutOrganizationInput
+  hosts?: Prisma.HostUncheckedCreateNestedManyWithoutOrganizationInput
+  visitors?: Prisma.VisitorUncheckedCreateNestedManyWithoutOrganizationInput
+  visits?: Prisma.VisitRequestUncheckedCreateNestedManyWithoutOrganizationInput
+  passes?: Prisma.VisitorPassUncheckedCreateNestedManyWithoutOrganizationInput
+  gates?: Prisma.GateUncheckedCreateNestedManyWithoutOrganizationInput
+  accessEvents?: Prisma.AccessEventUncheckedCreateNestedManyWithoutOrganizationInput
+  permanentPasses?: Prisma.PermanentPassUncheckedCreateNestedManyWithoutOrganizationInput
+  permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUncheckedCreateNestedManyWithoutOrganizationInput
+  siteOrganizations?: Prisma.SiteOrganizationUncheckedCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationCreateOrConnectWithoutVehicleAccessEventsInput = {
+  where: Prisma.OrganizationWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutVehicleAccessEventsInput, Prisma.OrganizationUncheckedCreateWithoutVehicleAccessEventsInput>
+}
+
+export type OrganizationUpsertWithoutVehicleAccessEventsInput = {
+  update: Prisma.XOR<Prisma.OrganizationUpdateWithoutVehicleAccessEventsInput, Prisma.OrganizationUncheckedUpdateWithoutVehicleAccessEventsInput>
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutVehicleAccessEventsInput, Prisma.OrganizationUncheckedCreateWithoutVehicleAccessEventsInput>
+  where?: Prisma.OrganizationWhereInput
+}
+
+export type OrganizationUpdateToOneWithWhereWithoutVehicleAccessEventsInput = {
+  where?: Prisma.OrganizationWhereInput
+  data: Prisma.XOR<Prisma.OrganizationUpdateWithoutVehicleAccessEventsInput, Prisma.OrganizationUncheckedUpdateWithoutVehicleAccessEventsInput>
+}
+
+export type OrganizationUpdateWithoutVehicleAccessEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  shortName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationType?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departments?: Prisma.DepartmentUpdateManyWithoutOrganizationNestedInput
+  hosts?: Prisma.HostUpdateManyWithoutOrganizationNestedInput
+  visitors?: Prisma.VisitorUpdateManyWithoutOrganizationNestedInput
+  visits?: Prisma.VisitRequestUpdateManyWithoutOrganizationNestedInput
+  passes?: Prisma.VisitorPassUpdateManyWithoutOrganizationNestedInput
+  gates?: Prisma.GateUpdateManyWithoutOrganizationNestedInput
+  accessEvents?: Prisma.AccessEventUpdateManyWithoutOrganizationNestedInput
+  permanentPasses?: Prisma.PermanentPassUpdateManyWithoutOrganizationNestedInput
+  permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUpdateManyWithoutOrganizationNestedInput
+  siteOrganizations?: Prisma.SiteOrganizationUpdateManyWithoutOrganizationNestedInput
+}
+
+export type OrganizationUncheckedUpdateWithoutVehicleAccessEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  shortName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  organizationType?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departments?: Prisma.DepartmentUncheckedUpdateManyWithoutOrganizationNestedInput
+  hosts?: Prisma.HostUncheckedUpdateManyWithoutOrganizationNestedInput
+  visitors?: Prisma.VisitorUncheckedUpdateManyWithoutOrganizationNestedInput
+  visits?: Prisma.VisitRequestUncheckedUpdateManyWithoutOrganizationNestedInput
+  passes?: Prisma.VisitorPassUncheckedUpdateManyWithoutOrganizationNestedInput
+  gates?: Prisma.GateUncheckedUpdateManyWithoutOrganizationNestedInput
+  accessEvents?: Prisma.AccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
+  permanentPasses?: Prisma.PermanentPassUncheckedUpdateManyWithoutOrganizationNestedInput
+  permanentPassAccessEvents?: Prisma.PermanentPassAccessEventUncheckedUpdateManyWithoutOrganizationNestedInput
+  siteOrganizations?: Prisma.SiteOrganizationUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 
@@ -2019,6 +2210,7 @@ export type OrganizationCountOutputType = {
   permanentPasses: number
   permanentPassAccessEvents: number
   siteOrganizations: number
+  vehicleAccessEvents: number
 }
 
 export type OrganizationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2032,6 +2224,7 @@ export type OrganizationCountOutputTypeSelect<ExtArgs extends runtime.Types.Exte
   permanentPasses?: boolean | OrganizationCountOutputTypeCountPermanentPassesArgs
   permanentPassAccessEvents?: boolean | OrganizationCountOutputTypeCountPermanentPassAccessEventsArgs
   siteOrganizations?: boolean | OrganizationCountOutputTypeCountSiteOrganizationsArgs
+  vehicleAccessEvents?: boolean | OrganizationCountOutputTypeCountVehicleAccessEventsArgs
 }
 
 /**
@@ -2114,6 +2307,13 @@ export type OrganizationCountOutputTypeCountSiteOrganizationsArgs<ExtArgs extend
   where?: Prisma.SiteOrganizationWhereInput
 }
 
+/**
+ * OrganizationCountOutputType without action
+ */
+export type OrganizationCountOutputTypeCountVehicleAccessEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VehicleAccessEventWhereInput
+}
+
 
 export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2141,6 +2341,7 @@ export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   permanentPasses?: boolean | Prisma.Organization$permanentPassesArgs<ExtArgs>
   permanentPassAccessEvents?: boolean | Prisma.Organization$permanentPassAccessEventsArgs<ExtArgs>
   siteOrganizations?: boolean | Prisma.Organization$siteOrganizationsArgs<ExtArgs>
+  vehicleAccessEvents?: boolean | Prisma.Organization$vehicleAccessEventsArgs<ExtArgs>
   _count?: boolean | Prisma.OrganizationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["organization"]>
 
@@ -2210,6 +2411,7 @@ export type OrganizationInclude<ExtArgs extends runtime.Types.Extensions.Interna
   permanentPasses?: boolean | Prisma.Organization$permanentPassesArgs<ExtArgs>
   permanentPassAccessEvents?: boolean | Prisma.Organization$permanentPassAccessEventsArgs<ExtArgs>
   siteOrganizations?: boolean | Prisma.Organization$siteOrganizationsArgs<ExtArgs>
+  vehicleAccessEvents?: boolean | Prisma.Organization$vehicleAccessEventsArgs<ExtArgs>
   _count?: boolean | Prisma.OrganizationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type OrganizationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -2228,6 +2430,7 @@ export type $OrganizationPayload<ExtArgs extends runtime.Types.Extensions.Intern
     permanentPasses: Prisma.$PermanentPassPayload<ExtArgs>[]
     permanentPassAccessEvents: Prisma.$PermanentPassAccessEventPayload<ExtArgs>[]
     siteOrganizations: Prisma.$SiteOrganizationPayload<ExtArgs>[]
+    vehicleAccessEvents: Prisma.$VehicleAccessEventPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2649,6 +2852,7 @@ export interface Prisma__OrganizationClient<T, Null = never, ExtArgs extends run
   permanentPasses<T extends Prisma.Organization$permanentPassesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$permanentPassesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PermanentPassPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   permanentPassAccessEvents<T extends Prisma.Organization$permanentPassAccessEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$permanentPassAccessEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PermanentPassAccessEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   siteOrganizations<T extends Prisma.Organization$siteOrganizationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$siteOrganizationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SiteOrganizationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  vehicleAccessEvents<T extends Prisma.Organization$vehicleAccessEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$vehicleAccessEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VehicleAccessEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3323,6 +3527,30 @@ export type Organization$siteOrganizationsArgs<ExtArgs extends runtime.Types.Ext
   take?: number
   skip?: number
   distinct?: Prisma.SiteOrganizationScalarFieldEnum | Prisma.SiteOrganizationScalarFieldEnum[]
+}
+
+/**
+ * Organization.vehicleAccessEvents
+ */
+export type Organization$vehicleAccessEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VehicleAccessEvent
+   */
+  select?: Prisma.VehicleAccessEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VehicleAccessEvent
+   */
+  omit?: Prisma.VehicleAccessEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VehicleAccessEventInclude<ExtArgs> | null
+  where?: Prisma.VehicleAccessEventWhereInput
+  orderBy?: Prisma.VehicleAccessEventOrderByWithRelationInput | Prisma.VehicleAccessEventOrderByWithRelationInput[]
+  cursor?: Prisma.VehicleAccessEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VehicleAccessEventScalarFieldEnum | Prisma.VehicleAccessEventScalarFieldEnum[]
 }
 
 /**
