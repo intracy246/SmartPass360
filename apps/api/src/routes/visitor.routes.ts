@@ -294,6 +294,127 @@ visitorRouter.get("/", requireBuilding, async (_request, response, next) => {
   } catch (error) { return next(error); }
 });
 
+visitorRouter.get("/operations", requireBuilding, async (_request, response, next) => {
+  try {
+    const user = response.locals.authUser as AuthUser;
+    const siteId = user.siteId!;
+
+    const [pending, inside] = await Promise.all([
+      prisma.visitRequest.findMany({
+        where: { siteId, status: "PENDING_APPROVAL" },
+        include: visitInclude,
+        orderBy: { createdAt: "asc" },
+        take: 100
+      }),
+      prisma.visitRequest.findMany({
+        where: { siteId, status: "INSIDE" },
+        include: visitInclude,
+        orderBy: { checkedInAt: "desc" },
+        take: 200
+      })
+    ]);
+
+    response.setHeader("Cache-Control", "no-store");
+    return response.json({
+      success: true,
+      data: {
+        pending: pending.map(publicVisit),
+        inside: inside.map(publicVisit)
+      }
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+visitorRouter.post<{ visitId: string }>("/:visitId/deny", requireBuilding, async (request, response, next) => {
+  try {
+    const user = response.locals.authUser as AuthUser;
+    const visitId = z.string().uuid().safeParse(request.params.visitId);
+    if (!visitId.success) {
+      return response.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Invalid visit ID." } });
+    }
+
+    const result = await prisma.visitRequest.updateMany({
+      where: { id: visitId.data, siteId: user.siteId!, status: "PENDING_APPROVAL" },
+      data: { status: "REJECTED" }
+    });
+
+    if (!result.count) {
+      return response.status(409).json({
+        error: { code: "VISIT_NOT_PENDING", message: "Only a pending visit can be denied." }
+      });
+    }
+
+    return response.json({ success: true, data: { id: visitId.data, status: "REJECTED" } });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+visitorRouter.post<{ visitId: string }>("/:visitId/check-out", requireBuilding, async (request, response, next) => {
+  try {
+    const user = response.locals.authUser as AuthUser;
+    const visitId = z.string().uuid().safeParse(request.params.visitId);
+    if (!visitId.success) {
+      return response.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Invalid visit ID." } });
+    }
+
+    const now = new Date();
+    const result = await prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM visit_requests WHERE id = ${visitId.data}::uuid FOR UPDATE`;
+      const visit = await tx.visitRequest.findFirst({
+        where: { id: visitId.data, siteId: user.siteId!, status: "INSIDE" },
+        include: { pass: true }
+      });
+      if (!visit) return null;
+
+      await tx.visitRequest.update({
+        where: { id: visit.id },
+        data: { status: "CHECKED_OUT", checkedOutAt: now }
+      });
+
+      if (visit.pass?.status === "ACTIVE") {
+        await tx.visitorPass.update({
+          where: { id: visit.pass.id },
+          data: { status: "USED" }
+        });
+      }
+
+      await tx.accessEvent.create({
+        data: {
+          siteId: user.siteId!,
+          organizationId: visit.organizationId,
+          visitId: visit.id,
+          visitorPassId: visit.pass?.id ?? null,
+          direction: "EXIT",
+          decision: "GRANTED",
+          turnstileOpened: false,
+          metadata: {
+            source: "MANUAL_SECURITY_CHECKOUT",
+            performedBy: user.username
+          }
+        }
+      });
+
+      return visit;
+    });
+
+    if (!result) {
+      return response.status(409).json({
+        error: { code: "VISITOR_NOT_INSIDE", message: "Only a visitor currently inside can be checked out." }
+      });
+    }
+
+    return response.json({
+      success: true,
+      data: { id: result.id, status: "CHECKED_OUT", checkedOutAt: now }
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 visitorRouter.post<{ visitId: string }>("/:visitId/approve", requireBuilding, async (request, response, next) => {
   try {
     const user = response.locals.authUser as AuthUser;
