@@ -381,7 +381,14 @@ accessRouter.post(
                 select: {
                   id: true,
                   name: true,
-                  isActive: true
+                  isActive: true,
+                  siteOrganizations: {
+                    where: { isActive: true },
+                    select: {
+                      siteId: true,
+                      site: { select: { isActive: true, status: true } }
+                    }
+                  }
                 }
               }
             }
@@ -396,7 +403,11 @@ accessRouter.post(
                 select: {
                   id: true,
                   name: true,
-                  isActive: true
+                  isActive: true,
+                  siteOrganizations: {
+                    where: { isActive: true },
+                    select: { siteId: true }
+                  }
                 }
               }
             }
@@ -436,7 +447,17 @@ accessRouter.post(
 
       const now = new Date();
 
+      const gateSites = gate.organization.siteOrganizations;
+      const passSiteIds = new Set(permanentPass.organization.siteOrganizations.map((item) => item.siteId));
+      const sharedSite = gateSites.find((item) => passSiteIds.has(item.siteId));
+
       let denialReason: string | null = null;
+
+      if (!sharedSite) {
+        denialReason = "BUILDING_MISMATCH";
+      } else if (!sharedSite.site.isActive || sharedSite.site.status !== "ACTIVE") {
+        denialReason = "BUILDING_INACTIVE";
+      }
 
       if (!permanentPass.organization.isActive) {
         denialReason = "ORGANIZATION_INACTIVE";
