@@ -70,7 +70,12 @@ export function OperationsPage() {
   const pendingVisitors = visitorsQuery.data?.data.pending ?? [];
   const peopleInside = visitorsQuery.data?.data.inside ?? [];
   const pendingVehicles = vehicleRequestsQuery.data?.data ?? [];
-  const vehiclesInside = (vehiclesQuery.data?.data ?? []).filter((vehicle) => vehicle.isCurrentlyInside);
+  const registeredVehiclesInside = (vehiclesQuery.data?.data ?? []).filter((vehicle) => vehicle.isCurrentlyInside);
+  const visitorVehiclesInside = peopleInside.filter((visit) => Boolean(visit.vehicleNumber));
+  const vehiclesInsideCount = new Set([
+    ...registeredVehiclesInside.map((vehicle) => vehicle.normalizedPlateNumber),
+    ...visitorVehiclesInside.map((visit) => (visit.vehicleNumber ?? "").replace(/[^A-Za-z0-9]/g, "").toUpperCase())
+  ]).size;
   const actionError =
     visitorReview.error instanceof Error ? visitorReview.error.message :
     visitorCheckout.error instanceof Error ? visitorCheckout.error.message :
@@ -100,7 +105,7 @@ export function OperationsPage() {
           <strong>{vehicleRequestsQuery.isPending ? "—" : pendingVehicles.length}</strong>
         </GlassCard>
         <GlassCard title="Vehicles inside" subtitle="Authorized vehicles currently inside" accent="blue">
-          <strong>{vehiclesQuery.isPending ? "—" : vehiclesInside.length}</strong>
+          <strong>{vehiclesQuery.isPending || visitorsQuery.isPending ? "—" : vehiclesInsideCount}</strong>
         </GlassCard>
       </section>
 
@@ -155,11 +160,21 @@ export function OperationsPage() {
         </GlassCard>
 
         <GlassCard title="Vehicles currently inside" subtitle="Authorized vehicle occupancy from ANPR state." accent="blue">
-          {vehiclesInside.length === 0 ? <div className="operations-page__state">No registered vehicles are currently inside.</div> :
-          <div className="operations-page__inside-list">{vehiclesInside.map((vehicle) => <article key={vehicle.id}>
-            <div><strong>{vehicle.plateNumber}</strong><span>Entered {formatDate(vehicle.lastEntryAt)}</span></div>
-            <span className="operations-page__inside-badge">INSIDE</span>
-          </article>)}</div>}
+          {registeredVehiclesInside.length === 0 && visitorVehiclesInside.length === 0 ? <div className="operations-page__state">No vehicles are currently inside.</div> :
+          <div className="operations-page__inside-list">
+            {registeredVehiclesInside.map((vehicle) => <article key={vehicle.id}>
+              <div><strong>{vehicle.plateNumber}</strong><span>Permanent vehicle · entered {formatDate(vehicle.lastEntryAt)}</span></div>
+              <span className="operations-page__inside-badge">INSIDE</span>
+            </article>)}
+            {visitorVehiclesInside
+              .filter((visit) => !registeredVehiclesInside.some((vehicle) =>
+                vehicle.normalizedPlateNumber === (visit.vehicleNumber ?? "").replace(/[^A-Za-z0-9]/g, "").toUpperCase()
+              ))
+              .map((visit) => <article key={`visitor-vehicle-${visit.id}`}>
+                <div><strong>{visit.vehicleNumber}</strong><span>Visitor vehicle · {visit.fullName} · entered {formatDate(visit.checkedInAt)}</span></div>
+                <span className="operations-page__inside-badge">INSIDE</span>
+              </article>)}
+          </div>}
         </GlassCard>
       </div>
     </div>
