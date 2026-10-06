@@ -16,6 +16,7 @@ export type VehicleAccessRequest = {
   normalizedPlateNumber: string;
   direction: "ENTRY" | "EXIT";
   confidence?: number | null;
+  snapshotUrl?: string | null;
   status: "PENDING" | "APPROVED" | "DENIED" | "EXPIRED";
   reason: string;
   detectedAt: string;
