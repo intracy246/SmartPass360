@@ -10,6 +10,11 @@ const navigationItems = [
     symbol: "◈"
   },
   {
+    label: "Live Operations",
+    path: "/operations",
+    symbol: "◌"
+  },
+  {
     label: "Visitors",
     path: "/visitors",
     symbol: "◎"
