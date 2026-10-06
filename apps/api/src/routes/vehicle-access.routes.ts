@@ -430,7 +430,7 @@ vehicleAccessRouter.post("/recognize", async (request, response, next) => {
         });
       }
 
-      const samePlateVisit = await prisma.visitRequest.findFirst({
+      const samePlateCandidates = await prisma.visitRequest.findMany({
         where: {
           siteId,
           visitor: { vehicleNumber: { not: null } },
@@ -438,13 +438,14 @@ vehicleAccessRouter.post("/recognize", async (request, response, next) => {
         },
         include: { visitor: { select: { vehicleNumber: true } } },
         orderBy: { createdAt: "desc" },
-        take: 1
+        take: 200
       });
+      const samePlateVisit = samePlateCandidates.find((visit) =>
+        visit.visitor.vehicleNumber &&
+        normalizePlateNumber(visit.visitor.vehicleNumber) === normalizedPlateNumber
+      ) ?? null;
 
-      if (
-        samePlateVisit?.visitor.vehicleNumber &&
-        normalizePlateNumber(samePlateVisit.visitor.vehicleNumber) === normalizedPlateNumber
-      ) {
+      if (samePlateVisit) {
         const reason = direction === "ENTRY" ? "VISITOR_ALREADY_INSIDE" : "VISITOR_NOT_INSIDE";
         const event = await prisma.vehicleAccessEvent.create({
           data: {
