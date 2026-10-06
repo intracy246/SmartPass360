@@ -674,13 +674,49 @@ async function reviewVehicleRequest(
       orderBy: { occurredAt: "asc" }
     });
 
-    if (decision === "APPROVED" && !detectionEvent?.gateAccessDeviceId) {
-      return response.status(409).json({
-        error: {
-          code: "GATE_DEVICE_UNAVAILABLE",
-          message: "The originating gate device is unavailable; the gate remains locked."
-        }
+    if (decision === "APPROVED") {
+      if (!detectionEvent?.gateAccessDeviceId) {
+        return response.status(409).json({
+          error: {
+            code: "GATE_DEVICE_UNAVAILABLE",
+            message: "The originating gate device is unavailable; the gate remains locked."
+          }
+        });
+      }
+
+      const liveDevice = await prisma.gateAccessDevice.findFirst({
+        where: {
+          id: detectionEvent.gateAccessDeviceId,
+          siteId: user.siteId!,
+          gateId: pending.gateId,
+          isActive: true,
+          site: { isActive: true, status: "ACTIVE" },
+          gate: { isActive: true, status: "ONLINE" }
+        },
+        select: { id: true }
       });
+
+      if (!liveDevice) {
+        return response.status(409).json({
+          error: {
+            code: "GATE_DEVICE_UNAVAILABLE",
+            message: "The gate or originating device is no longer available; the gate remains locked."
+          }
+        });
+      }
+
+      if (now.getTime() - pending.detectedAt.getTime() > 120_000) {
+        await prisma.vehicleAccessRequest.update({
+          where: { id: pending.id },
+          data: { status: "EXPIRED", reviewedAt: now, reviewedBy: user.username }
+        });
+        return response.status(409).json({
+          error: {
+            code: "VEHICLE_REQUEST_EXPIRED",
+            message: "This vehicle arrival is too old to unlock safely. A new ANPR detection is required."
+          }
+        });
+      }
     }
 
     const updated = await prisma.$transaction(async (transaction) => {
