@@ -56,6 +56,7 @@ CREATE TABLE "vehicle_access_events" (
   "authorized_vehicle_id" UUID,
   "permanent_pass_id" UUID,
   "gate_id" UUID NOT NULL,
+  "gate_access_device_id" UUID,
   "vehicle_access_request_id" UUID,
   "device_request_id" TEXT,
   "plate_number" TEXT NOT NULL,
@@ -85,6 +86,7 @@ CREATE INDEX "vehicle_access_events_site_id_occurred_at_idx" ON "vehicle_access_
 CREATE INDEX "vehicle_access_events_authorized_vehicle_id_occurred_at_idx" ON "vehicle_access_events"("authorized_vehicle_id", "occurred_at");
 CREATE INDEX "vehicle_access_events_permanent_pass_id_idx" ON "vehicle_access_events"("permanent_pass_id");
 CREATE INDEX "vehicle_access_events_gate_id_occurred_at_idx" ON "vehicle_access_events"("gate_id", "occurred_at");
+CREATE INDEX "vehicle_access_events_gate_access_device_id_idx" ON "vehicle_access_events"("gate_access_device_id");
 CREATE INDEX "vehicle_access_events_vehicle_access_request_id_idx" ON "vehicle_access_events"("vehicle_access_request_id");
 CREATE INDEX "vehicle_access_events_site_id_normalized_plate_number_occurred_at_idx" ON "vehicle_access_events"("site_id", "normalized_plate_number", "occurred_at");
 
@@ -99,4 +101,5 @@ ALTER TABLE "vehicle_access_events" ADD CONSTRAINT "vehicle_access_events_organi
 ALTER TABLE "vehicle_access_events" ADD CONSTRAINT "vehicle_access_events_authorized_vehicle_id_fkey" FOREIGN KEY ("authorized_vehicle_id") REFERENCES "authorized_vehicles"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE "vehicle_access_events" ADD CONSTRAINT "vehicle_access_events_permanent_pass_id_fkey" FOREIGN KEY ("permanent_pass_id") REFERENCES "permanent_passes"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE "vehicle_access_events" ADD CONSTRAINT "vehicle_access_events_gate_id_fkey" FOREIGN KEY ("gate_id") REFERENCES "gates"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "vehicle_access_events" ADD CONSTRAINT "vehicle_access_events_gate_access_device_id_fkey" FOREIGN KEY ("gate_access_device_id") REFERENCES "gate_access_devices"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE "vehicle_access_events" ADD CONSTRAINT "vehicle_access_events_vehicle_access_request_id_fkey" FOREIGN KEY ("vehicle_access_request_id") REFERENCES "vehicle_access_requests"("id") ON DELETE SET NULL ON UPDATE CASCADE;
