@@ -22,6 +22,7 @@ import { OwnerOrganizationsPage } from "../pages/owner/OwnerOrganizationsPage";
 import { getStoredUser, getToken } from "../auth/session";
 import { KiosksPage } from "../pages/kiosks/KiosksPage";
 import { VehiclesPage } from "../pages/vehicles/VehiclesPage";
+import { OperationsPage } from "../pages/operations/OperationsPage";
 
 function EmptyModule({
   title
@@ -73,6 +74,7 @@ export function AppRouter() {
       </Route>
       <Route element={<RequireBuilding><DashboardLayout /></RequireBuilding>}>
         <Route index element={<DashboardPage />} />
+        <Route path="operations" element={<OperationsPage />} />
 
         <Route
   path="visitors"
