@@ -534,8 +534,9 @@ model GateAccessDevice {
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
-  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
-  gate Gate @relation(fields: [gateId], references: [id], onDelete: Cascade)
+  site         Site                 @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  gate         Gate                 @relation(fields: [gateId], references: [id], onDelete: Cascade)
+  accessEvents VehicleAccessEvent[]
 
   @@unique([siteId, gateId, name])
   @@index([gateId, isActive])
