@@ -21,7 +21,7 @@ Topology: 2D QR scanner -> trusted local edge adapter -> SmartPass360 access API
 
 Visitor QR: POST /api/v1/access/hardware/qr-scan with x-gate-device-key. Send credential, gateId, optional direction, and a unique UUID requestId.
 
-Permanent pass QR: POST /api/v1/access/permanent-pass/scan with x-gate-device-key. Send qrCode and gateId.
+Permanent pass QR: POST /api/v1/access/permanent-pass/scan with x-gate-device-key. Send qrCode, gateId, and a unique UUID requestId. Scanner retries with the same requestId return no new unlock command.
 
 Actuate only for a granted response whose turnstileCommand is UNLOCK. Never unlock on malformed responses, errors, timeouts, or denial. A USB HID scanner may feed the edge app, but a public browser must not directly control a turnstile relay.
 
