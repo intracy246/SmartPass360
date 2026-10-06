@@ -17,6 +17,60 @@ accessRouter.post("/validate", requireBuilding, async (request, response, next) 
   } catch (error) { return next(error); }
 });
 
+accessRouter.post("/hardware/qr-scan", async (request, response, next) => {
+  try {
+    const parsed = visitorScanSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return response.status(400).json({
+        decision: "DENIED",
+        turnstileCommand: "KEEP_LOCKED",
+        error: { code: "VALIDATION_ERROR", message: "A QR credential and valid gate ID are required." }
+      });
+    }
+
+    const device = await authenticatePhysicalGateDevice(request, parsed.data.gateId);
+    if (!device) {
+      return response.status(401).json({
+        decision: "DENIED",
+        turnstileCommand: "KEEP_LOCKED",
+        error: { code: "UNAUTHORIZED_GATE_DEVICE", message: "A provisioned gate device credential is required." }
+      });
+    }
+
+    const visitorPrefix = "smartpass360://visitor-pass/";
+    const permanentPrefix = "smartpass360://permanent-pass/";
+
+    if (parsed.data.credential.startsWith(visitorPrefix)) {
+      const result = await validateVisitorScan(device.siteId, parsed.data);
+      await prisma.gateAccessDevice.update({ where: { id: device.id }, data: { lastSeenAt: new Date() } });
+      return response.json({ success: true, credentialType: "VISITOR", ...result, data: result });
+    }
+
+    if (parsed.data.credential.startsWith(permanentPrefix)) {
+      request.body = {
+        qrCode: parsed.data.credential,
+        gateId: parsed.data.gateId,
+        requestId: parsed.data.requestId
+      };
+      return response.status(422).json({
+        decision: "ROUTE_PERMANENT_PASS",
+        credentialType: "PERMANENT_PASS",
+        turnstileCommand: "KEEP_LOCKED",
+        route: "/api/v1/access/permanent-pass/scan",
+        message: "Permanent-pass credential detected. Route it to the permanent-pass scanner endpoint using the same device key."
+      });
+    }
+
+    return response.status(400).json({
+      decision: "DENIED",
+      turnstileCommand: "KEEP_LOCKED",
+      error: { code: "UNSUPPORTED_QR_CREDENTIAL", message: "The scanned QR is not a SmartPass360 access credential." }
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 accessRouter.get("/gates", requireBuilding, async (_request, response, next) => {
   try {
     const user = response.locals.authUser as AuthUser;
@@ -439,9 +493,38 @@ accessRouter.patch("/gate-devices/:deviceId", requireBuilding, async (request, r
   }
 });
 
+function getGateDeviceKey(request: any) {
+  const raw = request.headers["x-gate-device-key"] ?? request.headers["x-device-key"];
+  return typeof raw === "string" && raw.trim() ? raw.trim() : null;
+}
+
+async function authenticatePhysicalGateDevice(request: any, gateId: string) {
+  const key = getGateDeviceKey(request);
+  if (!key) return null;
+
+  return prisma.gateAccessDevice.findFirst({
+    where: {
+      gateId,
+      deviceKeyHash: hashGateDeviceKey(key),
+      isActive: true,
+      site: { isActive: true, status: "ACTIVE" },
+      gate: {
+        isActive: true,
+        status: "ONLINE",
+        organization: {
+          isActive: true,
+          siteOrganizations: { some: { isActive: true } }
+        }
+      }
+    },
+    include: { gate: true }
+  });
+}
+
 const scanSchema = z.object({
   qrCode: z.string().trim().min(1).max(2000),
-  gateId: z.string().uuid()
+  gateId: z.string().uuid(),
+  requestId: z.string().uuid().optional()
 });
 
 function extractPermanentPassToken(qrCode: string) {
@@ -484,6 +567,16 @@ accessRouter.post(
         return;
       }
 
+      const physicalDevice = await authenticatePhysicalGateDevice(request, parsed.data.gateId);
+      if (!physicalDevice) {
+        response.status(401).json({
+          decision: "DENIED",
+          denialReason: "UNAUTHORIZED_GATE_DEVICE",
+          turnstileCommand: "KEEP_LOCKED"
+        });
+        return;
+      }
+
       const token = extractPermanentPassToken(
         parsed.data.qrCode
       );
@@ -498,6 +591,31 @@ accessRouter.post(
       }
 
       const tokenHash = hashQrToken(token);
+
+      if (parsed.data.requestId) {
+        const duplicate = await prisma.permanentPassAccessEvent.findFirst({
+          where: {
+            gateId: parsed.data.gateId,
+            metadata: {
+              path: ["requestId"],
+              equals: parsed.data.requestId
+            }
+          },
+          orderBy: { occurredAt: "desc" }
+        });
+        if (duplicate) {
+          response.status(200).json({
+            decision: duplicate.decision,
+            denialReason: duplicate.denialReason,
+            activityType: duplicate.activityType,
+            turnstileCommand: "KEEP_LOCKED",
+            accessEventId: duplicate.id,
+            duplicate: true,
+            message: "Duplicate scanner request; no new unlock command."
+          });
+          return;
+        }
+      }
 
       const [gate, permanentPass] =
         await Promise.all([
@@ -646,7 +764,9 @@ accessRouter.post(
 
             metadata: {
               gateCode: gate.code,
-              gateName: gate.name
+              gateName: gate.name,
+              requestId: parsed.data.requestId ?? null,
+              gateDeviceId: physicalDevice.id
             }
           }
         });
@@ -699,7 +819,9 @@ accessRouter.post(
                   metadata: {
                     gateCode: gate.code,
                     gateName: gate.name,
-                    commandIssued: "UNLOCK"
+                    commandIssued: "UNLOCK",
+                    requestId: parsed.data.requestId ?? null,
+                    gateDeviceId: physicalDevice.id
                   }
                 }
               });
