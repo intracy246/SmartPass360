@@ -108,6 +108,7 @@ export function VehiclesPage() {
               <thead>
                 <tr>
                   <th>Plate</th>
+                  <th>Snapshot</th>
                   <th>Gate</th>
                   <th>Direction</th>
                   <th>Confidence</th>
@@ -120,6 +121,11 @@ export function VehiclesPage() {
                 {requests.map((item) => (
                   <tr key={item.id}>
                     <td><strong>{item.plateNumber}</strong></td>
+                    <td>
+                      {item.snapshotUrl ? (
+                        <a href={item.snapshotUrl} target="_blank" rel="noreferrer">View image</a>
+                      ) : "—"}
+                    </td>
                     <td>{item.gate?.name ?? "—"}</td>
                     <td>{item.direction}</td>
                     <td>
