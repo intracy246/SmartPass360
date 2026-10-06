@@ -89,6 +89,8 @@ export function AppRouter() {
   element={<AccessControlPage />}
 />
 
+        <Route path="gate-setup" element={<GateSetupPage />} />
+
       <Route
   path="organizations"
   element={<OrganizationsPage />}
