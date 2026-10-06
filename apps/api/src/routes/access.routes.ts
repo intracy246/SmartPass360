@@ -519,7 +519,8 @@ async function authenticatePhysicalGateDevice(request: any, gateId: string) {
 
 const scanSchema = z.object({
   qrCode: z.string().trim().min(1).max(2000),
-  gateId: z.string().uuid()
+  gateId: z.string().uuid(),
+  requestId: z.string().uuid().optional()
 });
 
 function extractPermanentPassToken(qrCode: string) {
@@ -586,6 +587,31 @@ accessRouter.post(
       }
 
       const tokenHash = hashQrToken(token);
+
+      if (parsed.data.requestId) {
+        const duplicate = await prisma.permanentPassAccessEvent.findFirst({
+          where: {
+            gateId: parsed.data.gateId,
+            metadata: {
+              path: ["requestId"],
+              equals: parsed.data.requestId
+            }
+          },
+          orderBy: { occurredAt: "desc" }
+        });
+        if (duplicate) {
+          response.status(200).json({
+            decision: duplicate.decision,
+            denialReason: duplicate.denialReason,
+            activityType: duplicate.activityType,
+            turnstileCommand: "KEEP_LOCKED",
+            accessEventId: duplicate.id,
+            duplicate: true,
+            message: "Duplicate scanner request; no new unlock command."
+          });
+          return;
+        }
+      }
 
       const [gate, permanentPass] =
         await Promise.all([
@@ -734,7 +760,9 @@ accessRouter.post(
 
             metadata: {
               gateCode: gate.code,
-              gateName: gate.name
+              gateName: gate.name,
+              requestId: parsed.data.requestId ?? null,
+              gateDeviceId: physicalDevice.id
             }
           }
         });
@@ -787,7 +815,9 @@ accessRouter.post(
                   metadata: {
                     gateCode: gate.code,
                     gateName: gate.name,
-                    commandIssued: "UNLOCK"
+                    commandIssued: "UNLOCK",
+                    requestId: parsed.data.requestId ?? null,
+                    gateDeviceId: physicalDevice.id
                   }
                 }
               });
