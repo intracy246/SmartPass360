@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
-  approveAndIssueVisitor,
+  approveVisitor,
   checkOutVisitor,
   denyVisitor,
   getVisitorOperations
@@ -54,7 +54,7 @@ export function OperationsPage() {
 
   const visitorReview = useMutation({
     mutationFn: ({ visitId, decision }: { visitId: string; decision: "APPROVE" | "DENY" }) =>
-      decision === "APPROVE" ? approveAndIssueVisitor(visitId) : denyVisitor(visitId),
+      decision === "APPROVE" ? approveVisitor(visitId) : denyVisitor(visitId),
     onSuccess: refresh
   });
   const visitorCheckout = useMutation({
@@ -118,7 +118,7 @@ export function OperationsPage() {
             <td>{visit.vehicleNumber ?? "—"}</td>
             <td>{formatDate(visit.registeredAt)}</td>
             <td><div className="operations-page__actions">
-              <GlassButton type="button" disabled={visitorReview.isPending} onClick={() => visitorReview.mutate({ visitId: visit.id, decision: "APPROVE" })}>Approve & Issue Pass</GlassButton>
+              <GlassButton type="button" disabled={visitorReview.isPending} onClick={() => visitorReview.mutate({ visitId: visit.id, decision: "APPROVE" })}>Approve Visitor</GlassButton>
               <GlassButton type="button" variant="secondary" disabled={visitorReview.isPending} onClick={() => visitorReview.mutate({ visitId: visit.id, decision: "DENY" })}>Deny</GlassButton>
             </div></td>
           </tr>)}</tbody>
