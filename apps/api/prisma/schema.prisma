@@ -576,6 +576,7 @@ model VehicleAccessEvent {
   authorizedVehicleId    String?               @map("authorized_vehicle_id") @db.Uuid
   permanentPassId        String?               @map("permanent_pass_id") @db.Uuid
   gateId                 String                @map("gate_id") @db.Uuid
+  gateAccessDeviceId     String?               @map("gate_access_device_id") @db.Uuid
   vehicleAccessRequestId String?               @map("vehicle_access_request_id") @db.Uuid
   deviceRequestId        String?               @map("device_request_id")
   plateNumber            String                @map("plate_number")
@@ -594,6 +595,7 @@ model VehicleAccessEvent {
   authorizedVehicle    AuthorizedVehicle?    @relation(fields: [authorizedVehicleId], references: [id], onDelete: SetNull)
   permanentPass        PermanentPass?        @relation(fields: [permanentPassId], references: [id], onDelete: SetNull)
   gate                 Gate                  @relation(fields: [gateId], references: [id], onDelete: Restrict)
+  gateAccessDevice     GateAccessDevice?      @relation(fields: [gateAccessDeviceId], references: [id], onDelete: SetNull)
   vehicleAccessRequest VehicleAccessRequest? @relation(fields: [vehicleAccessRequestId], references: [id], onDelete: SetNull)
 
   @@unique([siteId, deviceRequestId])
@@ -601,6 +603,7 @@ model VehicleAccessEvent {
   @@index([authorizedVehicleId, occurredAt])
   @@index([permanentPassId])
   @@index([gateId, occurredAt])
+  @@index([gateAccessDeviceId])
   @@index([vehicleAccessRequestId])
   @@index([siteId, normalizedPlateNumber, occurredAt])
   @@map("vehicle_access_events")

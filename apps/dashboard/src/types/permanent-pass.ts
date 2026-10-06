@@ -21,6 +21,16 @@ export type PermanentPassActivityType =
   | "ENTRY"
   | "EXIT";
 
+export type PermanentPassVehicle = {
+  id: string;
+  plateNumber: string;
+  normalizedPlateNumber: string;
+  isActive: boolean;
+  isCurrentlyInside: boolean;
+  lastEntryAt?: string | null;
+  lastExitAt?: string | null;
+};
+
 export type PermanentPass = {
   id: string;
 
@@ -43,6 +53,7 @@ export type PermanentPass = {
   phone?: string | null;
   email?: string | null;
   photoUrl?: string | null;
+  vehicle?: PermanentPassVehicle | null;
 
   validFrom: string;
   expiryType: PermanentPassExpiryType;
@@ -93,6 +104,7 @@ export type CreatePermanentPassPayload = {
   email?: string;
 
   photoDataUrl?: string;
+  vehiclePlateNumber?: string;
 
   validFrom: string;
   expiryType: PermanentPassExpiryType;
@@ -119,6 +131,7 @@ export type UpdatePermanentPassPayload = {
   phone?: string | null;
 
   email?: string | null;
+  vehiclePlateNumber?: string | null;
 };
 export type UpdatePermanentPassStatusPayload = {
   status: PermanentPassStatus;

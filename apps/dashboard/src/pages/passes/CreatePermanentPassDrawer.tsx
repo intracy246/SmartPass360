@@ -44,6 +44,7 @@ type PermanentPassFormState = {
   department: string;
   holderType: PermanentPassHolderType;
   phone: string;
+  vehiclePlateNumber: string;
   photoDataUrl: string;
 };
 
@@ -71,6 +72,7 @@ const initialFormState: PermanentPassFormState = {
   department: "",
   holderType: "EMPLOYEE",
   phone: "",
+  vehiclePlateNumber: "",
   photoDataUrl: ""
 };
 
@@ -425,6 +427,9 @@ export function CreatePermanentPassDrawer({
 
         phone:
           form.phone.trim(),
+
+        vehiclePlateNumber:
+          form.vehiclePlateNumber.trim() || undefined,
 
         photoDataUrl:
           form.photoDataUrl ||
@@ -878,6 +883,29 @@ export function CreatePermanentPassDrawer({
                     {formErrors.phone}
                   </small>
                 )}
+              </label>
+
+              <label className="permanent-pass-field">
+                <span>
+                  Vehicle Plate Number
+                </span>
+
+                <input
+                  type="text"
+                  value={form.vehiclePlateNumber}
+                  placeholder="T 123 DAO"
+                  autoComplete="off"
+                  onChange={(event) => {
+                    updateField(
+                      "vehiclePlateNumber",
+                      event.target.value.toUpperCase()
+                    );
+                  }}
+                />
+
+                <small>
+                  Optional. Register the holder's vehicle for ANPR automatic gate access.
+                </small>
               </label>
             </div>
           </div>

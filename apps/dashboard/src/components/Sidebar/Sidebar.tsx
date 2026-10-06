@@ -35,6 +35,11 @@ const navigationItems = [
     symbol: "▣"
   },
   {
+    label: "Vehicles",
+    path: "/vehicles",
+    symbol: "▤"
+  },
+  {
     label: "Users",
     path: "/users",
     symbol: "◉"
