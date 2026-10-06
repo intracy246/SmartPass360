@@ -7,6 +7,7 @@ export function IssuedVisitorTicket({ pass }: { pass: KioskIssuedPass }) {
   const [qrImage, setQrImage] = useState("");
   const [error, setError] = useState("");
   const printed = useRef(false);
+  const autoPrintEnabled = import.meta.env.VITE_KIOSK_AUTO_PRINT !== "false";
   useEffect(() => {
     let active = true;
     QRCode.toDataURL(pass.qrValue, { width: 300, margin: 4, errorCorrectionLevel: "M" })
@@ -15,7 +16,7 @@ export function IssuedVisitorTicket({ pass }: { pass: KioskIssuedPass }) {
     return () => { active = false; };
   }, [pass.qrValue]);
   useEffect(() => {
-    if (!qrImage || printed.current) return;
+    if (!autoPrintEnabled || !qrImage || printed.current) return;
     let active = true;
     const images = [...document.querySelectorAll<HTMLImageElement>(".visitor-ticket img")];
     void Promise.all(images.map(img => img.decode().catch(() => undefined))).then(() => {
@@ -24,7 +25,7 @@ export function IssuedVisitorTicket({ pass }: { pass: KioskIssuedPass }) {
       window.print();
     });
     return () => { active = false; };
-  }, [qrImage]);
+  }, [autoPrintEnabled, qrImage]);
   return <>
     <article className="visitor-ticket" aria-label="Printable visitor pass">
       {pass.site.logoUrl && <img className="visitor-ticket__logo" src={pass.site.logoUrl} alt={pass.site.name} />}
