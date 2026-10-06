@@ -15,6 +15,7 @@ import { kioskRouter } from "./routes/kiosk.routes";
 import { ownerRouter } from "./routes/owner.routes";
 import { visitorRouter } from "./routes/visitor.routes";
 import { visitorPassRouter } from "./routes/visitor-pass.routes";
+import { vehicleAccessRouter } from "./routes/vehicle-access.routes";
 
 export const app = express();
 
@@ -88,6 +89,7 @@ app.use("/api/v1/kiosks", kioskRouter);
 app.use("/api/v1/auth", ownerRouter);
 app.use("/api/v1/visitors", visitorRouter);
 app.use("/api/v1/passes", visitorPassRouter);
+app.use("/api/v1/vehicle-access", vehicleAccessRouter);
 
 app.use(notFoundHandler);
 
