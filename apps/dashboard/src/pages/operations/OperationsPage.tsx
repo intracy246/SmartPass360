@@ -61,8 +61,12 @@ export function OperationsPage() {
     mutationFn: checkOutVisitor,
     onSuccess: refresh
   });
-  const vehicleReview = useMutation({
-    mutationFn: ({ requestId, decision }: { requestId: string; decision: "APPROVE" | "DENY" }) =>
+  const vehicleReview = useMutation<
+    { data: import("../../api/vehicle-access-api").VehicleAccessRequest; action: "UNLOCK" | "KEEP_LOCKED" },
+    Error,
+    { requestId: string; decision: "APPROVE" | "DENY" }
+  >({
+    mutationFn: ({ requestId, decision }) =>
       decision === "APPROVE" ? approveVehicleRequest(requestId) : denyVehicleRequest(requestId),
     onSuccess: refresh
   });
