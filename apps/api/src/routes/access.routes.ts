@@ -439,6 +439,34 @@ accessRouter.patch("/gate-devices/:deviceId", requireBuilding, async (request, r
   }
 });
 
+function getGateDeviceKey(request: any) {
+  const raw = request.headers["x-gate-device-key"] ?? request.headers["x-device-key"];
+  return typeof raw === "string" && raw.trim() ? raw.trim() : null;
+}
+
+async function authenticatePhysicalGateDevice(request: any, gateId: string) {
+  const key = getGateDeviceKey(request);
+  if (!key) return null;
+
+  return prisma.gateAccessDevice.findFirst({
+    where: {
+      gateId,
+      deviceKeyHash: hashGateDeviceKey(key),
+      isActive: true,
+      site: { isActive: true, status: "ACTIVE" },
+      gate: {
+        isActive: true,
+        status: "ONLINE",
+        organization: {
+          isActive: true,
+          siteOrganizations: { some: { isActive: true } }
+        }
+      }
+    },
+    include: { gate: true }
+  });
+}
+
 const scanSchema = z.object({
   qrCode: z.string().trim().min(1).max(2000),
   gateId: z.string().uuid()
@@ -480,6 +508,16 @@ accessRouter.post(
             message: "Invalid gate scan request.",
             details: parsed.error.flatten()
           }
+        });
+        return;
+      }
+
+      const physicalDevice = await authenticatePhysicalGateDevice(request, parsed.data.gateId);
+      if (!physicalDevice) {
+        response.status(401).json({
+          decision: "DENIED",
+          denialReason: "UNAUTHORIZED_GATE_DEVICE",
+          turnstileCommand: "KEEP_LOCKED"
         });
         return;
       }
