@@ -10,6 +10,7 @@ import { DashboardPage } from "../pages/dashboard/DashboardPage";
 import { VisitorsPage } from "../pages/visitors/VisitorsPage";
 import { PassesPage } from "../pages/passes/PassesPage";
 import { AccessControlPage } from "../pages/access/AccessControlPage";
+import { GateSetupPage } from "../pages/access/GateSetupPage";
 import { OrganizationsPage } from "../pages/organizations/OrganizationsPage";
 import { SettingsPage } from "../pages/settings/SettingsPage";
 import { LoginPage } from "../pages/auth/LoginPage";
@@ -87,6 +88,8 @@ export function AppRouter() {
   path="access"
   element={<AccessControlPage />}
 />
+
+        <Route path="gate-setup" element={<GateSetupPage />} />
 
       <Route
   path="organizations"

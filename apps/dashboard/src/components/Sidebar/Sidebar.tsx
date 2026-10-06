@@ -25,6 +25,11 @@ const navigationItems = [
     symbol: "⌁"
   },
   {
+    label: "Gate Setup",
+    path: "/gate-setup",
+    symbol: "⊞"
+  },
+  {
     label: "Organizations",
     path: "/organizations",
     symbol: "▦"
