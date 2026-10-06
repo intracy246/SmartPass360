@@ -140,6 +140,7 @@ vehicleAccessRouter.post("/recognize", async (request, response, next) => {
       plateNumber: z.string().trim().min(3).max(30),
       direction: directionSchema.optional(),
       confidence: z.number().min(0).max(1).optional(),
+      snapshotUrl: z.string().trim().url().max(2000).optional(),
       requestId: z.string().trim().min(1).max(200).optional()
     }).safeParse(request.body);
 
@@ -318,6 +319,7 @@ vehicleAccessRouter.post("/recognize", async (request, response, next) => {
       const expectedVisit = await findExpectedVisitorVehicle(siteId, normalizedPlateNumber, direction, now);
 
       if (expectedVisit?.pass) {
+        const visitorPass = expectedVisit.pass;
         const event = await prisma.$transaction(async (transaction) => {
           const created = await transaction.vehicleAccessEvent.create({
             data: {
@@ -337,9 +339,9 @@ vehicleAccessRouter.post("/recognize", async (request, response, next) => {
                 gateDeviceId: device.id,
                 gateDeviceName: device.name,
                 visitId: expectedVisit.id,
-                visitorPassId: expectedVisit.pass.id,
+                visitorPassId: visitorPass.id,
                 visitorName: expectedVisit.visitor.fullName,
-                passNumber: expectedVisit.pass.passNumber
+                passNumber: visitorPass.passNumber
               }, "DELIVERED_INLINE")
             }
           });
@@ -353,7 +355,7 @@ vehicleAccessRouter.post("/recognize", async (request, response, next) => {
 
           if (direction === "EXIT") {
             await transaction.visitorPass.update({
-              where: { id: expectedVisit.pass.id },
+              where: { id: visitorPass.id },
               data: { status: "USED" }
             });
           }
@@ -375,7 +377,7 @@ vehicleAccessRouter.post("/recognize", async (request, response, next) => {
             visitId: expectedVisit.id,
             visitorId: expectedVisit.visitor.id,
             fullName: expectedVisit.visitor.fullName,
-            passNumber: expectedVisit.pass.passNumber,
+            passNumber: visitorPass.passNumber,
             vehicleNumber: expectedVisit.visitor.vehicleNumber
           },
           gate: { id: gate.id, name: gate.name, direction }
@@ -397,6 +399,7 @@ vehicleAccessRouter.post("/recognize", async (request, response, next) => {
         normalizedPlateNumber,
         direction,
         confidence: parsed.data.confidence ?? null,
+        snapshotUrl: parsed.data.snapshotUrl ?? null,
         status: "PENDING",
         reason: requestReason
       },
