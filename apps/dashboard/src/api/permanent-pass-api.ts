@@ -147,3 +147,16 @@ export function replacePermanentPass(
   );
 }
 
+
+export function reprintPermanentPass(
+  permanentPassId: string
+) {
+  return apiRequest<ReplacePermanentPassResponse>(
+    `/permanent-passes/${encodeURIComponent(
+      permanentPassId
+    )}/reprint`,
+    {
+      method: "POST"
+    }
+  );
+}

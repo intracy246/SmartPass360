@@ -33,6 +33,11 @@ const environmentSchema = z.object({
     .min(32)
     .default("smartpass360-development-secret-change-this"),
 
+  PERMANENT_PASS_QR_ENCRYPTION_KEY: z
+    .string()
+    .min(32)
+    .optional(),
+
   OWNER_USERNAME: z
     .string()
     .min(3)

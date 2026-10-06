@@ -1350,18 +1350,32 @@ export function PassesPage() {
                                     type="button"
                                     variant="secondary"
                                     onClick={async () => {
-                                      if (!pass.qrToken) {
-                                        window.alert(
-                                          "This permanent pass has no QR token."
-                                        );
-                                        return;
-                                      }
-
                                       try {
+                                        const {
+                                          reprintPermanentPass
+                                        } = await import(
+                                          "../../api/permanent-pass-api"
+                                        );
+
+                                        const reprint =
+                                          await reprintPermanentPass(
+                                            pass.id
+                                          );
+
+                                        const currentPass =
+                                          reprint.data;
+
+                                        if (!currentPass.qrToken) {
+                                          throw new Error(
+                                            "The active QR credential was not returned."
+                                          );
+                                        }
+
                                         const QRCode =
                                           await import("qrcode");
 
-                                        const payload = pass.qrToken;
+                                        const payload =
+                                          currentPass.qrToken;
 
                                         const qrDataUrl =
                                           await QRCode.toDataURL(

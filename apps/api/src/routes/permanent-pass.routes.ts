@@ -3,6 +3,7 @@ import { Router } from "express";
 import { z } from "zod";
 
 import { prisma } from "../lib/prisma";
+import { env } from "../config/env";
 import { requireBuilding, type AuthUser } from "../middleware/auth.middleware";
 
 export const permanentPassRouter = Router();
@@ -90,6 +91,36 @@ const replaceSchema = z.object({
 
 function createQrToken() {
   return crypto.randomBytes(32).toString("base64url");
+}
+
+function permanentQrEncryptionKey() {
+  const secret = env.PERMANENT_PASS_QR_ENCRYPTION_KEY ?? env.AUTH_JWT_SECRET;
+  return crypto.createHash("sha256").update(secret).digest();
+}
+
+function encryptQrToken(token: string) {
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv("aes-256-gcm", permanentQrEncryptionKey(), iv);
+  const ciphertext = Buffer.concat([cipher.update(token, "utf8"), cipher.final()]);
+  const authTag = cipher.getAuthTag();
+  return `v1.${iv.toString("base64url")}.${authTag.toString("base64url")}.${ciphertext.toString("base64url")}`;
+}
+
+function decryptQrToken(value: string) {
+  const [version, ivValue, authTagValue, ciphertextValue] = value.split(".");
+  if (version !== "v1" || !ivValue || !authTagValue || !ciphertextValue) {
+    throw new Error("Unsupported permanent QR credential format.");
+  }
+  const decipher = crypto.createDecipheriv(
+    "aes-256-gcm",
+    permanentQrEncryptionKey(),
+    Buffer.from(ivValue, "base64url")
+  );
+  decipher.setAuthTag(Buffer.from(authTagValue, "base64url"));
+  return Buffer.concat([
+    decipher.update(Buffer.from(ciphertextValue, "base64url")),
+    decipher.final()
+  ]).toString("utf8");
 }
 
 function hashQrToken(token: string) {
@@ -377,6 +408,7 @@ permanentPassRouter.post("/", async (request, response, next) => {
           organizationId: input.organizationId,
           passNumber: createPassNumber(),
           qrTokenHash: hashQrToken(qrToken),
+          qrTokenEncrypted: encryptQrToken(qrToken),
           fullName: input.fullName,
           staffNumber: input.staffNumber || null,
           department: input.department,
@@ -575,6 +607,72 @@ permanentPassRouter.patch("/:permanentPassId/status", async (request, response, 
   }
 });
 
+
+permanentPassRouter.post("/:permanentPassId/reprint", async (request, response, next) => {
+  try {
+    const permanentPassId = z.string().uuid().safeParse(request.params.permanentPassId);
+    if (!permanentPassId.success) return validationError(response, permanentPassId.error.flatten());
+
+    const user = response.locals.authUser as AuthUser;
+    const pass = await prisma.permanentPass.findFirst({
+      where: buildingPassWhere(user.siteId!, permanentPassId.data),
+      include: vehicleInclude()
+    });
+
+    if (!pass) {
+      return response.status(404).json({
+        error: { code: "PERMANENT_PASS_NOT_FOUND", message: "Permanent pass was not found." }
+      });
+    }
+
+    if (pass.status !== "ACTIVE") {
+      return response.status(409).json({
+        error: {
+          code: "PERMANENT_PASS_NOT_ACTIVE",
+          message: "Only an active permanent pass can be reprinted."
+        }
+      });
+    }
+
+    if (!pass.qrTokenEncrypted) {
+      return response.status(409).json({
+        error: {
+          code: "LEGACY_QR_NOT_REPRINTABLE",
+          message: "This pass was created before secure QR reprinting was enabled. Replace QR once to issue a new active credential; after that, Print QR will reprint that same credential."
+        }
+      });
+    }
+
+    let qrToken: string;
+    try {
+      qrToken = decryptQrToken(pass.qrTokenEncrypted);
+    } catch {
+      return response.status(500).json({
+        error: {
+          code: "QR_CREDENTIAL_DECRYPTION_FAILED",
+          message: "The active QR credential could not be recovered. Do not replace it unless an administrator intends to invalidate the current QR."
+        }
+      });
+    }
+
+    if (hashQrToken(qrToken) !== pass.qrTokenHash) {
+      return response.status(500).json({
+        error: {
+          code: "QR_CREDENTIAL_INTEGRITY_FAILED",
+          message: "The stored QR credential failed integrity verification."
+        }
+      });
+    }
+
+    return response.status(200).json({
+      data: serializePermanentPass(pass, qrToken),
+      message: "Current active QR credential retrieved for reprint."
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 permanentPassRouter.post("/:permanentPassId/replace", async (request, response, next) => {
   try {
     const permanentPassId = z.string().uuid().safeParse(request.params.permanentPassId);
@@ -609,7 +707,10 @@ permanentPassRouter.post("/:permanentPassId/replace", async (request, response, 
     const qrToken = createQrToken();
     const pass = await prisma.permanentPass.update({
       where: { id: existing.id },
-      data: { qrTokenHash: hashQrToken(qrToken) },
+      data: {
+        qrTokenHash: hashQrToken(qrToken),
+        qrTokenEncrypted: encryptQrToken(qrToken)
+      },
       include: vehicleInclude()
     });
 
