@@ -301,3 +301,59 @@
     align-items: stretch;
   }
 }
+
+
+.operations-activity__message {
+  margin: 0;
+  padding: 28px 0;
+  color: #8fa0b8;
+  text-align: center;
+}
+
+.operations-activity__message--error {
+  color: #ff8a9c;
+}
+
+.operations-activity__list {
+  display: grid;
+  gap: 10px;
+}
+
+.operations-activity__item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 18px;
+  padding: 14px 16px;
+  border: 1px solid rgba(139, 92, 246, 0.14);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.operations-activity__item > div {
+  display: grid;
+  gap: 5px;
+}
+
+.operations-activity__item > div:last-child {
+  text-align: right;
+}
+
+.operations-activity__item strong {
+  color: #f8f8ff;
+  font-size: 13px;
+}
+
+.operations-activity__item span {
+  color: #8193aa;
+  font-size: 11px;
+}
+
+@media (max-width: 620px) {
+  .operations-activity__item {
+    grid-template-columns: 1fr;
+  }
+
+  .operations-activity__item > div:last-child {
+    text-align: left;
+  }
+}
