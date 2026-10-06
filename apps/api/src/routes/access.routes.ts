@@ -20,7 +20,7 @@ accessRouter.post("/validate", requireBuilding, async (request, response, next) 
 accessRouter.get("/gates", requireBuilding, async (_request, response, next) => {
   try {
     const user = response.locals.authUser as AuthUser;
-    const gates = await prisma.gate.findMany({ where: { organization: { siteOrganizations: { some: { siteId: user.siteId!, isActive: true } } } }, select: { id: true, name: true, direction: true, isActive: true, status: true } });
+    const gates = await prisma.gate.findMany({ where: { organization: { siteOrganizations: { some: { siteId: user.siteId!, isActive: true } } } }, select: { id: true, code: true, name: true, location: true, direction: true, isActive: true, status: true, organization: { select: { id: true, name: true } } }, orderBy: { createdAt: "desc" } });
     return response.json({ success: true, data: gates });
   } catch (error) { return next(error); }
 });
