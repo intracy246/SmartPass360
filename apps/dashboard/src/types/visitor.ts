@@ -8,25 +8,33 @@ export type VisitorType =
   | "GOVERNMENT_OFFICIAL"
   | "VIP";
 
-export type CreateVisitorPayload = {
-  fullName: string;
-  idType?: string;
-  idNumber?: string;
-  phone?: string;
-  email?: string;
-  company?: string;
-  vehicleNumber?: string;
-};
+export type VisitorIdentificationType =
+  | "NONE"
+  | "NATIONAL_ID"
+  | "PASSPORT"
+  | "DRIVING_LICENCE"
+  | "VOTER_ID"
+  | "OTHER";
 
 export type CreateVisitPayload = {
-  visitor: CreateVisitorPayload;
-  visitorType: VisitorType;
-  hostId?: string;
-  departmentId?: string;
-  purpose: string;
-  scheduledDate?: string;
-  expectedEntryTime?: string;
-  expectedExitTime?: string;
+  organizationId: string;
+  fullName: string;
+  phoneNumber: string;
+  identificationType: VisitorIdentificationType;
+  identificationNumber?: string;
+  companyName?: string;
+  vehicleRegistrationNumber?: string;
+  departmentOrOffice?: string;
+  hostName?: string;
+  purposeOfVisit?: string;
+};
+
+export type IssuedVisitorPass = {
+  passNumber: string;
+  qrValue: string;
+  issuedAt: string;
+  validFrom: string;
+  validUntil: string;
 };
 
 export type VisitorRegistrationResponse = {
@@ -34,8 +42,9 @@ export type VisitorRegistrationResponse = {
   data: {
     visitorId: string;
     visitId: string;
-    status: string;
-    passNumber?: string;
+    status: "PASS_ISSUED";
+    source: "RECEPTION";
+    pass: IssuedVisitorPass;
   };
 };
 

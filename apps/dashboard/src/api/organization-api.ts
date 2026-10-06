@@ -9,7 +9,8 @@ import type {
 export function getOrganizations(
   search = "",
   page = 1,
-  pageSize = 20
+  pageSize = 20,
+  active?: boolean
 ): Promise<OrganizationListResponse> {
   const searchParams = new URLSearchParams({
     page: String(page),
@@ -18,6 +19,10 @@ export function getOrganizations(
 
   if (search.trim()) {
     searchParams.set("search", search.trim());
+  }
+
+  if (active !== undefined) {
+    searchParams.set("active", String(active));
   }
 
   return apiRequest<OrganizationListResponse>(

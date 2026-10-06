@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 import { getApiHealth } from "../../api/health-api";
 import { GlassButton } from "../../components/Buttons/GlassButton";
@@ -6,6 +7,7 @@ import { GlassCard } from "../../components/Cards/GlassCard";
 import "./DashboardPage.css";
 
 export function DashboardPage() {
+  const navigate = useNavigate();
   const healthQuery = useQuery({
     queryKey: ["api-health"],
     queryFn: getApiHealth,
@@ -33,7 +35,10 @@ export function DashboardPage() {
             Export Report
           </GlassButton>
 
-          <GlassButton>
+          <GlassButton
+            type="button"
+            onClick={() => navigate("/visitors?mode=register#register-visitor")}
+          >
             Register Visitor
           </GlassButton>
         </div>

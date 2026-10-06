@@ -59,14 +59,27 @@ export function VisitorPassPreview({
   organizationName = "SMARTPASS360",
   organizationSubtitle = "Secure Visitor Access"
 }: VisitorPassPreviewProps) {
-  const [qrImage, setQrImage] = useState("");
+  const [generatedQr, setGeneratedQr] = useState<{
+    value: string;
+    image: string;
+  } | null>(null);
   useEffect(() => {
     let active = true;
-    if (data.qrValue) void QRCode.toDataURL(data.qrValue, { width: 240, margin: 4 })
-      .then(image => { if (active) setQrImage(image); })
-      .catch(() => { if (active) setQrImage(""); });
+    const qrValue = data.qrValue;
+    if (qrValue && !qrValue.startsWith("data:image/")) {
+      void QRCode.toDataURL(qrValue, { width: 240, margin: 4 })
+        .then(image => {
+          if (active) setGeneratedQr({ value: qrValue, image });
+        })
+        .catch(() => undefined);
+    }
     return () => { active = false; };
   }, [data.qrValue]);
+  const qrImage = data.qrValue?.startsWith("data:image/")
+    ? data.qrValue
+    : generatedQr && generatedQr.value === data.qrValue
+      ? generatedQr.image
+      : "";
   const displayName =
     data.fullName.trim() || "Visitor name";
 

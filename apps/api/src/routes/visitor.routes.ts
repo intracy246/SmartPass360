@@ -4,7 +4,15 @@ import { z } from "zod";
 
 import { prisma } from "../lib/prisma";
 import { requireBuilding, type AuthUser } from "../middleware/auth.middleware";
-import { activeMembership, getActivatedKiosk, hashToken, publicVisit, visitInclude } from "../lib/visitor-workflow";
+import {
+  activeMembership,
+  getActivatedKiosk,
+  hashToken,
+  issueVisitorPass,
+  publicVisit,
+  visitorPassQrValue,
+  visitInclude
+} from "../lib/visitor-workflow";
 
 export const visitorRouter = Router();
 
@@ -35,7 +43,7 @@ const kioskRegistrationSchema = z.object({
 const receptionRegistrationSchema = z.object({
   organizationId: z.string().uuid(),
   fullName: z.string().trim().min(3).max(200),
-  phoneNumber: z.string().trim().min(7).max(40).optional(),
+  phoneNumber: z.string().trim().min(7).max(40),
   identificationType: idTypeSchema.default("NONE"),
   identificationNumber: z.string().trim().max(200).optional(),
   companyName: z.string().trim().max(200).optional(),
@@ -43,6 +51,17 @@ const receptionRegistrationSchema = z.object({
   departmentOrOffice: z.string().trim().max(200).optional(),
   hostName: z.string().trim().max(200).optional(),
   purposeOfVisit: z.string().trim().max(1000).optional()
+}).superRefine((value, context) => {
+  if (
+    value.identificationType !== "NONE" &&
+    !value.identificationNumber?.trim()
+  ) {
+    context.addIssue({
+      code: "custom",
+      path: ["identificationNumber"],
+      message: "Identification number is required for the selected identification type."
+    });
+  }
 });
 
 async function organizationBelongsToSite(siteId: string, organizationId: string) {
@@ -168,19 +187,94 @@ visitorRouter.post("/register", requireBuilding, async (request, response, next)
     }
 
     const user = response.locals.authUser as AuthUser;
-    if (!(await organizationBelongsToSite(user.siteId!, parsed.data.organizationId))) {
+    const token = crypto.randomBytes(32).toString("base64url");
+    const qrValue = await (await import("qrcode")).default.toDataURL(
+      visitorPassQrValue(token),
+      { width: 300, margin: 4, errorCorrectionLevel: "M" }
+    );
+
+    const result = await prisma.$transaction(async (tx) => {
+      const membership = await tx.siteOrganization.findFirst({
+        where: {
+          siteId: user.siteId!,
+          organizationId: parsed.data.organizationId,
+          isActive: true,
+          organization: { isActive: true },
+          site: { isActive: true, status: "ACTIVE" }
+        },
+        select: { id: true }
+      });
+
+      if (!membership) return null;
+
+      const visitor = await tx.visitor.create({
+        data: {
+          organizationId: parsed.data.organizationId,
+          fullName: parsed.data.fullName,
+          idType:
+            parsed.data.identificationType === "NONE"
+              ? undefined
+              : parsed.data.identificationType,
+          idNumberEncrypted:
+            parsed.data.identificationType === "NONE"
+              ? undefined
+              : parsed.data.identificationNumber,
+          phone: parsed.data.phoneNumber,
+          company: parsed.data.companyName,
+          vehicleNumber: parsed.data.vehicleRegistrationNumber
+        }
+      });
+
+      const approvedAt = new Date();
+      const visit = await tx.visitRequest.create({
+        data: {
+          siteId: user.siteId!,
+          source: "RECEPTION",
+          organizationId: parsed.data.organizationId,
+          visitorId: visitor.id,
+          visitorType: "WALK_IN",
+          purpose: parsed.data.purposeOfVisit ?? "",
+          destinationOffice: parsed.data.departmentOrOffice,
+          hostNameSnapshot: parsed.data.hostName,
+          approvalRequired: false,
+          approvedAt,
+          status: "APPROVED"
+        }
+      });
+
+      const { pass } = await issueVisitorPass(tx, {
+        visitId: visit.id,
+        organizationId: visit.organizationId,
+        token,
+        validFrom: approvedAt
+      });
+
+      return { visitor, visit, pass };
+    });
+
+    if (!result) {
       return response.status(403).json({
-        error: { code: "INVALID_ORGANIZATION", message: "Selected organization does not belong to your building." }
+        error: {
+          code: "INVALID_ORGANIZATION",
+          message: "Selected organization does not belong to your building or is unavailable."
+        }
       });
     }
 
-    const { visitor, visit } = await createVisit({ ...parsed.data, siteId: user.siteId!, source: "RECEPTION" });
     return response.status(201).json({
       success: true,
       data: {
-        visitorId: visitor.id,
-        visitId: visit.id,
-        status: visit.status
+        visitorId: result.visitor.id,
+        visitId: result.visit.id,
+        status: "PASS_ISSUED",
+        source: "RECEPTION",
+        pass: {
+          passNumber: result.pass.passNumber,
+          qrValue,
+          issuedAt: result.pass.issuedAt,
+          validFrom: result.pass.validFrom,
+          validUntil: result.pass.validUntil
+        }
       }
     });
   } catch (error) {
@@ -246,27 +340,18 @@ visitorRouter.post<{ visitId: string }>("/:visitId/approve-and-issue", requireBu
         return { conflict: true as const };
       }
 
-      const existingPass = await tx.visitorPass.findUnique({ where: { visitId: visit.id } });
       const token = crypto.randomBytes(32).toString("base64url");
       const now = new Date();
-      const pass = existingPass ?? await tx.visitorPass.create({
-        data: {
-          organizationId: visit.organizationId,
-          visitId: visit.id,
-          passNumber: `VP-${crypto.randomBytes(8).toString("hex").toUpperCase()}`,
-          qrTokenHash: hashToken(token),
-          validFrom: now,
-          validUntil: new Date(now.getTime() + 8 * 60 * 60 * 1000)
-        }
+      const { pass, created } = await issueVisitorPass(tx, {
+        visitId: visit.id,
+        organizationId: visit.organizationId,
+        token,
+        validFrom: now
       });
-
-      if (!existingPass) {
-        await tx.visitRequest.update({ where: { id: visit.id }, data: { status: "PASS_ISSUED" } });
-      }
 
       return {
         passNumber: pass.passNumber,
-        qrToken: existingPass ? null : token,
+        qrToken: created ? token : null,
         fullName: visit.visitor.fullName,
         organizationName: visit.organization.name,
         issuedAt: pass.issuedAt,
@@ -279,7 +364,7 @@ visitorRouter.post<{ visitId: string }>("/:visitId/approve-and-issue", requireBu
     if (!result.qrToken) return response.status(409).json({ error: { code: "PASS_ALREADY_ISSUED", message: "This pass was already issued from the kiosk flow." } });
 
     const QRCode = (await import("qrcode")).default;
-    const qrValue = await QRCode.toDataURL(`smartpass360://visitor-pass/${result.qrToken}`, { width: 300, margin: 4, errorCorrectionLevel: "M" });
+    const qrValue = await QRCode.toDataURL(visitorPassQrValue(result.qrToken), { width: 300, margin: 4, errorCorrectionLevel: "M" });
 
     return response.json({
       success: true,
@@ -342,18 +427,18 @@ visitorRouter.post<{ visitId: string }>("/:visitId/kiosk-pass", async (request, 
       if (!membership) return null;
       const now = new Date();
       if (visit.pass && (visit.pass.status !== "ACTIVE" || visit.pass.validUntil <= now || visit.pass.qrTokenHash !== hashToken(token))) return null;
-      const pass = visit.pass ?? await tx.visitorPass.create({ data: {
-        organizationId: visit.organizationId, visitId: visit.id,
-        passNumber: `VP-${crypto.randomBytes(8).toString("hex").toUpperCase()}`,
-        qrTokenHash: hashToken(token), validFrom: now, validUntil: new Date(now.getTime() + 8 * 60 * 60 * 1000)
-      } });
-      await tx.visitRequest.update({ where: { id: visit.id }, data: { status: "PASS_ISSUED" } });
+      const { pass } = await issueVisitorPass(tx, {
+        visitId: visit.id,
+        organizationId: visit.organizationId,
+        token,
+        validFrom: now
+      });
       return {
         passId: pass.id, passNumber: pass.passNumber, fullName: visit.visitor.fullName,
         site: visit.site, organization: visit.organization,
         departmentOrOffice: visit.destinationOffice, hostName: visit.hostNameSnapshot, purpose: visit.purpose,
         issuedAt: pass.issuedAt, validFrom: pass.validFrom, validUntil: pass.validUntil,
-        qrValue: `smartpass360://visitor-pass/${token}`
+        qrValue: visitorPassQrValue(token)
       };
     });
     if (!result) return response.status(409).json({ error: { code: "PASS_NOT_ISSUABLE", message: "This visit must be approved and eligible before issuing an entry pass." } });

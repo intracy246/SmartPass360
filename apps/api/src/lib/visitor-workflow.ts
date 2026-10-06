@@ -5,6 +5,50 @@ import type { Prisma } from "../generated/prisma/client";
 
 export const hashToken = (token: string) => crypto.createHash("sha256").update(token).digest("hex");
 
+export const visitorPassQrValue = (token: string) =>
+  `smartpass360://visitor-pass/${token}`;
+
+export async function issueVisitorPass(
+  transaction: Prisma.TransactionClient,
+  input: {
+    visitId: string;
+    organizationId: string;
+    token: string;
+    validFrom?: Date;
+  }
+) {
+  const validFrom = input.validFrom ?? new Date();
+  const existingPass = await transaction.visitorPass.findUnique({
+    where: { visitId: input.visitId }
+  });
+
+  if (existingPass) {
+    await transaction.visitRequest.update({
+      where: { id: input.visitId },
+      data: { status: "PASS_ISSUED" }
+    });
+    return { pass: existingPass, created: false };
+  }
+
+  const pass = await transaction.visitorPass.create({
+    data: {
+      organizationId: input.organizationId,
+      visitId: input.visitId,
+      passNumber: `VP-${crypto.randomBytes(8).toString("hex").toUpperCase()}`,
+      qrTokenHash: hashToken(input.token),
+      validFrom,
+      validUntil: new Date(validFrom.getTime() + 8 * 60 * 60 * 1000)
+    }
+  });
+
+  await transaction.visitRequest.update({
+    where: { id: input.visitId },
+    data: { status: "PASS_ISSUED" }
+  });
+
+  return { pass, created: true };
+}
+
 export const visitInclude = {
   visitor: true,
   organization: { select: { id: true, name: true } },
