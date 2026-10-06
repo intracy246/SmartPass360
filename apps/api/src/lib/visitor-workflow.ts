@@ -59,7 +59,8 @@ export const visitInclude = {
 export function publicVisit(visit: Prisma.VisitRequestGetPayload<{ include: typeof visitInclude }>) {
   return {
     id: visit.id, visitorId: visit.visitorId, fullName: visit.visitor.fullName,
-    phone: visit.visitor.phone, organization: visit.organization,
+    phone: visit.visitor.phone, company: visit.visitor.company,
+    vehicleNumber: visit.visitor.vehicleNumber, organization: visit.organization,
     departmentOrOffice: visit.destinationOffice, hostName: visit.hostNameSnapshot,
     purpose: visit.purpose, registeredAt: visit.createdAt, source: visit.source,
     status: visit.status, approvedAt: visit.approvedAt,

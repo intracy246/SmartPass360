@@ -1,7 +1,5 @@
-import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "../../api/api-client";
-import { printVisitorPass } from "../../utils/visitor-pass-print";
 import "./VisitorQueue.css";
 
 type QueueVisit = {
@@ -13,39 +11,25 @@ type QueueVisit = {
 
 export function VisitorQueue() {
   const queryClient = useQueryClient();
-  const [printError, setPrintError] = useState<string | null>(null);
   const queue = useQuery({ queryKey: ["visitor-queue"], queryFn: () => apiRequest<{ data: QueueVisit[] }>("/visitors"), refetchInterval: 3000 });
   const approval = useMutation({
-    mutationFn: (visitId: string) => apiRequest<{ success: boolean; data: { pass: {
-      passNumber: string;
-      qrValue: string;
-      fullName: string;
-      organizationName: string;
-      issuedAt: string;
-      validUntil: string;
-    } } }>(`/visitors/${visitId}/approve-and-issue`, { method: "POST" }),
-    onSuccess: async (response) => {
-      await queryClient.invalidateQueries({ queryKey: ["visitor-queue"] });
-
-      const pass = response.data.pass;
-      try {
-        setPrintError(null);
-        await printVisitorPass(pass);
-      } catch (error) {
-        setPrintError(
-          error instanceof Error
-            ? error.message
-            : "The issued visitor pass could not be printed."
-        );
-      }
+    mutationFn: (visitId: string) =>
+      apiRequest<{ success: boolean; data: { id: string; status: string } }>(
+        `/visitors/${visitId}/approve`,
+        { method: "POST" }
+      ),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["visitor-queue"] }),
+        queryClient.invalidateQueries({ queryKey: ["visitor-operations"] }),
+        queryClient.invalidateQueries({ queryKey: ["operations-summary"] })
+      ]);
     }
   });
   return <section className="visitor-queue" aria-label="Reception and Security visitor queue">
     <header><div><h2>Reception / Security queue</h2><p>Building visits · updates every 3 seconds · latest 100 registrations</p></div><button type="button" onClick={() => void queue.refetch()}>Refresh queue</button></header>
-    {(queue.error || approval.error || printError) && (
-      <p role="alert">
-        {(queue.error || approval.error)?.message ?? printError}
-      </p>
+    {(queue.error || approval.error) && (
+      <p role="alert">{(queue.error || approval.error)?.message}</p>
     )}
     {queue.isPending && <p>Loading visits…</p>}
     {queue.data?.data.length === 0 && <p>No visits registered for this building.</p>}
@@ -59,7 +43,7 @@ export function VisitorQueue() {
           {visit.checkedInAt && <div>Entry: {new Date(visit.checkedInAt).toLocaleString()}</div>}
           {visit.checkedOutAt && <div>Exit: {new Date(visit.checkedOutAt).toLocaleString()}</div>}
         </td>
-        <td>{visit.status === "PENDING_APPROVAL" ? <button type="button" disabled={approval.isPending} onClick={() => approval.mutate(visit.id)}>Approve & print</button> : "—"}</td>
+        <td>{visit.status === "PENDING_APPROVAL" ? <button type="button" disabled={approval.isPending} onClick={() => approval.mutate(visit.id)}>Approve visitor</button> : "—"}</td>
       </tr>)}
     </tbody></table></div>
   </section>;
