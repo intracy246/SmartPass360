@@ -326,7 +326,7 @@ vehicleAccessRouter.post("/recognize", async (request, response, next) => {
       gate: pendingRequest.gate
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 });
 
@@ -373,7 +373,7 @@ vehicleAccessRouter.get("/vehicles", requireBuilding, async (_request, response,
       }))
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 });
 
@@ -408,7 +408,7 @@ vehicleAccessRouter.get("/requests", requireBuilding, async (_request, response,
       }))
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 });
 
@@ -488,7 +488,7 @@ vehicleAccessRouter.get("/events", requireBuilding, async (request, response, ne
       }
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 });
 
