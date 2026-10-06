@@ -1,13 +1,37 @@
-import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { getApiHealth } from "../../api/health-api";
+import {
+  approveVehicleRequest,
+  denyVehicleRequest,
+  getVehicleRequests
+} from "../../api/vehicle-access-api";
 import { GlassButton } from "../../components/Buttons/GlassButton";
 import { GlassCard } from "../../components/Cards/GlassCard";
 import "./DashboardPage.css";
 
 export function DashboardPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const vehicleRequestsQuery = useQuery({
+    queryKey: ["vehicle-access-requests"],
+    queryFn: getVehicleRequests,
+    refetchInterval: 5_000
+  });
+
+  const approveVehicle = useMutation({
+    mutationFn: approveVehicleRequest,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["vehicle-access-requests"] })
+  });
+
+  const denyVehicle = useMutation({
+    mutationFn: denyVehicleRequest,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["vehicle-access-requests"] })
+  });
+
+  const pendingVehicles = vehicleRequestsQuery.data?.data ?? [];
+
   const healthQuery = useQuery({
     queryKey: ["api-health"],
     queryFn: getApiHealth,
@@ -91,6 +115,67 @@ export function DashboardPage() {
           <span className="stat-card__note">
             Gate service not connected
           </span>
+        </GlassCard>
+      </section>
+
+
+      <section className="dashboard-page__vehicle-approvals">
+        <GlassCard
+          title="Vehicle approvals"
+          subtitle="Unknown or low-confidence vehicles waiting for Security approval."
+          accent="cyan"
+        >
+          <div className="vehicle-approval__heading">
+            <div>
+              <strong>{pendingVehicles.length}</strong>
+              <span> waiting for approval</span>
+            </div>
+            <GlassButton type="button" variant="secondary" onClick={() => navigate("/vehicles")}>
+              View all vehicles
+            </GlassButton>
+          </div>
+
+          {vehicleRequestsQuery.isPending ? (
+            <p className="vehicle-approval__message">Loading vehicle arrivals...</p>
+          ) : vehicleRequestsQuery.isError ? (
+            <p className="vehicle-approval__message vehicle-approval__message--error">
+              Vehicle approval queue is unavailable.
+            </p>
+          ) : pendingVehicles.length === 0 ? (
+            <p className="vehicle-approval__message">No vehicles are waiting for Security approval.</p>
+          ) : (
+            <div className="vehicle-approval__list">
+              {pendingVehicles.slice(0, 5).map((item) => (
+                <article className="vehicle-approval__item" key={item.id}>
+                  <div className="vehicle-approval__plate">
+                    <strong>{item.plateNumber}</strong>
+                    <span>{item.direction} · {item.gate?.name ?? "Gate"}</span>
+                  </div>
+                  <div className="vehicle-approval__meta">
+                    <span>{new Date(item.detectedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+                    <span>{item.confidence == null ? item.reason : `ANPR ${Math.round(item.confidence * 100)}%`}</span>
+                  </div>
+                  <div className="vehicle-approval__actions">
+                    <GlassButton
+                      type="button"
+                      variant="secondary"
+                      disabled={denyVehicle.isPending || approveVehicle.isPending}
+                      onClick={() => denyVehicle.mutate(item.id)}
+                    >
+                      Deny
+                    </GlassButton>
+                    <GlassButton
+                      type="button"
+                      disabled={approveVehicle.isPending || denyVehicle.isPending}
+                      onClick={() => approveVehicle.mutate(item.id)}
+                    >
+                      Approve & Open
+                    </GlassButton>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
         </GlassCard>
       </section>
 
