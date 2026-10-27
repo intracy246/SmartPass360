@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+import QRCode from "qrcode";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiError } from "../../api/api-client";
 import {
@@ -23,6 +24,30 @@ export function KiosksPage() {
   const [code, setCode] = useState("");
   const [location, setLocation] = useState("");
   const [message, setMessage] = useState<string | null>(null);
+  const [registrationQr, setRegistrationQr] = useState<string | null>(null);
+
+  const registrationUrl = viewing
+    ? `https://kiosk.smartpass.smartcycle360.com/register?kioskId=${encodeURIComponent(viewing.id)}`
+    : "";
+
+  useEffect(() => {
+    let active = true;
+    setRegistrationQr(null);
+
+    if (!registrationUrl) return () => { active = false; };
+
+    void QRCode.toDataURL(registrationUrl, {
+      width: 360,
+      margin: 3,
+      errorCorrectionLevel: "M"
+    }).then((dataUrl) => {
+      if (active) setRegistrationQr(dataUrl);
+    }).catch(() => {
+      if (active) setRegistrationQr(null);
+    });
+
+    return () => { active = false; };
+  }, [registrationUrl]);
 
   const createMutation = useMutation({
     mutationFn: createKiosk,
@@ -155,6 +180,47 @@ export function KiosksPage() {
               <div><span>Activated at</span><strong>{viewing.activatedAt ? new Date(viewing.activatedAt).toLocaleString() : "—"}</strong></div>
               <div><span>Last seen</span><strong>{viewing.lastSeenAt ? new Date(viewing.lastSeenAt).toLocaleString() : "—"}</strong></div>
             </div>
+
+            <section className="kiosk-public-qr" aria-label="Visitor mobile registration QR">
+              <div className="kiosk-public-qr__heading">
+                <p>PUBLIC VISITOR SELF-REGISTRATION</p>
+                <h3>QR code for this kiosk</h3>
+                <span>Visitors scan this code with their phones, complete registration, then wait for Security or Reception approval.</span>
+              </div>
+
+              <div className="kiosk-public-qr__image">
+                {registrationQr
+                  ? <img src={registrationQr} alt={`Mobile visitor registration QR for ${viewing.name}`} />
+                  : <span>Preparing QR code…</span>}
+              </div>
+
+              <label className="kiosk-public-qr__link">
+                <span>Mobile registration link</span>
+                <input readOnly value={registrationUrl} onFocus={(event) => event.currentTarget.select()} />
+              </label>
+
+              <div className="kiosk-public-qr__actions">
+                <a
+                  href={registrationQr ?? undefined}
+                  download={`smartpass360-${viewing.code}-registration-qr.png`}
+                  aria-disabled={!registrationQr}
+                  onClick={(event) => { if (!registrationQr) event.preventDefault(); }}
+                >
+                  Download QR
+                </a>
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => {
+                    void navigator.clipboard.writeText(registrationUrl)
+                      .then(() => setMessage("Mobile registration link copied."))
+                      .catch(() => setMessage("Copy is unavailable in this browser. Select the registration link and copy it."));
+                  }}
+                >
+                  Copy link
+                </button>
+              </div>
+            </section>
 
             <div className="kiosk-drawer__actions">
               <button className="secondary" onClick={() => { setEditing(viewing); setViewing(null); }}>Edit kiosk</button>
