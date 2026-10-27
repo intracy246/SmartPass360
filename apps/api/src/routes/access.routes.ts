@@ -197,6 +197,91 @@ accessRouter.post("/hardware/ack", async (request, response, next) => {
   }
 });
 
+accessRouter.post("/hardware/permanent-pass/ack", async (request, response, next) => {
+  try {
+    const parsed = hardwareActuationAckSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return response.status(400).json({
+        success: false,
+        turnstileCommand: "KEEP_LOCKED",
+        error: { code: "VALIDATION_ERROR", message: "A valid permanent access event, gate and actuator result are required." }
+      });
+    }
+
+    const device = await authenticatePhysicalGateDevice(request, parsed.data.gateId);
+    if (!device) {
+      return response.status(401).json({
+        success: false,
+        turnstileCommand: "KEEP_LOCKED",
+        error: { code: "UNAUTHORIZED_GATE_DEVICE", message: "A provisioned gate device credential is required." }
+      });
+    }
+
+    const event = await prisma.permanentPassAccessEvent.findFirst({
+      where: {
+        id: parsed.data.eventId,
+        gateId: device.gateId,
+        decision: "GRANTED"
+      },
+      select: { id: true, metadata: true }
+    });
+    if (!event) {
+      return response.status(404).json({
+        success: false,
+        turnstileCommand: "KEEP_LOCKED",
+        error: { code: "ACCESS_EVENT_NOT_FOUND", message: "No granted permanent-pass event exists for this gate." }
+      });
+    }
+
+    const metadata = event.metadata && typeof event.metadata === "object" && !Array.isArray(event.metadata)
+      ? event.metadata as Record<string, unknown>
+      : {};
+    if (metadata.validationMode !== "HARDWARE" || metadata.commandIssued !== "UNLOCK") {
+      return response.status(409).json({
+        success: false,
+        turnstileCommand: "KEEP_LOCKED",
+        error: { code: "HARDWARE_UNLOCK_NOT_AUTHORIZED", message: "This event did not authorize a hardware unlock." }
+      });
+    }
+
+    const acknowledgedAt = new Date();
+    const updated = await prisma.permanentPassAccessEvent.update({
+      where: { id: event.id },
+      data: {
+        turnstileOpened: parsed.data.opened,
+        metadata: {
+          ...metadata,
+          actuatorAcknowledged: true,
+          actuatorOpened: parsed.data.opened,
+          actuatorFailureCode: parsed.data.opened ? null : (parsed.data.failureCode ?? "ACTUATION_FAILED"),
+          actuatorDeviceId: device.id,
+          actuatorAcknowledgedAt: acknowledgedAt.toISOString()
+        }
+      },
+      select: { id: true, turnstileOpened: true }
+    });
+
+    await prisma.gateAccessDevice.update({
+      where: { id: device.id },
+      data: { lastSeenAt: acknowledgedAt }
+    });
+
+    return response.json({
+      success: true,
+      data: {
+        eventId: updated.id,
+        gateId: device.gateId,
+        actuatorAcknowledged: true,
+        turnstileOpened: updated.turnstileOpened,
+        turnstileCommand: updated.turnstileOpened ? "UNLOCK_CONFIRMED" : "KEEP_LOCKED",
+        acknowledgedAt
+      }
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 accessRouter.get("/gates", requireBuilding, async (_request, response, next) => {
   try {
     const user = response.locals.authUser as AuthUser;
@@ -815,6 +900,10 @@ accessRouter.post(
           permanentPass.expiresAt &&
           permanentPass.expiresAt.getTime() <= now.getTime()
         ) denialReason = "PASS_EXPIRED";
+        else if (
+          permanentPass.lastActivityAt &&
+          now.getTime() - permanentPass.lastActivityAt.getTime() < 2000
+        ) denialReason = "SCAN_TOO_SOON";
         else if (gate.direction !== "BIDIRECTIONAL" && gate.direction !== activityType) {
           denialReason = activityType === "ENTRY" ? "ENTRY_NOT_ALLOWED_AT_GATE" : "EXIT_NOT_ALLOWED_AT_GATE";
         }
@@ -1066,6 +1155,14 @@ accessRouter.post(
 
       if (
         !denialReason &&
+        permanentPass.lastActivityAt &&
+        now.getTime() - permanentPass.lastActivityAt.getTime() < 2000
+      ) {
+        denialReason = "SCAN_TOO_SOON";
+      }
+
+      if (
+        !denialReason &&
         gate.direction !== "BIDIRECTIONAL" &&
         gate.direction !== activityType
       ) {
@@ -1096,6 +1193,8 @@ accessRouter.post(
             turnstileOpened: false,
 
             metadata: {
+              validationMode: "HARDWARE",
+              commandIssued: "KEEP_LOCKED",
               gateCode: gate.code,
               gateName: gate.name,
               requestId: parsed.data.requestId ?? null,
@@ -1150,6 +1249,7 @@ accessRouter.post(
                   turnstileOpened: false,
 
                   metadata: {
+                    validationMode: "HARDWARE",
                     gateCode: gate.code,
                     gateName: gate.name,
                     commandIssued: "UNLOCK",
