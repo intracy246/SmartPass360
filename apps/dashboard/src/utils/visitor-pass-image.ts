@@ -82,7 +82,7 @@ export async function downloadVisitorPassImage(pass: DownloadableVisitorPass) {
   const qrImage = await loadImage(qrSource);
   const canvas = document.createElement("canvas");
   canvas.width = 1000;
-  canvas.height = 1480;
+  canvas.height = 1600;
   const context = canvas.getContext("2d");
   if (!context) throw new Error("This browser cannot create the visitor ticket image.");
 
@@ -171,6 +171,14 @@ export async function downloadVisitorPassImage(pass: DownloadableVisitorPass) {
   context.font = "17px Arial, sans-serif";
   context.fillText("A non-permanent pass expires 24 hours after issue.", 500, passY + 196);
   context.fillText("Present this QR to Security at entry and exit.", 500, passY + 228);
+  context.fillStyle = "#123d35";
+  context.font = "bold 17px Arial, sans-serif";
+  context.fillText("RETURN THIS PASS TO SECURITY WHEN YOU EXIT.", 500, passY + 266);
+  context.font = "15px Arial, sans-serif";
+  context.fillText("Tafadhali rudisha tiketi hii kwa mlinzi unapotoka.", 500, passY + 295);
+  context.fillStyle = "#64748b";
+  context.font = "bold 15px Arial, sans-serif";
+  context.fillText("SmartPass360 by SmartCycle360", 500, passY + 330);
 
   const blob = await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((value) => value ? resolve(value) : reject(new Error("The visitor ticket image could not be saved.")), "image/png");
