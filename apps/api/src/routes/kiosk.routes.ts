@@ -334,6 +334,81 @@ kioskRouter.delete<{ kioskId: string }>("/:kioskId", requireBuilding, async (req
   }
 });
 
+kioskRouter.get("/public/:kioskId/registration-config", async (request, response, next) => {
+  try {
+    const parsedId = z.string().uuid().safeParse(request.params.kioskId);
+    if (!parsedId.success) {
+      return response.status(404).json({
+        error: { code: "KIOSK_NOT_AVAILABLE", message: "This kiosk registration link is invalid or unavailable." }
+      });
+    }
+
+    const kiosk = await prisma.kiosk.findFirst({
+      where: {
+        id: parsedId.data,
+        isActive: true,
+        site: { isActive: true, status: "ACTIVE" }
+      },
+      select: {
+        id: true,
+        name: true,
+        code: true,
+        location: true,
+        site: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+            logoUrl: true,
+            isActive: true,
+            status: true,
+            organizations: {
+              where: {
+                isActive: true,
+                organization: { isActive: true }
+              },
+              select: {
+                organization: {
+                  select: { id: true, name: true, code: true, isActive: true }
+                }
+              },
+              orderBy: { organization: { name: "asc" } }
+            }
+          }
+        }
+      }
+    });
+
+    if (!kiosk) {
+      return response.status(404).json({
+        error: { code: "KIOSK_NOT_AVAILABLE", message: "This kiosk is inactive or no longer available for visitor registration." }
+      });
+    }
+
+    response.setHeader("Cache-Control", "no-store");
+    return response.status(200).json({
+      success: true,
+      data: {
+        kiosk: {
+          id: kiosk.id,
+          name: kiosk.name,
+          code: kiosk.code,
+          location: kiosk.location
+        },
+        site: {
+          id: kiosk.site.id,
+          name: kiosk.site.name,
+          code: kiosk.site.code,
+          logoUrl: kiosk.site.logoUrl
+        },
+        organizations: kiosk.site.organizations.map(({ organization }) => organization)
+      }
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 kioskRouter.get("/:kioskId/config", async (request, response, next) => {
   try {
     const deviceId =
