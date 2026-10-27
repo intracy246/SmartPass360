@@ -2,6 +2,63 @@ import crypto from "node:crypto";
 import { Router } from "express";
 import { z } from "zod";
 
+const reportPeriodSchema = z.enum(["today", "week", "month"]);
+type ReportPeriod = z.infer<typeof reportPeriodSchema>;
+
+function darEsSalaamDateParts(date: Date) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Africa/Dar_es_Salaam",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(date);
+
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return {
+    year: Number(values.year),
+    month: Number(values.month),
+    day: Number(values.day)
+  };
+}
+
+function dateStringUtc(year: number, month: number, day: number) {
+  return new Date(Date.UTC(year, month - 1, day)).toISOString().slice(0, 10);
+}
+
+function addCalendarDays(dateString: string, days: number) {
+  const [year, month, day] = dateString.split("-").map(Number);
+  return dateStringUtc(year, month, day + days);
+}
+
+function reportDateRange(period: ReportPeriod, now = new Date()) {
+  const local = darEsSalaamDateParts(now);
+  const today = dateStringUtc(local.year, local.month, local.day);
+  let startDate: string;
+  let endDate: string;
+
+  if (period === "today") {
+    startDate = today;
+    endDate = addCalendarDays(today, 1);
+  } else if (period === "week") {
+    const date = new Date(`${today}T00:00:00.000Z`);
+    const daysSinceMonday = (date.getUTCDay() + 6) % 7;
+    startDate = addCalendarDays(today, -daysSinceMonday);
+    endDate = addCalendarDays(startDate, 7);
+  } else {
+    startDate = dateStringUtc(local.year, local.month, 1);
+    endDate = local.month === 12
+      ? dateStringUtc(local.year + 1, 1, 1)
+      : dateStringUtc(local.year, local.month + 1, 1);
+  }
+
+  // Tanzania has UTC+03:00 year-round. Use local calendar boundaries so
+  // the daily list rolls over at midnight in Dar es Salaam, not at UTC midnight.
+  return {
+    gte: new Date(`${startDate}T00:00:00.000+03:00`),
+    lt: new Date(`${endDate}T00:00:00.000+03:00`)
+  };
+}
+
 import { prisma } from "../lib/prisma.js";
 import { requireBuilding, type AuthUser } from "../middleware/auth.middleware.js";
 import {
@@ -282,16 +339,75 @@ visitorRouter.post("/register", requireBuilding, async (request, response, next)
   }
 });
 
-visitorRouter.get("/", requireBuilding, async (_request, response, next) => {
+visitorRouter.get("/report", requireBuilding, async (request, response, next) => {
   try {
     const user = response.locals.authUser as AuthUser;
+    const parsedPeriod = reportPeriodSchema.safeParse(
+      typeof request.query.period === "string" ? request.query.period : "today"
+    );
+
+    if (!parsedPeriod.success) {
+      return response.status(400).json({
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Report period must be today, week, or month."
+        }
+      });
+    }
+
     const visits = await prisma.visitRequest.findMany({
-      where: { siteId: user.siteId! }, include: visitInclude,
-      orderBy: { createdAt: "desc" }, take: 100
+      where: {
+        siteId: user.siteId!,
+        createdAt: reportDateRange(parsedPeriod.data)
+      },
+      include: visitInclude,
+      orderBy: { createdAt: "desc" }
     });
+
     response.setHeader("Cache-Control", "no-store");
-    return response.json({ success: true, data: visits.map(publicVisit) });
-  } catch (error) { return next(error); }
+    return response.json({
+      success: true,
+      period: parsedPeriod.data,
+      count: visits.length,
+      data: visits.map(publicVisit)
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+visitorRouter.get("/", requireBuilding, async (request, response, next) => {
+  try {
+    const user = response.locals.authUser as AuthUser;
+    const parsedPeriod = reportPeriodSchema.safeParse(
+      typeof request.query.period === "string" ? request.query.period : "today"
+    );
+
+    if (!parsedPeriod.success) {
+      return response.status(400).json({
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Period must be today, week, or month."
+        }
+      });
+    }
+
+    // The visible Reception / Visitors list defaults to today's visits.
+    // Historical records remain in PostgreSQL and are available via /report.
+    const visits = await prisma.visitRequest.findMany({
+      where: {
+        siteId: user.siteId!,
+        createdAt: reportDateRange(parsedPeriod.data)
+      },
+      include: visitInclude,
+      orderBy: { createdAt: "desc" }
+    });
+
+    response.setHeader("Cache-Control", "no-store");
+    return response.json({ success: true, period: parsedPeriod.data, data: visits.map(publicVisit) });
+  } catch (error) {
+    return next(error);
+  }
 });
 
 visitorRouter.get("/operations", requireBuilding, async (_request, response, next) => {
