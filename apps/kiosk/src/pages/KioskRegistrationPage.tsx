@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -345,14 +346,14 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
     registrationMutation.mutate(payload);
   }
 
-  function startAnotherRegistration() {
+  const startAnotherRegistration = useCallback(() => {
     window.sessionStorage.removeItem("smartpass360.pendingVisit");
     window.sessionStorage.removeItem("smartpass360.kioskLanguage");
     setCompletedRegistration(null);
     setLanguage(null);
     setErrorMessage(null);
     setForm(initialForm);
-  }
+  }, []);
 
   if (completedRegistration && language) {
     return <KioskVisitCompletion registration={completedRegistration} onFinish={startAnotherRegistration} language={language} />;
