@@ -46,7 +46,9 @@ export async function validateVisitorScan(
           visitId: pass?.visitId, visitorPassId: pass?.id, gateId: gate?.id,
           direction: input.direction ?? direction, decision: denialReason ? "DENIED" : "GRANTED",
           denialReason, scannedAt: now,
-          turnstileOpened: hardwareAvailable && !denialReason,
+          // Validation authorizes a command but cannot prove the relay actuated.
+          // The trusted gate adapter confirms physical opening through /hardware/ack.
+          turnstileOpened: false,
           metadata: {
             validationMode: hardwareAvailable ? "HARDWARE" : "SOFTWARE",
             commandIssued: denialReason
