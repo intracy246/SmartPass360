@@ -32,7 +32,13 @@ const reportPeriodLabels: Record<ReportPeriod, string> = {
 };
 
 function csvCell(value: unknown) {
-  const text = value == null ? "" : String(value);
+  let text = value == null ? "" : String(value);
+
+  // Prevent spreadsheet formula execution from untrusted visitor-entered text.
+  if (/^[\\s]*[=+@-]/.test(text)) {
+    text = `'${text}`;
+  }
+
   return `"${text.replaceAll('"', '""')}"`;
 }
 
