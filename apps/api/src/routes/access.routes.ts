@@ -71,6 +71,132 @@ accessRouter.post("/hardware/qr-scan", async (request, response, next) => {
   }
 });
 
+const hardwareActuationAckSchema = z.object({
+  eventId: z.string().uuid(),
+  gateId: z.string().uuid(),
+  opened: z.boolean(),
+  failureCode: z.string().trim().max(120).optional()
+});
+
+accessRouter.post("/hardware/ack", async (request, response, next) => {
+  try {
+    const parsed = hardwareActuationAckSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return response.status(400).json({
+        success: false,
+        turnstileCommand: "KEEP_LOCKED",
+        error: { code: "VALIDATION_ERROR", message: "A valid event ID, gate ID and actuator result are required." }
+      });
+    }
+
+    const device = await authenticatePhysicalGateDevice(request, parsed.data.gateId);
+    if (!device) {
+      return response.status(401).json({
+        success: false,
+        turnstileCommand: "KEEP_LOCKED",
+        error: { code: "UNAUTHORIZED_GATE_DEVICE", message: "A provisioned gate device credential is required." }
+      });
+    }
+
+    const event = await prisma.accessEvent.findFirst({
+      where: {
+        id: parsed.data.eventId,
+        siteId: device.siteId,
+        gateId: device.gateId,
+        decision: "GRANTED"
+      },
+      select: {
+        id: true,
+        metadata: true,
+        turnstileOpened: true
+      }
+    });
+
+    if (!event) {
+      return response.status(404).json({
+        success: false,
+        turnstileCommand: "KEEP_LOCKED",
+        error: { code: "ACCESS_EVENT_NOT_FOUND", message: "No granted access event was found for this building and gate." }
+      });
+    }
+
+    const metadata = event.metadata && typeof event.metadata === "object" && !Array.isArray(event.metadata)
+      ? event.metadata as Record<string, unknown>
+      : {};
+
+    if (metadata.validationMode !== "HARDWARE" || metadata.commandIssued !== "UNLOCK") {
+      return response.status(409).json({
+        success: false,
+        turnstileCommand: "KEEP_LOCKED",
+        error: { code: "HARDWARE_UNLOCK_NOT_AUTHORIZED", message: "This event did not authorize a hardware unlock." }
+      });
+    }
+
+    const acknowledgedAt = new Date();
+    const updated = await prisma.$transaction(async (tx) => {
+      // Re-check the event while writing the acknowledgement. Repeated acknowledgements
+      // are idempotent; they never issue a new unlock command.
+      const latest = await tx.accessEvent.findFirst({
+        where: { id: event.id, siteId: device.siteId, gateId: device.gateId, decision: "GRANTED" },
+        select: { id: true, metadata: true }
+      });
+      if (!latest) return null;
+
+      const latestMetadata = latest.metadata && typeof latest.metadata === "object" && !Array.isArray(latest.metadata)
+        ? latest.metadata as Record<string, unknown>
+        : {};
+      if (latestMetadata.validationMode !== "HARDWARE" || latestMetadata.commandIssued !== "UNLOCK") {
+        return null;
+      }
+
+      return tx.accessEvent.update({
+        where: { id: latest.id },
+        data: {
+          turnstileOpened: parsed.data.opened,
+          metadata: {
+            validationMode: "HARDWARE",
+            commandIssued: "UNLOCK",
+            requestedGateId: device.gateId,
+            actuatorAcknowledged: true,
+            actuatorOpened: parsed.data.opened,
+            actuatorFailureCode: parsed.data.opened ? null : (parsed.data.failureCode ?? "ACTUATION_FAILED"),
+            actuatorDeviceId: device.id,
+            actuatorAcknowledgedAt: acknowledgedAt.toISOString()
+          }
+        },
+        select: { id: true, turnstileOpened: true }
+      });
+    });
+
+    if (!updated) {
+      return response.status(409).json({
+        success: false,
+        turnstileCommand: "KEEP_LOCKED",
+        error: { code: "HARDWARE_ACK_REJECTED", message: "The access event is no longer eligible for acknowledgement." }
+      });
+    }
+
+    await prisma.gateAccessDevice.update({
+      where: { id: device.id },
+      data: { lastSeenAt: acknowledgedAt }
+    });
+
+    return response.json({
+      success: true,
+      data: {
+        eventId: updated.id,
+        gateId: device.gateId,
+        actuatorAcknowledged: true,
+        turnstileOpened: updated.turnstileOpened,
+        turnstileCommand: updated.turnstileOpened ? "UNLOCK_CONFIRMED" : "KEEP_LOCKED",
+        acknowledgedAt
+      }
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 accessRouter.get("/gates", requireBuilding, async (_request, response, next) => {
   try {
     const user = response.locals.authUser as AuthUser;
