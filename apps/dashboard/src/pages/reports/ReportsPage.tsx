@@ -163,7 +163,7 @@ export function ReportsPage() {
       {reportError && (
         <div className="reports-page__error" role="alert">
           {reportError.message}
-          <button type="button" onClick={() => void Promise.all([reportQuery.refetch(), buildingQuery.refetch(), organizationsQuery.refetch()])}>
+          <button type="button" onClick={() => void Promise.all([dailyReportQuery.refetch(), weeklyReportQuery.refetch(), monthlyReportQuery.refetch(), buildingQuery.refetch(), organizationsQuery.refetch()])}>
             Try again
           </button>
         </div>
