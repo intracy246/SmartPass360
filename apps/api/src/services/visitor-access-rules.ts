@@ -13,6 +13,9 @@ type ScanState = {
 export function visitorAccessDecision(state: ScanState) {
   const { gate, pass, last, now } = state;
   const direction = last?.direction === "ENTRY" ? "EXIT" : "ENTRY";
+  // A 24-hour visitor ticket stops authorizing new entry after expiry. Do not
+  // block egress for somebody already recorded as inside; safety exit wins.
+  const exiting = direction === "EXIT" && pass?.visit.status === "INSIDE";
   let denialReason: string | null = null;
   if (!state.buildingActive) denialReason = "BUILDING_INACTIVE";
   else if (!gate) denialReason = "WRONG_GATE";
@@ -20,8 +23,8 @@ export function visitorAccessDecision(state: ScanState) {
   else if (!pass) denialReason = state.formatValid ? "UNKNOWN_PASS" : "INVALID_QR_FORMAT";
   else if (pass.organizationId !== gate.organizationId) denialReason = "WRONG_GATE";
   else if (!state.membershipActive) denialReason = "ORGANIZATION_INACTIVE";
-  else if (pass.status !== "ACTIVE") denialReason = `PASS_${pass.status}`;
-  else if (now < pass.validFrom || now >= pass.validUntil) denialReason = "OUTSIDE_VALID_TIME";
+  else if (pass.status !== "ACTIVE" && !exiting) denialReason = `PASS_${pass.status}`;
+  else if (!exiting && (now < pass.validFrom || now >= pass.validUntil)) denialReason = "OUTSIDE_VALID_TIME";
   else if (!pass.visit.approvedAt || !["PASS_ISSUED", "READY_FOR_ENTRY", "INSIDE"].includes(pass.visit.status)) denialReason = "VISIT_NOT_ACTIVE";
   else if ((pass.visit.status === "INSIDE") !== (last?.direction === "ENTRY")) denialReason = "STATE_MISMATCH";
   else if (state.requestedDirection && state.requestedDirection !== direction) denialReason = "ANTI_PASSBACK";
