@@ -89,7 +89,7 @@ export function formatReportDate(value: string | Date) {
   }).format(new Date(value));
 }
 
-export function formatReportDateTime(value?: string | null) {
+export function formatReportDateTime(value?: string | Date | null) {
   if (!value) return "—";
   return new Intl.DateTimeFormat("en-GB", {
     timeZone: "Africa/Dar_es_Salaam",
@@ -124,6 +124,13 @@ export function getReportRangeLabel(period: ReportPeriod, now = new Date()) {
   return start === lastDay
     ? formatReportDate(start + "T12:00:00.000Z")
     : formatReportDate(start + "T12:00:00.000Z") + " – " + formatReportDate(lastDay + "T12:00:00.000Z");
+}
+
+function statusLabel(value: string) {
+  return value
+    .replaceAll("_", " ")
+    .toLowerCase()
+    .replace(/\\b[a-z]/g, (character) => character.toUpperCase());
 }
 
 export function summarizeVisitorReport(
@@ -380,12 +387,14 @@ function buildPdfBytes(pageContents: string[][], logo: PdfLogo | null) {
 class PdfReportComposer {
   private pages: PdfPage[] = [];
   private current!: PdfPage;
+  private readonly building: BuildingSettings;
+  private readonly period: ReportPeriod;
+  private readonly logo: PdfLogo | null;
 
-  constructor(
-    private readonly building: BuildingSettings,
-    private readonly period: ReportPeriod,
-    private readonly logo: PdfLogo | null
-  ) {
+  constructor(building: BuildingSettings, period: ReportPeriod, logo: PdfLogo | null) {
+    this.building = building;
+    this.period = period;
+    this.logo = logo;
     this.newPage(true);
   }
 
