@@ -41,7 +41,7 @@ export function scanPermanentPass(
   payload: PermanentPassScanPayload
 ): Promise<PermanentPassScanResult> {
   return apiRequest<PermanentPassScanResult>(
-    "/access/permanent-pass/scan",
+    "/access/permanent-pass/validate",
     {
       method: "POST",
       body: payload
