@@ -290,17 +290,20 @@ export function VisitorQueue() {
                   {visit.checkedOutAt && <div>Exit: {new Date(visit.checkedOutAt).toLocaleString("en-GB", { timeZone: "Africa/Dar_es_Salaam" })}</div>}
                 </td>
                 <td>
-                  {visit.status === "PENDING_APPROVAL"
+                  {visit.status === "PENDING_APPROVAL" ||
+                  (visit.status === "APPROVED" && !visit.pass?.passNumber)
                     ? (
                       <button
                         type="button"
                         disabled={approval.isPending}
                         onClick={() => approveAndPrint(visit.id)}
                       >
-                        Approve & Auto-Print Pass
+                        {visit.status === "PENDING_APPROVAL" ? "Approve & Auto-Print Pass" : "Issue & Auto-Print Pass"}
                       </button>
                     )
-                    : "—"}
+                    : visit.status === "PASS_ISSUED" && !visit.checkedInAt && visit.pass?.passNumber
+                      ? "Pass issued"
+                      : "—"}
                 </td>
               </tr>
             ))}
