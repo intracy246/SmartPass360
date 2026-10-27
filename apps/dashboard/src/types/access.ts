@@ -76,7 +76,7 @@ export type PermanentPassScanResult = {
   decision: "GRANTED" | "DENIED";
   denialReason?: string;
   activityType?: "ENTRY" | "EXIT";
-  turnstileCommand: "UNLOCK" | "KEEP_LOCKED";
+  turnstileCommand: "UNLOCK" | "KEEP_LOCKED" | "VALIDATED_ONLY";
   accessEventId?: string;
   gate?: {
     id: string;
