@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -10,11 +11,14 @@ import {
 } from "../../api/vehicle-access-api";
 import { GlassButton } from "../../components/Buttons/GlassButton";
 import { GlassCard } from "../../components/Cards/GlassCard";
+import { exportVisitorReportPdf } from "../../utils/visitor-report-pdf";
 import "./DashboardPage.css";
 
 export function DashboardPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [isExportingReport, setIsExportingReport] = useState(false);
+  const [reportExportError, setReportExportError] = useState<string | null>(null);
   const operationsQuery = useQuery({
     queryKey: ["operations-summary"],
     queryFn: getOperationsSummary,
@@ -41,6 +45,18 @@ export function DashboardPage() {
 
   const pendingVehicles = vehicleRequestsQuery.data?.data ?? [];
 
+  async function exportDailyReport() {
+    setIsExportingReport(true);
+    setReportExportError(null);
+    try {
+      await exportVisitorReportPdf("today");
+    } catch (error) {
+      setReportExportError(error instanceof Error ? error.message : "The daily PDF report could not be generated.");
+    } finally {
+      setIsExportingReport(false);
+    }
+  }
+
   const healthQuery = useQuery({
     queryKey: ["api-health"],
     queryFn: getApiHealth,
@@ -64,8 +80,8 @@ export function DashboardPage() {
         </div>
 
         <div className="dashboard-page__actions">
-          <GlassButton type="button" variant="secondary" onClick={() => navigate("/reports")}>
-            Export PDF Report
+          <GlassButton type="button" variant="secondary" onClick={() => void exportDailyReport()} disabled={isExportingReport}>
+            {isExportingReport ? "Preparing PDF…" : "Export Daily PDF"}
           </GlassButton>
 
           <GlassButton
@@ -76,6 +92,7 @@ export function DashboardPage() {
           </GlassButton>
         </div>
       </header>
+      {reportExportError && <p role="alert" style={{ color: "#fda4af", margin: "0 0 16px" }}>{reportExportError}</p>}
 
       <section className="dashboard-page__stats">
         <GlassCard accent="blue">
