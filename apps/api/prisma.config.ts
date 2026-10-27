@@ -7,10 +7,10 @@ const currentFile = fileURLToPath(import.meta.url);
 const currentDir = path.dirname(currentFile);
 const apiEnvPath = path.resolve(currentDir, ".env");
 
-dotenv.config({ path: apiEnvPath });
+dotenv.config({ path: apiEnvPath, override: false });
 
 if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL is missing from apps/api/.env");
+  throw new Error("DATABASE_URL is required to run Prisma CLI commands.");
 }
 
 export default defineConfig({

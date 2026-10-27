@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { visitorAccessDecision } from "./visitor-access-rules";
-import { prisma } from "../lib/prisma";
-import { hashToken } from "../lib/visitor-workflow";
-import { Prisma } from "../generated/prisma/client";
+import { visitorAccessDecision } from "./visitor-access-rules.js";
+import { prisma } from "../lib/prisma.js";
+import { hashToken } from "../lib/visitor-workflow.js";
+import { Prisma } from "../generated/prisma/client.js";
 
 export const visitorScanSchema = z.object({
   credential: z.string().trim().min(1).max(2000), gateId: z.string().uuid(),

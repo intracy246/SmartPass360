@@ -2,8 +2,8 @@ import crypto from "node:crypto";
 import { Router } from "express";
 import { z } from "zod";
 
-import { prisma } from "../lib/prisma";
-import { requireBuilding, type AuthUser } from "../middleware/auth.middleware";
+import { prisma } from "../lib/prisma.js";
+import { requireBuilding, type AuthUser } from "../middleware/auth.middleware.js";
 
 export const vehicleAccessRouter = Router();
 

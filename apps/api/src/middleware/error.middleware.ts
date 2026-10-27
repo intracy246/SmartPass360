@@ -10,11 +10,12 @@ export function errorHandler(
   response: Response,
   _next: NextFunction
 ): void {
+  const errorName = error instanceof Error ? error.name : "UnknownError";
   request.log.error(
     {
-      error,
+      errorName,
       method: request.method,
-      path: request.originalUrl
+      path: request.path
     },
     "Unhandled application error"
   );

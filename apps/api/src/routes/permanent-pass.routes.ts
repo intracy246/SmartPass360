@@ -2,9 +2,9 @@ import crypto from "node:crypto";
 import { Router } from "express";
 import { z } from "zod";
 
-import { prisma } from "../lib/prisma";
-import { env } from "../config/env";
-import { requireBuilding, type AuthUser } from "../middleware/auth.middleware";
+import { prisma } from "../lib/prisma.js";
+import { env } from "../config/env.js";
+import { requireBuilding, type AuthUser } from "../middleware/auth.middleware.js";
 
 export const permanentPassRouter = Router();
 

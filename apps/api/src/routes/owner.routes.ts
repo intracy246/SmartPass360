@@ -3,9 +3,9 @@ import { promisify } from "node:util";
 import { Router } from "express";
 import { z } from "zod";
 
-import { env } from "../config/env";
-import { prisma } from "../lib/prisma";
-import { requireBuilding, requireOwner, signAuthToken, type AuthUser } from "../middleware/auth.middleware";
+import { env } from "../config/env.js";
+import { prisma } from "../lib/prisma.js";
+import { requireBuilding, requireOwner, signAuthToken, type AuthUser } from "../middleware/auth.middleware.js";
 
 export const ownerRouter = Router();
 

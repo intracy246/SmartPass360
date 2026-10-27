@@ -1,9 +1,9 @@
-﻿import crypto from "node:crypto";
+import crypto from "node:crypto";
 import { Router } from "express";
 import { z } from "zod";
-import { prisma } from "../lib/prisma";
-import { requireBuilding, type AuthUser } from "../middleware/auth.middleware";
-import { validateVisitorScan, visitorScanSchema } from "../services/visitor-access";
+import { prisma } from "../lib/prisma.js";
+import { requireBuilding, type AuthUser } from "../middleware/auth.middleware.js";
+import { validateVisitorScan, visitorScanSchema } from "../services/visitor-access.js";
 
 export const accessRouter = Router();
 

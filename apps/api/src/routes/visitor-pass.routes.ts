@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { z } from "zod";
-import { prisma } from "../lib/prisma";
-import { requireBuilding, type AuthUser } from "../middleware/auth.middleware";
-import type { Prisma } from "../generated/prisma/client";
+import { prisma } from "../lib/prisma.js";
+import { requireBuilding, type AuthUser } from "../middleware/auth.middleware.js";
+import type { Prisma } from "../generated/prisma/client.js";
 
 export const visitorPassRouter = Router();
 const querySchema = z.object({

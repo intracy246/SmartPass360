@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import type { NextFunction, Request, Response } from "express";
-import { env } from "../config/env";
+import { env } from "../config/env.js";
 
 export type AuthScope = "OWNER" | "BUILDING";
 

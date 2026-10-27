@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import type { Request } from "express";
-import { prisma } from "./prisma";
-import type { Prisma } from "../generated/prisma/client";
+import { prisma } from "./prisma.js";
+import type { Prisma } from "../generated/prisma/client.js";
 
 export const hashToken = (token: string) => crypto.createHash("sha256").update(token).digest("hex");
 
