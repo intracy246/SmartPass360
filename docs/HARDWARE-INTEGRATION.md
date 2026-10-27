@@ -25,6 +25,8 @@ Permanent pass QR: POST /api/v1/access/permanent-pass/scan with x-gate-device-ke
 
 Actuate only for a granted response whose turnstileCommand is UNLOCK. Never unlock on malformed responses, errors, timeouts, or denial. A USB HID scanner may feed the edge app, but a public browser must not directly control a turnstile relay.
 
+After the local controller has actually pulsed the relay, POST /api/v1/access/hardware/ack using the same x-gate-device-key. Send eventId from the granted scan response, gateId, opened: true only after actuator confirmation, or opened: false with failureCode if the relay/controller reports failure. The access event is not marked as physically opened until this acknowledgement succeeds. Retrying the acknowledgement is idempotent and does not issue another unlock.
+
 ## Thermal printer
 Visitor tickets are formatted for 80 mm thermal media. Kiosk auto-print is enabled by default. Set VITE_KIOSK_AUTO_PRINT=false only for an intentionally manual-print deployment.
 
