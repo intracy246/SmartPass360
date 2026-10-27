@@ -8,6 +8,15 @@ export const hashToken = (token: string) => crypto.createHash("sha256").update(t
 export const visitorPassQrValue = (token: string) =>
   `smartpass360://visitor-pass/${token}`;
 
+
+/**
+ * Derives the same high-entropy pass credential on trusted server routes without
+ * storing or returning the original kiosk/mobile registration receipt.
+ * The receipt hash is a server-side secret until possession of the receipt is proven.
+ */
+export const visitorPassTokenForReceiptHash = (visitId: string, receiptTokenHash: string) =>
+  crypto.createHmac("sha256", receiptTokenHash).update(`visitor-pass:${visitId}`).digest("base64url");
+
 export async function issueVisitorPass(
   transaction: Prisma.TransactionClient,
   input: {
@@ -37,7 +46,7 @@ export async function issueVisitorPass(
       passNumber: `VP-${crypto.randomBytes(8).toString("hex").toUpperCase()}`,
       qrTokenHash: hashToken(input.token),
       validFrom,
-      validUntil: new Date(validFrom.getTime() + 8 * 60 * 60 * 1000)
+      validUntil: new Date(validFrom.getTime() + 24 * 60 * 60 * 1000)
     }
   });
 
