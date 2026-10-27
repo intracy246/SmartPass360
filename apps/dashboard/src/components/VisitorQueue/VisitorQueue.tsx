@@ -99,7 +99,7 @@ function downloadCsv(visits: QueueVisit[], period: ReportPeriod) {
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
-  URL.revokeObjectURL(url);
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 export function VisitorQueue() {
