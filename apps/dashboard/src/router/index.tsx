@@ -23,6 +23,7 @@ import { getStoredUser, getToken } from "../auth/session";
 import { KiosksPage } from "../pages/kiosks/KiosksPage";
 import { VehiclesPage } from "../pages/vehicles/VehiclesPage";
 import { OperationsPage } from "../pages/operations/OperationsPage";
+import { ReportsPage } from "../pages/reports/ReportsPage";
 
 function EmptyModule({
   title
@@ -106,10 +107,7 @@ export function AppRouter() {
           element={<EmptyModule title="Users" />}
         />
 
-        <Route
-          path="reports"
-          element={<EmptyModule title="Reports" />}
-        />
+        <Route path="reports" element={<ReportsPage />} />
 
         <Route
           path="settings"
