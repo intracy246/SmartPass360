@@ -156,6 +156,14 @@ export async function downloadMobileVisitorTicketImage(ticket: MobileVisitorTick
   ctx.font = "17px Arial, sans-serif";
   ctx.fillText("Tiketi ya kawaida ni halali kwa saa 24 tangu kutolewa.", 500, detailsY + 180);
   ctx.fillText("Onyesha QR kwenye lango wakati wa kuingia na kutoka.", 500, detailsY + 211);
+  ctx.fillStyle = "#123d35";
+  ctx.font = "bold 17px Arial, sans-serif";
+  ctx.fillText("RETURN THIS PASS TO SECURITY WHEN YOU EXIT.", 500, detailsY + 245);
+  ctx.font = "15px Arial, sans-serif";
+  ctx.fillText("Tafadhali rudisha tiketi hii kwa mlinzi unapotoka.", 500, detailsY + 273);
+  ctx.fillStyle = "#64748b";
+  ctx.font = "bold 15px Arial, sans-serif";
+  ctx.fillText("SmartPass360 by SmartCycle360", 500, detailsY + 304);
 
   const blob = await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((value) => value ? resolve(value) : reject(new Error("Imeshindikana kuhifadhi picha ya tiketi.")), "image/png");
