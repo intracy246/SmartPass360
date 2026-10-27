@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { activateKiosk } from "./api/kiosk-api";
 import { ApiError } from "./api/api-client";
 import { KioskRegistrationPage } from "./pages/KioskRegistrationPage";
+import { PublicVisitorRegistrationPage } from "./pages/PublicVisitorRegistrationPage";
 import "./pages/KioskActivationPage.css";
 
 function getDeviceId() {
@@ -18,6 +19,14 @@ function getDeviceId() {
 }
 
 export default function App() {
+  if (window.location.pathname === "/register") {
+    return <PublicVisitorRegistrationPage />;
+  }
+
+  return <DeviceKioskApp />;
+}
+
+function DeviceKioskApp() {
   const initialKioskId = window.localStorage.getItem("smartpass360.deviceId")
     ? window.localStorage.getItem("smartpass360.kioskId")
     : null;
