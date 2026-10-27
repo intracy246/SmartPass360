@@ -31,6 +31,21 @@ const reportPeriodLabels: Record<ReportPeriod, string> = {
   month: "This month"
 };
 
+function darEsSalaamDateKey(value: string | Date) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Africa/Dar_es_Salaam",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(new Date(value));
+  const part = (type: string) => parts.find((item) => item.type === type)?.value ?? "";
+  return `${part("year")}-${part("month")}-${part("day")}`;
+}
+
+function todayInDarEsSalaam() {
+  return darEsSalaamDateKey(new Date());
+}
+
 function csvCell(value: unknown) {
   let text = value == null ? "" : String(value);
 
@@ -114,6 +129,12 @@ export function VisitorQueue() {
     refetchInterval: 3000
   });
 
+  // Defensive display filter: if an older API deployment still returns historical rows,
+  // keep the live Reception queue limited to today's Tanzania-local registrations.
+  const todayVisits = (queue.data?.data ?? []).filter(
+    (visit) => darEsSalaamDateKey(visit.registeredAt) === todayInDarEsSalaam()
+  );
+
   const approval = useMutation({
     mutationFn: (visitId: string) =>
       apiRequest<{ success: boolean; data: { id: string; status: string } }>(
@@ -190,7 +211,7 @@ export function VisitorQueue() {
         <p className="visitor-queue__error" role="alert">{(queue.error || approval.error)?.message}</p>
       )}
       {queue.isPending && <p>Loading today's visits…</p>}
-      {queue.data?.data.length === 0 && !queue.isPending && <p>No visits registered today. Previous days are preserved in reports.</p>}
+      {todayVisits.length === 0 && !queue.isPending && <p>No visits registered today. Previous days are preserved in reports.</p>}
 
       <div className="visitor-queue__scroll">
         <table>
@@ -205,7 +226,7 @@ export function VisitorQueue() {
             </tr>
           </thead>
           <tbody>
-            {queue.data?.data.map((visit) => (
+            {todayVisits.map((visit) => (
               <tr key={visit.id}>
                 <td><strong>{visit.fullName}</strong><br />{visit.phone || "—"}</td>
                 <td>{visit.organization.name}<br />{visit.departmentOrOffice || "—"}<br />{visit.hostName || "—"}</td>
