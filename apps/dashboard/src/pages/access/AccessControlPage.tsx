@@ -75,9 +75,6 @@ export function AccessControlPage() {
   const [validationError, setValidationError] =
     useState<string | null>(null);
 
-  const permanentGateId =
-    "d16badd9-4aad-4f61-ae83-efc977b80b75";
-
   const [permanentCredential, setPermanentCredential] =
     useState("");
 
@@ -201,9 +198,16 @@ export function AccessControlPage() {
     setPermanentError(null);
     setPermanentResult(null);
 
+    if (!gateId) {
+      setPermanentError("Select an active gate or checkpoint first.");
+      permanentScannerRef.current?.focus();
+      return;
+    }
+
     permanentScanMutation.mutate({
       qrCode,
-      gateId: permanentGateId
+      gateId,
+      requestId: crypto.randomUUID()
     });
   }
 
@@ -213,26 +217,45 @@ export function AccessControlPage() {
   function handleCameraCredential(scannedCredential: string) {
     const cleanedCredential = scannedCredential.trim();
 
-    if (!cleanedCredential.startsWith("smartpass360://visitor-pass/")) {
-      setValidationResult(null);
-      setValidationError("This QR is not a SmartPass360 visitor ticket. Scan the QR displayed on an approved visitor pass, not the kiosk registration QR.");
-      return;
-    }
-
     if (!gateId) {
       setValidationResult(null);
+      setPermanentResult(null);
       setValidationError("Select the gate or checkpoint for this building before scanning.");
+      setPermanentError("Select the gate or checkpoint for this building before scanning.");
       return;
     }
 
-    setValidationError(null);
+    if (cleanedCredential.startsWith("smartpass360://visitor-pass/")) {
+      setPermanentResult(null);
+      setPermanentError(null);
+      setValidationError(null);
+      setValidationResult(null);
+      validationMutation.mutate({
+        credential: cleanedCredential,
+        gateId,
+        direction: direction === "AUTO" ? undefined : direction,
+        requestId: crypto.randomUUID()
+      });
+      return;
+    }
+
+    if (cleanedCredential.startsWith("smartpass360://permanent-pass/")) {
+      setValidationResult(null);
+      setValidationError(null);
+      setPermanentResult(null);
+      setPermanentError(null);
+      permanentScanMutation.mutate({
+        qrCode: cleanedCredential,
+        gateId,
+        requestId: crypto.randomUUID()
+      });
+      return;
+    }
+
     setValidationResult(null);
-    validationMutation.mutate({
-      credential: cleanedCredential,
-      gateId,
-      direction: direction === "AUTO" ? undefined : direction,
-      requestId: crypto.randomUUID()
-    });
+    setPermanentResult(null);
+    setValidationError("This is not a SmartPass360 visitor or permanent-pass ticket. Do not scan the kiosk registration QR here.");
+    setPermanentError("This is not a SmartPass360 visitor or permanent-pass ticket. Do not scan the kiosk registration QR here.");
   }
 
   return (
@@ -261,9 +284,11 @@ export function AccessControlPage() {
         gates={gatesQuery.data?.data ?? []}
         selectedGateId={gateId}
         onGateChange={setGateId}
-        isValidating={validationMutation.isPending}
+        isValidating={validationMutation.isPending || permanentScanMutation.isPending}
         result={validationResult}
         error={validationError}
+        permanentResult={permanentResult}
+        permanentError={permanentError}
         onCredentialRead={handleCameraCredential}
       />
 
