@@ -675,7 +675,11 @@ export async function exportVisitorReportPdf(period: ReportPeriod) {
   ], visitorRows.length ? visitorRows : [{ cells: ["—", "No registrations", "—", "No visitor registrations were recorded during this period.", "—", "—", "—", "—", "—"] }]);
 
   const pdfBytes = buildPdfBytes(composer.getPageCommands(), logo);
-  const blob = new Blob([pdfBytes], { type: "application/pdf" });
+  const pdfBuffer = pdfBytes.buffer.slice(
+    pdfBytes.byteOffset,
+    pdfBytes.byteOffset + pdfBytes.byteLength
+  ) as ArrayBuffer;
+  const blob = new Blob([pdfBuffer], { type: "application/pdf" });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
