@@ -451,7 +451,7 @@ export function PublicVisitorRegistrationPage() {
             </div>
             <p className="mobile-registration__eyebrow">{t.submitted}</p>
             <h1>{isRejected ? (language === "sw" ? "Tafadhali wasiliana na Usalama" : "Please contact Security") : isIssued ? t.issued : t.waiting}</h1>
-            <p className="mobile-registration__reference">{t.reference}: <strong>{registration.referenceNumber}</strong></p>
+            <p className="mobile-registration__reference">{t.reference}: <strong>{registration?.referenceNumber ?? "—"}</strong></p>
 
             {statusQuery.isError && !isRejected && !isIssued && (
               <div className="mobile-registration__alert" role="status">{t.statusRetry}</div>
