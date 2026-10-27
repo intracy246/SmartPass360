@@ -1,6 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { KioskRegistrationResult } from "../types/kiosk";
 import "./KioskVisitCompletion.css";
+
+const RESET_SECONDS = 5;
 
 export function KioskVisitCompletion({
   registration,
@@ -11,28 +13,38 @@ export function KioskVisitCompletion({
   onFinish: () => void;
   language: "en" | "sw";
 }) {
+  const [secondsRemaining, setSecondsRemaining] = useState(RESET_SECONDS);
+
   const text = language === "sw" ? {
     eyebrow: "USAJILI UMEPOKELEWA",
     title: "Asante kwa kujisajili",
     reference: "Namba ya rejea",
-    instruction: "Tafadhali chukua Visitor Access Pass yako iliyochapishwa kwa Mpokezi au kwa Mlinzi.",
-    returnPass: "Rudisha tiketi hii kwa Mlinzi baada ya kutoka kwenye jengo.",
+    instruction: "Usajili wako umepokelewa. Tafadhali subiri idhini ya Mapokezi au Mlinzi. Ukishaidhinishwa, chukua Visitor Access Pass yako iliyochapishwa kwa Mapokezi au kwa Mlinzi.",
+    returnPass: "Rudisha tiketi hii kwa Mlinzi mara tu unapotoka kwenye jengo.",
     reset: "Skrini itajisafisha yenyewe baada ya sekunde 5 ili mgeni anayefuata aweze kujisajili.",
-    countdown: "Inarudi kwenye fomu baada ya sekunde 5..."
+    countdown: (seconds: number) => seconds > 0 ? `Inarudi kwenye fomu baada ya sekunde ${seconds}...` : "Inarudi kwenye fomu..."
   } : {
     eyebrow: "REGISTRATION RECEIVED",
     title: "Thank you for registering",
     reference: "Visitor reference",
-    instruction: "Please collect your printed Visitor Access Pass from Reception or Security.",
-    returnPass: "Return this pass to Security when you exit the building.",
+    instruction: "Your registration has been received. Please wait for approval from Reception or Security. Once approved, collect your printed Visitor Access Pass from Reception or Security.",
+    returnPass: "Return this pass to Security as soon as you exit the building.",
     reset: "This screen will reset automatically in 5 seconds for the next visitor.",
-    countdown: "Returning to registration in 5 seconds..."
+    countdown: (seconds: number) => seconds > 0 ? `Returning to registration in ${seconds} second${seconds === 1 ? "" : "s"}...` : "Returning to registration..."
   };
 
   useEffect(() => {
-    const timer = window.setTimeout(onFinish, 5000);
-    return () => window.clearTimeout(timer);
-  }, [onFinish]);
+    setSecondsRemaining(RESET_SECONDS);
+    const interval = window.setInterval(() => {
+      setSecondsRemaining((current) => Math.max(0, current - 1));
+    }, 1000);
+    const timeout = window.setTimeout(onFinish, RESET_SECONDS * 1000);
+
+    return () => {
+      window.clearInterval(interval);
+      window.clearTimeout(timeout);
+    };
+  }, [onFinish, registration.visitId]);
 
   return (
     <main className="kiosk-screen">
@@ -52,7 +64,7 @@ export function KioskVisitCompletion({
         <div className="kiosk-reset-countdown" aria-hidden="true">
           <span />
         </div>
-        <small className="kiosk-complete__countdown-label">{text.countdown}</small>
+        <small className="kiosk-complete__countdown-label">{text.countdown(secondsRemaining)}</small>
         <footer className="kiosk-complete__footer">SMARTPASS360 by SmartCycle360</footer>
       </section>
     </main>
