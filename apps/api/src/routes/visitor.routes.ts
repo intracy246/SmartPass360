@@ -11,6 +11,7 @@ import {
   issueVisitorPass,
   publicVisit,
   visitorPassQrValue,
+  visitorPassTokenForReceiptHash,
   visitInclude
 } from "../lib/visitor-workflow.js";
 
@@ -515,7 +516,7 @@ visitorRouter.post("/self-service/status", publicStatusRateLimit, async (request
     }
 
     const { kioskId, visitId, receiptToken } = parsed.data;
-    const passToken = crypto.createHmac("sha256", receiptToken)
+    const legacyPassToken = crypto.createHmac("sha256", receiptToken)
       .update(`visitor-pass:${visitId}`)
       .digest("base64url");
 
@@ -562,24 +563,31 @@ visitorRouter.post("/self-service/status", publicStatusRateLimit, async (request
       if (!membership) return { kind: "unavailable" as const };
 
       const now = new Date();
+      const stablePassToken = visitorPassTokenForReceiptHash(visit.id, visit.kioskReceiptHash!);
+      let passToken = stablePassToken;
       let pass = visit.pass;
 
       if (pass) {
-        if (
-          pass.status !== "ACTIVE" ||
-          pass.validUntil <= now ||
-          pass.qrTokenHash !== hashToken(passToken)
-        ) {
+        // Preserve passes issued before the stable-token migration; all newly
+        // issued passes use the stable token so Security can also print them.
+        if (pass.qrTokenHash === hashToken(legacyPassToken)) {
+          passToken = legacyPassToken;
+        } else if (pass.qrTokenHash !== hashToken(stablePassToken)) {
+          return { kind: "unavailable" as const };
+        }
+
+        if (pass.status !== "ACTIVE" || pass.validUntil <= now) {
           return { kind: "unavailable" as const };
         }
       } else {
         const issued = await issueVisitorPass(tx, {
           visitId: visit.id,
           organizationId: visit.organizationId,
-          token: passToken,
+          token: stablePassToken,
           validFrom: now
         });
         pass = issued.pass;
+        passToken = stablePassToken;
       }
 
       return {
@@ -882,28 +890,35 @@ visitorRouter.post<{ visitId: string }>("/:visitId/approve-and-issue", requireBu
         return { conflict: true as const };
       }
 
-      const token = crypto.randomBytes(32).toString("base64url");
       const now = new Date();
-      const { pass, created } = await issueVisitorPass(tx, {
+      const token = visit.kioskReceiptHash
+        ? visitorPassTokenForReceiptHash(visit.id, visit.kioskReceiptHash)
+        : crypto.randomBytes(32).toString("base64url");
+      const { pass } = await issueVisitorPass(tx, {
         visitId: visit.id,
         organizationId: visit.organizationId,
         token,
         validFrom: now
       });
 
+      if (pass.qrTokenHash !== hashToken(token) || pass.status !== "ACTIVE" || pass.validUntil <= now) {
+        return { conflict: true as const };
+      }
+
       return {
         passNumber: pass.passNumber,
-        qrToken: created ? token : null,
+        qrToken: token,
         fullName: visit.visitor.fullName,
         organizationName: visit.organization.name,
         issuedAt: pass.issuedAt,
+        validFrom: pass.validFrom,
         validUntil: pass.validUntil
       };
     });
 
     if (!result) return response.status(404).json({ error: { code: "VISIT_NOT_AVAILABLE", message: "Visit not available in this building." } });
     if ("conflict" in result) return response.status(409).json({ error: { code: "VISIT_NOT_APPROVABLE", message: "This visit cannot be approved." } });
-    if (!result.qrToken) return response.status(409).json({ error: { code: "PASS_ALREADY_ISSUED", message: "This pass was already issued from the kiosk flow." } });
+    if (!result.qrToken) return response.status(409).json({ error: { code: "PASS_ALREADY_ISSUED", message: "This pass already exists with a different credential. Use the original ticket or contact an administrator." } });
 
     const QRCode = (await import("qrcode")).default;
     const qrValue = await QRCode.toDataURL(visitorPassQrValue(result.qrToken), { width: 300, margin: 4, errorCorrectionLevel: "M" });
@@ -917,6 +932,7 @@ visitorRouter.post<{ visitId: string }>("/:visitId/approve-and-issue", requireBu
           fullName: result.fullName,
           organizationName: result.organizationName,
           issuedAt: result.issuedAt,
+          validFrom: result.validFrom,
           validUntil: result.validUntil
         }
       }
@@ -952,9 +968,10 @@ visitorRouter.post<{ visitId: string }>("/:visitId/kiosk-pass", async (request, 
     }
     const kiosk = await getActivatedKiosk(request, parsed.data.kioskId);
     if (!kiosk) return response.status(403).json({ error: { code: "KIOSK_NOT_AVAILABLE", message: "Activated kiosk device required." } });
-    // The server-generated 256-bit receipt is held only by the kiosk. Derive a
-    // separate QR credential so issuance retries can recover it without storing raw tokens.
-    const token = crypto.createHmac("sha256", parsed.data.receiptToken).update(`visitor-pass:${request.params.visitId}`).digest("base64url");
+    // Legacy token supports already-issued kiosk tickets. New passes use a stable
+    // token derived from the server-side receipt hash, allowing approved tickets to be
+    // retrieved by the kiosk and printed by authorized Security without storing raw tokens.
+    const legacyToken = crypto.createHmac("sha256", parsed.data.receiptToken).update(`visitor-pass:${request.params.visitId}`).digest("base64url");
     const result = await prisma.$transaction(async tx => {
       await tx.$queryRaw`SELECT id FROM visit_requests WHERE id = ${request.params.visitId}::uuid FOR UPDATE`;
       const visit = await tx.visitRequest.findFirst({ where: {
@@ -968,13 +985,20 @@ visitorRouter.post<{ visitId: string }>("/:visitId/kiosk-pass", async (request, 
       } });
       if (!membership) return null;
       const now = new Date();
-      if (visit.pass && (visit.pass.status !== "ACTIVE" || visit.pass.validUntil <= now || visit.pass.qrTokenHash !== hashToken(token))) return null;
+      const stableToken = visitorPassTokenForReceiptHash(visit.id, visit.kioskReceiptHash!);
+      let token = stableToken;
+      if (visit.pass) {
+        if (visit.pass.qrTokenHash === hashToken(legacyToken)) token = legacyToken;
+        else if (visit.pass.qrTokenHash !== hashToken(stableToken)) return null;
+        if (visit.pass.status !== "ACTIVE" || visit.pass.validUntil <= now) return null;
+      }
       const { pass } = await issueVisitorPass(tx, {
         visitId: visit.id,
         organizationId: visit.organizationId,
         token,
         validFrom: now
       });
+      if (pass.qrTokenHash !== hashToken(token) || pass.status !== "ACTIVE" || pass.validUntil <= now) return null;
       return {
         passId: pass.id, passNumber: pass.passNumber, fullName: visit.visitor.fullName,
         site: visit.site, organization: visit.organization,
