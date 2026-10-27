@@ -44,7 +44,6 @@ type OrganizationResponse = {
 export type OrganizationReportSummary = {
   organization: ReportOrganization;
   visitors: number;
-  visits: number;
   entered: number;
   exited: number;
   pending: number;
@@ -140,8 +139,7 @@ export function summarizeVisitorReport(
       const organizationVisits = visits.filter((visit) => visit.organization?.id === organization.id);
       return {
         organization,
-        visitors: new Set(organizationVisits.map((visit) => visit.visitorId || visit.id)).size,
-        visits: organizationVisits.length,
+        visitors: organizationVisits.length,
         entered: organizationVisits.filter((visit) => Boolean(visit.checkedInAt)).length,
         exited: organizationVisits.filter((visit) => Boolean(visit.checkedOutAt)).length,
         pending: organizationVisits.filter((visit) => visit.status === "PENDING_APPROVAL").length,
@@ -178,7 +176,7 @@ function reportHtml(
   organizations: ReportOrganization[]
 ) {
   const summary = summarizeVisitorReport(organizations, visits);
-  const uniqueVisitors = new Set(visits.map((visit) => visit.visitorId || visit.id)).size;
+  const organizationsVisited = summary.filter((item) => item.visitors > 0).length;
   const entered = visits.filter((visit) => Boolean(visit.checkedInAt)).length;
   const exited = visits.filter((visit) => Boolean(visit.checkedOutAt)).length;
   const periodTitle = REPORT_PERIOD_LABELS[period] + " Visitor Report";
@@ -190,7 +188,7 @@ function reportHtml(
   const summaryRows = summary.map((item) =>
     "<tr><td><strong>" + escapeHtml(item.organization.name) + "</strong>" +
     (item.organization.code ? '<div class="muted">' + escapeHtml(item.organization.code) + "</div>" : "") +
-    "</td><td class=\"num\">" + item.visitors + "</td><td class=\"num\">" + item.visits +
+    "</td><td class=\"num\">" + item.visitors +
     "</td><td class=\"num\">" + item.entered + "</td><td class=\"num\">" + item.exited +
     "</td><td class=\"num\">" + item.pending + "</td><td class=\"num\">" + item.rejected + "</td></tr>"
   ).join("");
@@ -207,12 +205,12 @@ function reportHtml(
   ).join("");
 
   const organizationSummary = summaryRows ||
-    '<tr><td colspan="7" class="empty">No organizations are configured for this building.</td></tr>';
+    '<tr><td colspan="6" class="empty">No organizations are configured for this building.</td></tr>';
   const visitDetails = detailRows ||
     '<tr><td colspan="9" class="empty">No visitor registrations were recorded during this period.</td></tr>';
   const totals = "<tr class=\"total-row\"><td><strong>TOTAL</strong></td><td class=\"num\">" +
-    uniqueVisitors + "</td><td class=\"num\">" + visits.length + "</td><td class=\"num\">" +
-    entered + "</td><td class=\"num\">" + exited + "</td><td class=\"num\">" +
+    visits.length + "</td><td class=\"num\">" + entered + "</td><td class=\"num\">" +
+    exited + "</td><td class=\"num\">" +
     visits.filter((visit) => visit.status === "PENDING_APPROVAL").length + "</td><td class=\"num\">" +
     visits.filter((visit) => ["REJECTED", "DENIED"].includes(visit.status)).length + "</td></tr>";
 
@@ -239,13 +237,13 @@ function reportHtml(
     escapeHtml(getReportRangeLabel(period)) + "</p><p>" + escapeHtml([building.address, building.city, building.country].filter(Boolean).join(", ") || building.code) +
     "</p></div><div class=\"right\"><strong>Official Report</strong><div class=\"muted\">Generated: " +
     escapeHtml(formatReportDateTime(new Date())) + "</div><div class=\"muted\">Time zone: East Africa Time (EAT)</div></div></header>" +
-    '<section class="kpis"><div class="kpi"><span>Total visits</span><strong>' + visits.length +
-    '</strong></div><div class="kpi"><span>Unique visitors</span><strong>' + uniqueVisitors +
+    '<section class="kpis"><div class="kpi"><span>Visitors registered</span><strong>' + visits.length +
+    '</strong></div><div class="kpi"><span>Organizations visited</span><strong>' + organizationsVisited +
     '</strong></div><div class="kpi"><span>Visitors entered</span><strong>' + entered +
     '</strong></div><div class="kpi"><span>Visitors exited</span><strong>' + exited +
     "</strong></div></section>" +
-    "<h2>Organization Summary</h2><p class=\"no-data\">Counts are based on visit registrations created within the selected reporting period. Unique visitors are counted once per organization for this period.</p>" +
-    '<table><thead><tr><th>Organization</th><th>Unique visitors</th><th>Total visits</th><th>Entered</th><th>Exited</th><th>Pending approval</th><th>Rejected / denied</th></tr></thead><tbody>' +
+    "<h2>Organization Summary</h2><p class=\"no-data\">Each visitor registration is counted as one visitor entry. Repeat registrations during the same period are counted separately.</p>" +
+    '<table><thead><tr><th>Organization</th><th>Visitors registered</th><th>Entered</th><th>Exited</th><th>Pending approval</th><th>Rejected / denied</th></tr></thead><tbody>' +
     organizationSummary + totals + "</tbody></table>" +
     "<h2>Visitor Register</h2><table class=\"details\"><thead><tr><th>No.</th><th>Visitor / phone</th><th>Organization</th><th>Purpose of visit</th><th>Registered (EAT)</th><th>Status</th><th>Entry (EAT)</th><th>Exit (EAT)</th><th>Pass number</th></tr></thead><tbody>" +
     visitDetails + "</tbody></table>" +
