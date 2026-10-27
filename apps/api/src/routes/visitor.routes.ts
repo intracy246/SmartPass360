@@ -910,6 +910,9 @@ visitorRouter.post<{ visitId: string }>("/:visitId/approve-and-issue", requireBu
         qrToken: token,
         fullName: visit.visitor.fullName,
         organizationName: visit.organization.name,
+        departmentOrOffice: visit.destinationOffice,
+        hostName: visit.hostNameSnapshot,
+        purpose: visit.purpose,
         issuedAt: pass.issuedAt,
         validFrom: pass.validFrom,
         validUntil: pass.validUntil
@@ -931,6 +934,9 @@ visitorRouter.post<{ visitId: string }>("/:visitId/approve-and-issue", requireBu
           qrValue,
           fullName: result.fullName,
           organizationName: result.organizationName,
+          departmentOrOffice: result.departmentOrOffice,
+          hostName: result.hostName,
+          purpose: result.purpose,
           issuedAt: result.issuedAt,
           validFrom: result.validFrom,
           validUntil: result.validUntil
