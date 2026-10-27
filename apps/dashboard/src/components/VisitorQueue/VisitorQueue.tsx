@@ -297,7 +297,7 @@ export function VisitorQueue() {
                         disabled={approval.isPending}
                         onClick={() => approveAndPrint(visit.id)}
                       >
-                        Approve & print pass
+                        Approve & Print Ticket
                       </button>
                     )
                     : "—"}
