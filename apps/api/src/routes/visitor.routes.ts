@@ -2,6 +2,18 @@ import crypto from "node:crypto";
 import { Router } from "express";
 import { z } from "zod";
 
+import { prisma } from "../lib/prisma.js";
+import { requireBuilding, type AuthUser } from "../middleware/auth.middleware.js";
+import {
+  activeMembership,
+  getActivatedKiosk,
+  hashToken,
+  issueVisitorPass,
+  publicVisit,
+  visitorPassQrValue,
+  visitInclude
+} from "../lib/visitor-workflow.js";
+
 const reportPeriodSchema = z.enum(["today", "week", "month"]);
 type ReportPeriod = z.infer<typeof reportPeriodSchema>;
 
@@ -58,18 +70,6 @@ function reportDateRange(period: ReportPeriod, now = new Date()) {
     lt: new Date(`${endDate}T00:00:00.000+03:00`)
   };
 }
-
-import { prisma } from "../lib/prisma.js";
-import { requireBuilding, type AuthUser } from "../middleware/auth.middleware.js";
-import {
-  activeMembership,
-  getActivatedKiosk,
-  hashToken,
-  issueVisitorPass,
-  publicVisit,
-  visitorPassQrValue,
-  visitInclude
-} from "../lib/visitor-workflow.js";
 
 export const visitorRouter = Router();
 
