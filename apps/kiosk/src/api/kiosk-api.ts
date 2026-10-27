@@ -6,7 +6,10 @@ import type {
   OrganizationOptionResponse,
   KioskBuildingConfigResponse,
   KioskVisitStatus,
-  KioskIssuedPass
+  KioskIssuedPass,
+  PublicVisitorRegistrationPayload,
+  PublicVisitorRegistrationResult,
+  PublicVisitorStatusResponse
 } from "../types/kiosk";
 
 export function activateKiosk(payload: { activationCode: string; deviceId: string }) {
@@ -62,4 +65,29 @@ export function getRegisteredKioskConfig(kioskId: string) {
       headers: deviceId ? { "x-kiosk-device-id": deviceId } : undefined
     }
   );
+}
+
+
+export function getPublicRegistrationConfig(kioskId: string) {
+  return apiRequest<KioskBuildingConfigResponse>(
+    `/kiosks/public/${encodeURIComponent(kioskId)}/registration-config`
+  );
+}
+
+export function registerPublicVisitor(payload: PublicVisitorRegistrationPayload) {
+  return apiRequest<PublicVisitorRegistrationResult>("/visitors/self-service/register", {
+    method: "POST",
+    body: payload
+  });
+}
+
+export function getPublicRegistrationStatus(payload: {
+  kioskId: string;
+  visitId: string;
+  receiptToken: string;
+}) {
+  return apiRequest<PublicVisitorStatusResponse>("/visitors/self-service/status", {
+    method: "POST",
+    body: payload
+  });
 }
