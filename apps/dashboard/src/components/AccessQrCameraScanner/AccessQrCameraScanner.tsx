@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { BrowserQRCodeReader } from "@zxing/browser";
 
-import type { AccessValidationResult } from "../../types/access";
+import type { AccessValidationResult, PermanentPassScanResult } from "../../types/access";
 import "./AccessQrCameraScanner.css";
 
 type ScannerGate = {
@@ -19,6 +19,8 @@ type Props = {
   isValidating: boolean;
   result: AccessValidationResult | null;
   error: string | null;
+  permanentResult?: PermanentPassScanResult | null;
+  permanentError?: string | null;
   onCredentialRead: (credential: string) => void;
 };
 
@@ -33,6 +35,8 @@ export function AccessQrCameraScanner({
   isValidating,
   result,
   error,
+  permanentResult = null,
+  permanentError = null,
   onCredentialRead
 }: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -136,8 +140,8 @@ export function AccessQrCameraScanner({
       <header className="access-qr-camera__header">
         <div>
           <span className="access-qr-camera__eyebrow">SOFTWARE GATE SCANNER</span>
-          <h2 id="access-qr-camera-title">Scan visitor ticket</h2>
-          <p>Use this device's camera to read the approved visitor QR. The server validates the ticket and records the access event; no turnstile hardware is required.</p>
+          <h2 id="access-qr-camera-title">Scan an access ticket</h2>
+          <p>Scan a 24-hour visitor QR or a permanent-pass QR. The server validates the credential for the selected gate and automatically determines entry or exit from the holder's recorded state.</p>
         </div>
         <span className="access-qr-camera__mode">NO HARDWARE REQUIRED</span>
       </header>
@@ -210,12 +214,12 @@ export function AccessQrCameraScanner({
             {decision === "GRANTED" ? "✓" : "×"}
           </div>
           <div className="access-qr-camera__decision-copy">
-            <span>SERVER ACCESS DECISION</span>
+            <span>SERVER ACCESS DECISION · VISITOR</span>
             <h3>{decision === "GRANTED" ? "ACCESS GRANTED" : "ACCESS DENIED"}</h3>
             <p>{result.data.message}</p>
-            {decision === "GRANTED" && (
+            {decision === "GRANTED" && result.data.turnstileCommand === "VALIDATED_ONLY" && (
               <p className="access-qr-camera__software-note">
-                Software validation only: the event has been recorded, but no physical turnstile or relay was opened.
+                Validation and entry/exit logging succeeded. No physical turnstile has been actuated; a provisioned controller is needed for that.
               </p>
             )}
             <div className="access-qr-camera__meta">
@@ -224,6 +228,33 @@ export function AccessQrCameraScanner({
               {result.data.gateName && <span>Gate: <strong>{result.data.gateName}</strong></span>}
               <span>Direction: <strong>{result.data.direction}</strong></span>
               <span>Decision: <strong>{result.data.turnstileCommand === "VALIDATED_ONLY" ? "Validated and logged" : result.data.turnstileCommand}</strong></span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {permanentError && <div className="access-qr-camera__error access-qr-camera__result" role="alert">{permanentError}</div>}
+
+      {permanentResult && (
+        <div className={`access-qr-camera__decision ${permanentResult.decision === "GRANTED" ? "is-granted" : "is-denied"}`} role="status">
+          <div className="access-qr-camera__decision-mark" aria-hidden="true">
+            {permanentResult.decision === "GRANTED" ? "✓" : "×"}
+          </div>
+          <div className="access-qr-camera__decision-copy">
+            <span>SERVER ACCESS DECISION · PERMANENT PASS</span>
+            <h3>{permanentResult.decision === "GRANTED" ? "ACCESS GRANTED" : "ACCESS DENIED"}</h3>
+            <p>{permanentResult.message ?? permanentResult.denialReason ?? "The scan has been processed."}</p>
+            {permanentResult.decision === "GRANTED" && permanentResult.turnstileCommand === "VALIDATED_ONLY" && (
+              <p className="access-qr-camera__software-note">
+                Entry/exit is recorded in software. A physical controller is required before any turnstile can open.
+              </p>
+            )}
+            <div className="access-qr-camera__meta">
+              {permanentResult.holder?.fullName && <span>Holder: <strong>{permanentResult.holder.fullName}</strong></span>}
+              {permanentResult.holder?.passNumber && <span>Pass: <strong>{permanentResult.holder.passNumber}</strong></span>}
+              {permanentResult.gate?.name && <span>Gate: <strong>{permanentResult.gate.name}</strong></span>}
+              {permanentResult.activityType && <span>Direction: <strong>{permanentResult.activityType}</strong></span>}
+              <span>Decision: <strong>{permanentResult.turnstileCommand === "VALIDATED_ONLY" ? "Validated and logged" : permanentResult.turnstileCommand}</strong></span>
             </div>
           </div>
         </div>
