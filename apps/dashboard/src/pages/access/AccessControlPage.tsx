@@ -17,6 +17,7 @@ import {
   validateAccess
 } from "../../api/access-api";
 import { VisitorQueue } from "../../components/VisitorQueue/VisitorQueue";
+import { AccessQrCameraScanner } from "../../components/AccessQrCameraScanner/AccessQrCameraScanner";
 
 import { ApiError } from "../../api/api-client";
 
@@ -209,6 +210,31 @@ export function AccessControlPage() {
   const events =
     accessEventsQuery.data?.data ?? [];
 
+  function handleCameraCredential(scannedCredential: string) {
+    const cleanedCredential = scannedCredential.trim();
+
+    if (!cleanedCredential.startsWith("smartpass360://visitor-pass/")) {
+      setValidationResult(null);
+      setValidationError("This QR is not a SmartPass360 visitor ticket. Scan the QR displayed on an approved visitor pass, not the kiosk registration QR.");
+      return;
+    }
+
+    if (!gateId) {
+      setValidationResult(null);
+      setValidationError("Select the gate or checkpoint for this building before scanning.");
+      return;
+    }
+
+    setValidationError(null);
+    setValidationResult(null);
+    validationMutation.mutate({
+      credential: cleanedCredential,
+      gateId,
+      direction: direction === "AUTO" ? undefined : direction,
+      requestId: crypto.randomUUID()
+    });
+  }
+
   return (
     <div className="access-page">
       <header className="access-page__header">
@@ -230,6 +256,16 @@ export function AccessControlPage() {
           Turnstile validation surface
         </div>
       </header>
+
+      <AccessQrCameraScanner
+        gates={gatesQuery.data?.data ?? []}
+        selectedGateId={gateId}
+        onGateChange={setGateId}
+        isValidating={validationMutation.isPending}
+        result={validationResult}
+        error={validationError}
+        onCredentialRead={handleCameraCredential}
+      />
 
       <VisitorQueue />
 
@@ -450,7 +486,7 @@ export function AccessControlPage() {
                   }
                 >
                   <option value="">Select gate</option>
-                  {gatesQuery.data?.data.map(gate => <option key={gate.id} value={gate.id} disabled={!gate.isActive || gate.status !== "ONLINE"}>{gate.name} · {gate.direction}</option>)}
+                  {gatesQuery.data?.data.map(gate => <option key={gate.id} value={gate.id} disabled={!gate.isActive}>{gate.name} · {gate.direction} · {gate.status}</option>)}
                 </select>
                 {gatesQuery.error && <span role="alert">{gatesQuery.error.message}</span>}
               </label>
