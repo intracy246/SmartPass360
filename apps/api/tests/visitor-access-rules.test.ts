@@ -39,15 +39,26 @@ test("rapid repeat cannot toggle an entry into an immediate exit", () => {
   assert.equal(visitorAccessDecision(state).denialReason, null);
 });
 
-test("used, revoked, expired and cancelled passes remain locked", () => {
+test("inactive passes cannot enter, but an inside visitor can still exit safely", () => {
   for (const status of ["USED", "REVOKED", "EXPIRED", "CANCELLED"]) {
-    const state = validState(); state.pass!.status = status;
+    const state = validState();
+    state.pass!.status = status;
     assert.equal(visitorAccessDecision(state).denialReason, `PASS_${status}`);
   }
-  const state = validState(); state.now = state.pass!.validUntil;
-  assert.equal(visitorAccessDecision(state).denialReason, "OUTSIDE_VALID_TIME");
-  state.now = new Date(-1);
-  assert.equal(visitorAccessDecision(state).denialReason, "OUTSIDE_VALID_TIME");
+
+  const entry = validState();
+  entry.now = entry.pass!.validUntil;
+  assert.equal(visitorAccessDecision(entry).denialReason, "OUTSIDE_VALID_TIME");
+  entry.now = new Date(-1);
+  assert.equal(visitorAccessDecision(entry).denialReason, "OUTSIDE_VALID_TIME");
+
+  const exit = validState();
+  exit.pass!.status = "EXPIRED";
+  exit.pass!.validUntil = new Date(9000);
+  exit.pass!.visit.status = "INSIDE";
+  exit.last = { direction: "ENTRY", scannedAt: new Date(7000) };
+  exit.now = new Date(10000);
+  assert.deepEqual(visitorAccessDecision(exit), { direction: "EXIT", denialReason: null });
 });
 
 test("approval cannot be bypassed and terminal visits cannot enter", () => {
