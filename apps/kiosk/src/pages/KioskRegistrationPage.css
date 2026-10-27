@@ -559,3 +559,220 @@
     min-height: calc(100vh - 36px);
   }
 }
+
+
+/* Public mobile-registration QR shown on the physical kiosk welcome screen. */
+.kiosk-language-welcome {
+  width: min(100%, 1120px);
+  grid-template-columns: minmax(0, 1fr) 300px;
+  align-items: center;
+  column-gap: clamp(20px, 3vw, 34px);
+  row-gap: clamp(18px, 2.2vh, 26px);
+}
+
+.kiosk-language-welcome__brand,
+.kiosk-language-welcome__copy {
+  grid-column: 1 / -1;
+}
+
+.kiosk-language-welcome__copy h1 {
+  font-size: clamp(38px, 5vw, 64px);
+}
+
+.kiosk-language-choice {
+  grid-column: 1;
+  gap: 14px;
+}
+
+.kiosk-language-choice__button {
+  min-height: 150px;
+  padding: 20px;
+  border-radius: 22px;
+}
+
+.kiosk-language-choice__button strong {
+  font-size: clamp(20px, 2vw, 26px);
+}
+
+.kiosk-language-qr {
+  grid-column: 2;
+  grid-row: 3;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 18px 16px;
+  border: 1px solid rgba(103, 217, 255, .24);
+  border-radius: 24px;
+  background:
+    linear-gradient(150deg, rgba(15, 38, 66, .96), rgba(7, 20, 39, .96));
+  box-shadow: 0 24px 58px rgba(0, 0, 0, .2), inset 0 1px 0 rgba(255, 255, 255, .04);
+}
+
+.kiosk-language-qr__copy {
+  display: grid;
+  gap: 7px;
+  text-align: center;
+}
+
+.kiosk-language-qr__copy p {
+  margin: 0;
+  color: #67d9ff;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: .11em;
+  line-height: 1.45;
+}
+
+.kiosk-language-qr__copy h2 {
+  margin: 0;
+  color: #f8f8ff;
+  font-size: 22px;
+  letter-spacing: -.025em;
+}
+
+.kiosk-language-qr__copy span {
+  color: #a6b7ce;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.kiosk-language-qr__copy small {
+  color: #72e3c0;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.kiosk-language-qr__frame {
+  display: grid;
+  place-items: center;
+  width: min(100%, 218px);
+  min-height: 194px;
+  aspect-ratio: 1;
+  padding: 9px;
+  border: 1px solid rgba(15, 23, 42, .08);
+  border-radius: 17px;
+  background: #fff;
+  color: #475569;
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.kiosk-language-qr__frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.kiosk-language-qr__site {
+  max-width: 100%;
+  color: #dcecff;
+  font-size: 11px;
+  line-height: 1.45;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  .kiosk-language-welcome {
+    width: min(100%, 560px);
+    min-height: auto;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    padding: 16px 0;
+  }
+
+  .kiosk-language-welcome__brand,
+  .kiosk-language-welcome__copy,
+  .kiosk-language-choice,
+  .kiosk-language-qr {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .kiosk-language-welcome__copy h1 {
+    font-size: clamp(32px, 8vw, 48px);
+  }
+
+  .kiosk-language-welcome__copy span {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .kiosk-language-choice {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .kiosk-language-choice__button {
+    min-height: 105px;
+    gap: 7px;
+    padding: 14px 8px;
+    border-radius: 17px;
+  }
+
+  .kiosk-language-choice__button strong {
+    font-size: 18px;
+  }
+
+  .kiosk-language-choice__button span {
+    font-size: 10px;
+    text-align: center;
+  }
+
+  .kiosk-language-qr {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .kiosk-language-qr__copy p {
+    font-size: 9px;
+  }
+
+  .kiosk-language-qr__frame {
+    width: min(100%, 220px);
+    min-height: 0;
+  }
+}
+
+@media (max-height: 780px) and (min-width: 761px) {
+  .kiosk-language-screen {
+    align-items: start;
+  }
+
+  .kiosk-language-welcome {
+    min-height: auto;
+    padding: 12px 0;
+    gap: 16px;
+  }
+
+  .kiosk-language-welcome__copy h1 {
+    font-size: clamp(34px, 4vw, 48px);
+  }
+
+  .kiosk-language-welcome__copy span {
+    margin-top: 8px;
+    font-size: 14px;
+  }
+
+  .kiosk-language-qr {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .kiosk-language-qr__frame {
+    width: min(100%, 170px);
+    min-height: 150px;
+    padding: 7px;
+  }
+
+  .kiosk-language-choice__button {
+    min-height: 120px;
+    padding: 14px;
+  }
+}
