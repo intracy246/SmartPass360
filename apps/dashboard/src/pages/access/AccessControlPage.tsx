@@ -133,6 +133,8 @@ export function AccessControlPage() {
 
     setValidationError(null);
     setValidationResult(null);
+    setPermanentError(null);
+    setPermanentResult(null);
 
     validationMutation.mutate({
       credential: cleanedCredential,
@@ -197,6 +199,8 @@ export function AccessControlPage() {
 
     setPermanentError(null);
     setPermanentResult(null);
+    setValidationError(null);
+    setValidationResult(null);
 
     if (!gateId) {
       setPermanentError("Select an active gate or checkpoint first.");
@@ -214,6 +218,14 @@ export function AccessControlPage() {
   const events =
     accessEventsQuery.data?.data ?? [];
 
+  function handleGateChange(nextGateId: string) {
+    setGateId(nextGateId);
+    setValidationResult(null);
+    setValidationError(null);
+    setPermanentResult(null);
+    setPermanentError(null);
+  }
+
   function handleCameraCredential(scannedCredential: string) {
     const cleanedCredential = scannedCredential.trim();
 
@@ -221,7 +233,7 @@ export function AccessControlPage() {
       setValidationResult(null);
       setPermanentResult(null);
       setValidationError("Select the gate or checkpoint for this building before scanning.");
-      setPermanentError("Select the gate or checkpoint for this building before scanning.");
+      setPermanentError(null);
       return;
     }
 
@@ -255,7 +267,7 @@ export function AccessControlPage() {
     setValidationResult(null);
     setPermanentResult(null);
     setValidationError("This is not a SmartPass360 visitor or permanent-pass ticket. Do not scan the kiosk registration QR here.");
-    setPermanentError("This is not a SmartPass360 visitor or permanent-pass ticket. Do not scan the kiosk registration QR here.");
+    setPermanentError(null);
   }
 
   return (
@@ -283,7 +295,7 @@ export function AccessControlPage() {
       <AccessQrCameraScanner
         gates={gatesQuery.data?.data ?? []}
         selectedGateId={gateId}
-        onGateChange={setGateId}
+        onGateChange={handleGateChange}
         isValidating={validationMutation.isPending || permanentScanMutation.isPending}
         result={validationResult}
         error={validationError}
