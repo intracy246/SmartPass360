@@ -64,8 +64,8 @@ export function DashboardPage() {
         </div>
 
         <div className="dashboard-page__actions">
-          <GlassButton variant="secondary">
-            Export Report
+          <GlassButton type="button" variant="secondary" onClick={() => navigate("/reports")}>
+            Export PDF Report
           </GlassButton>
 
           <GlassButton
