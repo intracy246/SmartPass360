@@ -3,9 +3,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "../../api/api-client";
 import { printVisitorPass } from "../../utils/visitor-pass-print";
 import { downloadVisitorPassImage } from "../../utils/visitor-pass-image";
+import { exportVisitorReportPdf, type ReportPeriod } from "../../utils/visitor-report-pdf";
 import "./VisitorQueue.css";
-
-type ReportPeriod = "today" | "week" | "month";
 
 type IssuedQueueTicket = {
   passNumber: string;
@@ -59,77 +58,6 @@ function darEsSalaamDateKey(value: string | Date) {
 
 function todayInDarEsSalaam() {
   return darEsSalaamDateKey(new Date());
-}
-
-function csvCell(value: unknown) {
-  let text = value == null ? "" : String(value);
-
-  // Prevent spreadsheet formula execution from untrusted visitor-entered text.
-  if (/^[\u0000-\u0020]*[=+@-]/.test(text)) {
-    text = `'${text}`;
-  }
-
-  return `"${text.replaceAll('"', '""')}"`;
-}
-
-function downloadCsv(visits: QueueVisit[], period: ReportPeriod) {
-  const headers = [
-    "Visit ID",
-    "Visitor Name",
-    "Phone",
-    "Company",
-    "Organization",
-    "Department / Office",
-    "Host",
-    "Purpose",
-    "Vehicle Registration",
-    "Registered At (EAT)",
-    "Registration Source",
-    "Visit Status",
-    "Approved At",
-    "Checked In At",
-    "Checked Out At",
-    "Pass Number"
-  ];
-
-  const rows = visits.map((visit) => [
-    visit.id,
-    visit.fullName,
-    visit.phone,
-    visit.company,
-    visit.organization?.name,
-    visit.departmentOrOffice,
-    visit.hostName,
-    visit.purpose,
-    visit.vehicleNumber,
-    visit.registeredAt ? new Date(visit.registeredAt).toLocaleString("en-GB", { timeZone: "Africa/Dar_es_Salaam" }) : "",
-    visit.source,
-    visit.status,
-    visit.approvedAt ? new Date(visit.approvedAt).toLocaleString("en-GB", { timeZone: "Africa/Dar_es_Salaam" }) : "",
-    visit.checkedInAt ? new Date(visit.checkedInAt).toLocaleString("en-GB", { timeZone: "Africa/Dar_es_Salaam" }) : "",
-    visit.checkedOutAt ? new Date(visit.checkedOutAt).toLocaleString("en-GB", { timeZone: "Africa/Dar_es_Salaam" }) : "",
-    visit.pass?.passNumber
-  ]);
-
-  const csv = [headers, ...rows]
-    .map((row) => row.map(csvCell).join(","))
-    .join("\r\n");
-  const blob = new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  const localDate = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Africa/Dar_es_Salaam",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
-  }).format(new Date());
-
-  anchor.href = url;
-  anchor.download = `smartpass360-visitors-${period}-${localDate}.csv`;
-  document.body.appendChild(anchor);
-  anchor.click();
-  anchor.remove();
-  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 export function VisitorQueue() {
@@ -211,21 +139,13 @@ export function VisitorQueue() {
     setExportError(null);
 
     try {
-      const response = await apiRequest<{
-        success: boolean;
-        period: ReportPeriod;
-        count: number;
-        data: QueueVisit[];
-      }>(`/visitors/report?period=${reportPeriod}`);
-
-      downloadCsv(response.data, reportPeriod);
+      await exportVisitorReportPdf(reportPeriod);
     } catch (error) {
-      setExportError(error instanceof Error ? error.message : "Unable to export the visitor report.");
+      setExportError(error instanceof Error ? error.message : "Unable to export the visitor PDF report.");
     } finally {
       setIsExporting(false);
     }
   }
-
   return (
     <section className="visitor-queue" aria-label="Reception and Security visitor queue">
       <header className="visitor-queue__header">
@@ -257,7 +177,7 @@ export function VisitorQueue() {
             onClick={() => void exportReport()}
             disabled={isExporting}
           >
-            {isExporting ? "Preparing report…" : `Export ${reportPeriodLabels[reportPeriod]}`}
+            {isExporting ? "Preparing PDF…" : `Export PDF · ${reportPeriodLabels[reportPeriod]}`}
           </button>
         </div>
       </header>
