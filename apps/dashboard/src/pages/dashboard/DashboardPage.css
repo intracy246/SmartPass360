@@ -1,5 +1,6 @@
 .dashboard-page {
   width: min(100%, 1600px);
+  min-width: 0;
   margin: 0 auto;
 }
 
@@ -194,18 +195,90 @@
 @media (max-width: 720px) {
   .dashboard-page__header {
     flex-direction: column;
+    gap: 16px;
+    margin-bottom: 20px;
   }
 
-  .dashboard-page__actions {
+  .dashboard-page__header > div:first-child {
+    min-width: 0;
     width: 100%;
   }
 
+  .dashboard-page__header h1 {
+    font-size: clamp(28px, 7.2vw, 36px);
+    line-height: 1.12;
+    overflow-wrap: anywhere;
+  }
+
+  .dashboard-page__description {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .dashboard-page__actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    gap: 8px;
+  }
+
   .dashboard-page__actions button {
-    flex: 1;
+    width: 100%;
+    min-width: 0;
+    padding: 0 10px;
+    font-size: 12px;
+    line-height: 1.25;
   }
 
   .dashboard-page__stats {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .stat-card__label {
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  .stat-card__value {
+    margin-top: 12px;
+    font-size: 32px;
+  }
+
+  .stat-card__note {
+    margin-top: 10px;
+    font-size: 10px;
+  }
+
+  .dashboard-page__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .operations-activity__item {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .vehicle-approval__item {
+    min-width: 0;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .vehicle-approval__actions {
+    flex-wrap: wrap;
+  }
+
+  .vehicle-approval__actions button {
+    flex: 1 1 120px;
+    min-width: 0;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  .system-status__details {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
