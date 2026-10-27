@@ -534,7 +534,7 @@ visitorRouter.post("/self-service/status", publicStatusRateLimit, async (request
 
       if (!visit) return { kind: "invalid" as const };
 
-      if (visit.status === "REJECTED" || visit.status === "DENIED") {
+      if (visit.status === "REJECTED") {
         return {
           kind: "rejected" as const,
           referenceNumber: visit.id.slice(0, 8).toUpperCase()
