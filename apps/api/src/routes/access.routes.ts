@@ -250,7 +250,12 @@ accessRouter.post("/hardware/permanent-pass/ack", async (request, response, next
       data: {
         turnstileOpened: parsed.data.opened,
         metadata: {
-          ...metadata,
+          validationMode: "HARDWARE",
+          commandIssued: "UNLOCK",
+          gateCode: typeof metadata.gateCode === "string" ? metadata.gateCode : "",
+          gateName: typeof metadata.gateName === "string" ? metadata.gateName : "",
+          requestId: typeof metadata.requestId === "string" ? metadata.requestId : null,
+          gateDeviceId: device.id,
           actuatorAcknowledged: true,
           actuatorOpened: parsed.data.opened,
           actuatorFailureCode: parsed.data.opened ? null : (parsed.data.failureCode ?? "ACTUATION_FAILED"),
