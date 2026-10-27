@@ -203,7 +203,7 @@ export function VisitorQueue() {
         <div className="visitor-queue__heading">
           <h2>Reception / Security queue</h2>
           <p>Today's registrations · refreshes every 3 seconds · new list starts at midnight (Dar es Salaam time).</p>
-          <p className="visitor-queue__retention-note">Older visits remain saved securely and can be exported by date range.</p>
+          <p className="visitor-queue__retention-note">Older visits remain saved securely. Export downloads a real PDF file with the selected period and organization summary for today, this week and this month.</p>
         </div>
 
         <div className="visitor-queue__tools">
