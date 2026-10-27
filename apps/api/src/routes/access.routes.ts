@@ -1163,6 +1163,14 @@ accessRouter.post(
 
       if (
         !denialReason &&
+        permanentPass.lastActivityAt &&
+        now.getTime() - permanentPass.lastActivityAt.getTime() < 2000
+      ) {
+        denialReason = "SCAN_TOO_SOON";
+      }
+
+      if (
+        !denialReason &&
         gate.direction !== "BIDIRECTIONAL" &&
         gate.direction !== activityType
       ) {
