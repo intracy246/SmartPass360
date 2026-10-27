@@ -117,7 +117,7 @@ export function VisitorQueue() {
           setTicketAction(null);
         }
       } else {
-        setTicketActionError("The pass was approved, but the browser blocked automatic printing. Select Print ticket below to retry.");
+        setTicketActionError("The pass was approved, but the browser blocked automatic printing. Check the printer connection/default printer, then select Print ticket below to retry.");
       }
 
       await Promise.all([
@@ -241,7 +241,7 @@ export function VisitorQueue() {
             <h3>{issuedTicket.fullName}</h3>
             <p>{issuedTicket.organizationName} · {issuedTicket.passNumber}</p>
             <p>Valid until {new Date(issuedTicket.validUntil).toLocaleString("en-GB", { timeZone: "Africa/Dar_es_Salaam" })}</p>
-            <small>Ticket QR is ready. Print a physical ticket or download the complete ticket as a PNG image.</small>
+            <small>The approval action has triggered automatic printing. Use Print ticket only if you need to reprint; Download PNG is available for records.</small>
           </div>
           <img src={issuedTicket.qrValue} alt="Approved visitor ticket QR code" />
           <div className="visitor-queue__ticket-actions">
