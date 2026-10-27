@@ -10,7 +10,6 @@ import {
   getReportRangeLabel,
   summarizeVisitorReport,
   getAllReportOrganizations,
-  type ReportOrganization,
   type ReportPeriod,
   type VisitorReportVisit
 } from "../../utils/visitor-report-pdf";
@@ -193,6 +192,45 @@ export function ReportsPage() {
         </article>
       </section>
 
+      <section className="reports-page__section">
+        <div className="reports-page__section-heading">
+          <div>
+            <h2>Organization Visits by Period</h2>
+            <p>Registration totals for every organization assigned to this building, for today, the current week, and the current calendar month.</p>
+          </div>
+          <span>{comparisonOrganizations.length} organizations</span>
+        </div>
+        {isLoading ? (
+          <p className="reports-page__state">Loading daily, weekly and monthly totals…</p>
+        ) : (
+          <div className="reports-page__table-wrap">
+            <table>
+              <thead>
+                <tr><th>Organization</th><th>Today</th><th>This week</th><th>This month</th></tr>
+              </thead>
+              <tbody>
+                {comparisonOrganizations.map((organization) => (
+                  <tr key={organization.id}>
+                    <td><strong>{organization.name}</strong></td>
+                    <td>{dailyVisits.filter((visit) => visit.organization?.id === organization.id).length}</td>
+                    <td>{weeklyVisits.filter((visit) => visit.organization?.id === organization.id).length}</td>
+                    <td>{monthlyVisits.filter((visit) => visit.organization?.id === organization.id).length}</td>
+                  </tr>
+                ))}
+                <tr className="reports-page__total-row">
+                  <td><strong>TOTAL VISITS</strong></td>
+                  <td>{dailyVisits.length}</td>
+                  <td>{weeklyVisits.length}</td>
+                  <td>{monthlyVisits.length}</td>
+                </tr>
+                {comparisonOrganizations.length === 0 && (
+                  <tr><td colSpan={4} className="reports-page__empty">No organizations are assigned to this building.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
       <section className="reports-page__section">
         <div className="reports-page__section-heading">
           <div>
