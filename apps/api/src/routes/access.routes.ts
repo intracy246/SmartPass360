@@ -1038,30 +1038,31 @@ accessRouter.post(
         denialReason = "BUILDING_INACTIVE";
       }
 
-      if (!permanentPass.organization.isActive) {
-        denialReason = "ORGANIZATION_INACTIVE";
-
-      } else if (permanentPass.status !== "ACTIVE") {
-        denialReason =
-          `PASS_${permanentPass.status}`;
-      } else if (
-        permanentPass.validFrom.getTime() >
-        now.getTime()
-      ) {
-        denialReason = "PASS_NOT_YET_VALID";
-      } else if (
-        permanentPass.expiryType === "FIXED_DATE" &&
-        permanentPass.expiresAt &&
-        permanentPass.expiresAt.getTime() <=
-          now.getTime()
-      ) {
-        denialReason = "PASS_EXPIRED";
-      }
-
       const activityType =
         permanentPass.isCurrentlyInside
           ? "EXIT"
           : "ENTRY";
+
+      // Never prevent a person recorded as inside from leaving because a
+      // permanent credential expired or was administratively suspended/revoked.
+      // These checks govern entry; egress is still recorded at the selected gate.
+      if (!permanentPass.organization.isActive && activityType !== "EXIT") {
+        denialReason = "ORGANIZATION_INACTIVE";
+      } else if (permanentPass.status !== "ACTIVE" && activityType !== "EXIT") {
+        denialReason = `PASS_${permanentPass.status}`;
+      } else if (
+        permanentPass.validFrom.getTime() > now.getTime() &&
+        activityType !== "EXIT"
+      ) {
+        denialReason = "PASS_NOT_YET_VALID";
+      } else if (
+        activityType !== "EXIT" &&
+        permanentPass.expiryType === "FIXED_DATE" &&
+        permanentPass.expiresAt &&
+        permanentPass.expiresAt.getTime() <= now.getTime()
+      ) {
+        denialReason = "PASS_EXPIRED";
+      }
 
       if (
         !denialReason &&
