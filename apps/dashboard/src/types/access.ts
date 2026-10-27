@@ -70,6 +70,7 @@ export type AccessEventListResponse = {
 export type PermanentPassScanPayload = {
   qrCode: string;
   gateId: string;
+  requestId?: string;
 };
 
 export type PermanentPassScanResult = {
