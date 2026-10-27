@@ -261,7 +261,7 @@ export function AccessQrCameraScanner({
       )}
 
       <p className="access-qr-camera__footnote">
-        Only approved SmartPass360 visitor tickets are accepted. A successful scan is checked by the Ubuntu API against this building, the selected gate, ticket validity and anti-passback rules. A screenshot of a QR is not trusted on its own.
+        Only approved SmartPass360 visitor tickets and active permanent passes are accepted. The Ubuntu API checks the signed-in building, selected gate, ticket validity and entry/exit state. A screenshot of a QR is not trusted on its own. The browser can record a software decision but cannot open a physical turnstile.
       </p>
     </section>
   );
