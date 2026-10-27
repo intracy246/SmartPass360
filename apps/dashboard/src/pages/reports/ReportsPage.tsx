@@ -9,6 +9,7 @@ import {
   formatReportDateTime,
   getReportRangeLabel,
   summarizeVisitorReport,
+  getAllReportOrganizations,
   type ReportOrganization,
   type ReportPeriod,
   type VisitorReportVisit
@@ -21,11 +22,6 @@ type ReportResponse = {
   period: ReportPeriod;
   count: number;
   data: VisitorReportVisit[];
-};
-
-type OrganizationResponse = {
-  success: boolean;
-  data: ReportOrganization[];
 };
 
 const periodOptions: { value: ReportPeriod; label: string }[] = [
@@ -43,11 +39,29 @@ export function ReportsPage() {
   const [isExporting, setIsExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
 
-  const reportQuery = useQuery({
-    queryKey: ["visitor-report", period],
-    queryFn: () => apiRequest<ReportResponse>("/visitors/report?period=" + encodeURIComponent(period)),
+  const dailyReportQuery = useQuery({
+    queryKey: ["visitor-report", "today"],
+    queryFn: () => apiRequest<ReportResponse>("/visitors/report?period=today"),
     staleTime: 15_000
   });
+
+  const weeklyReportQuery = useQuery({
+    queryKey: ["visitor-report", "week"],
+    queryFn: () => apiRequest<ReportResponse>("/visitors/report?period=week"),
+    staleTime: 15_000
+  });
+
+  const monthlyReportQuery = useQuery({
+    queryKey: ["visitor-report", "month"],
+    queryFn: () => apiRequest<ReportResponse>("/visitors/report?period=month"),
+    staleTime: 15_000
+  });
+
+  const reportQuery = period === "today"
+    ? dailyReportQuery
+    : period === "week"
+      ? weeklyReportQuery
+      : monthlyReportQuery;
 
   const buildingQuery = useQuery({
     queryKey: ["building-settings"],
@@ -57,12 +71,27 @@ export function ReportsPage() {
 
   const organizationsQuery = useQuery({
     queryKey: ["report-organizations"],
-    queryFn: () => apiRequest<OrganizationResponse>("/organizations?page=1&pageSize=100"),
+    queryFn: getAllReportOrganizations,
     staleTime: 60_000
   });
 
   const visits = reportQuery.data?.data ?? [];
-  const organizations = organizationsQuery.data?.data ?? [];
+  const dailyVisits = dailyReportQuery.data?.data ?? [];
+  const weeklyVisits = weeklyReportQuery.data?.data ?? [];
+  const monthlyVisits = monthlyReportQuery.data?.data ?? [];
+  const organizations = organizationsQuery.data ?? [];
+
+  const comparisonOrganizations = useMemo(() => {
+    const all = [...organizations];
+    for (const visit of [...dailyVisits, ...weeklyVisits, ...monthlyVisits]) {
+      const item = visit.organization;
+      if (item && !all.some((organization) => organization.id === item.id)) {
+        all.push({ id: item.id, name: item.name });
+      }
+    }
+    return all.sort((a, b) => a.name.localeCompare(b.name));
+  }, [organizations, dailyVisits, weeklyVisits, monthlyVisits]);
+
   const summaries = useMemo(
     () => summarizeVisitorReport(organizations, visits),
     [organizations, visits]
@@ -70,8 +99,10 @@ export function ReportsPage() {
   const organizationsVisited = summaries.filter((item) => item.visitors > 0).length;
   const entered = visits.filter((visit) => Boolean(visit.checkedInAt)).length;
   const exited = visits.filter((visit) => Boolean(visit.checkedOutAt)).length;
-  const isLoading = reportQuery.isPending || buildingQuery.isPending || organizationsQuery.isPending;
-
+  const isLoading = dailyReportQuery.isPending || weeklyReportQuery.isPending ||
+    monthlyReportQuery.isPending || buildingQuery.isPending || organizationsQuery.isPending;
+  const reportError = dailyReportQuery.error || weeklyReportQuery.error || monthlyReportQuery.error ||
+    buildingQuery.error || organizationsQuery.error;
   async function handleExport() {
     setExportError(null);
     setIsExporting(true);
@@ -99,7 +130,7 @@ export function ReportsPage() {
           <GlassButton
             type="button"
             variant="secondary"
-            onClick={() => void Promise.all([reportQuery.refetch(), buildingQuery.refetch(), organizationsQuery.refetch()])}
+            onClick={() => void Promise.all([dailyReportQuery.refetch(), weeklyReportQuery.refetch(), monthlyReportQuery.refetch(), buildingQuery.refetch(), organizationsQuery.refetch()])}
             disabled={isLoading}
           >
             Refresh data
@@ -130,9 +161,9 @@ export function ReportsPage() {
       </section>
 
       {exportError && <p className="reports-page__error" role="alert">{exportError}</p>}
-      {(reportQuery.error || buildingQuery.error || organizationsQuery.error) && (
+      {reportError && (
         <div className="reports-page__error" role="alert">
-          {(reportQuery.error || buildingQuery.error || organizationsQuery.error)?.message}
+          {reportError.message}
           <button type="button" onClick={() => void Promise.all([reportQuery.refetch(), buildingQuery.refetch(), organizationsQuery.refetch()])}>
             Try again
           </button>
