@@ -871,14 +871,12 @@ accessRouter.post(
         });
 
         if (!permanentPass) {
-          const event = null;
           return {
             decision: "DENIED" as const,
             denialReason: "INVALID_CREDENTIAL",
             activityType: "ENTRY" as const,
             turnstileCommand: "KEEP_LOCKED" as const,
-            message: "No active permanent pass matches this QR.",
-            event
+            message: "No active permanent pass matches this QR."
           };
         }
 
