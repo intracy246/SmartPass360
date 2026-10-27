@@ -154,145 +154,399 @@ export function summarizeVisitorReport(
     .sort((a, b) => a.organization.name.localeCompare(b.organization.name));
 }
 
-function escapeHtml(value: unknown) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
+type PdfLogo = { bytes: Uint8Array; width: number; height: number };
+type PdfPage = { commands: string[]; y: number };
+type PdfColumn = { title: string; width: number; align?: "left" | "center" | "right" };
+type PdfTableRow = { cells: string[]; total?: boolean };
+
+const PAGE_WIDTH = 842;
+const PAGE_HEIGHT = 595;
+const PAGE_LEFT = 30;
+const PAGE_RIGHT = 812;
+const CONTENT_BOTTOM = 552;
+const FOOTER_TOP = 565;
+
+function toAsciiBytes(value: string) {
+  return new TextEncoder().encode(value);
 }
 
-function safeLogoUrl(value?: string | null) {
-  if (!value) return "";
-  if (/^data:image\/(?:png|jpe?g|webp|gif);base64,/i.test(value)) return value;
-  if (/^https:\/\//i.test(value)) return value;
-  return "";
+const winAnsiSpecial: Record<string, number> = {
+  "€": 0x80, "‚": 0x82, "ƒ": 0x83, "„": 0x84, "…": 0x85, "†": 0x86,
+  "‡": 0x87, "ˆ": 0x88, "‰": 0x89, "Š": 0x8a, "‹": 0x8b, "Œ": 0x8c,
+  "Ž": 0x8e, "‘": 0x91, "’": 0x92, "“": 0x93, "”": 0x94, "•": 0x95,
+  "–": 0x96, "—": 0x97, "˜": 0x98, "™": 0x99, "š": 0x9a, "›": 0x9b,
+  "œ": 0x9c, "ž": 0x9e, "Ÿ": 0x9f
+};
+
+function normalizePdfText(value: unknown) {
+  return String(value ?? "—")
+    .replaceAll("—", "-")
+    .replaceAll("–", "-")
+    .replaceAll("·", " | ")
+    .replaceAll("\u00a0", " ")
+    .replaceAll("\r", " ")
+    .replaceAll("\n", " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
-function statusLabel(value: string) {
-  return value.replaceAll("_", " ").toLowerCase().replace(/\b[a-z]/g, (character) => character.toUpperCase());
+function pdfTextHex(value: unknown) {
+  const text = normalizePdfText(value);
+  const bytes: number[] = [];
+  for (const character of text) {
+    const code = character.codePointAt(0) ?? 63;
+    if (code >= 32 && code <= 126) {
+      bytes.push(code);
+    } else if (code >= 160 && code <= 255) {
+      bytes.push(code);
+    } else if (winAnsiSpecial[character] !== undefined) {
+      bytes.push(winAnsiSpecial[character]);
+    } else {
+      bytes.push(63);
+    }
+  }
+  return "<" + bytes.map((byte) => byte.toString(16).padStart(2, "0")).join("").toUpperCase() + ">";
 }
 
-function reportHtml(
-  period: ReportPeriod,
-  building: BuildingSettings,
-  visits: VisitorReportVisit[],
-  organizations: ReportOrganization[],
-  visitsByPeriod: VisitsByPeriod
-) {
-  const selectedSummary = summarizeVisitorReport(organizations, visits);
-  const dailySummary = new Map(summarizeVisitorReport(organizations, visitsByPeriod.today).map((item) => [item.organization.id, item.visitors]));
-  const weeklySummary = new Map(summarizeVisitorReport(organizations, visitsByPeriod.week).map((item) => [item.organization.id, item.visitors]));
-  const monthlySummary = new Map(summarizeVisitorReport(organizations, visitsByPeriod.month).map((item) => [item.organization.id, item.visitors]));
-  const uniqueOrganizationsVisited = selectedSummary.filter((item) => item.visitors > 0).length;
-  const entered = visits.filter((visit) => Boolean(visit.checkedInAt)).length;
-  const exited = visits.filter((visit) => Boolean(visit.checkedOutAt)).length;
-  const periodTitle = REPORT_PERIOD_LABELS[period] + " Visitor Report";
-  const logoUrl = safeLogoUrl(building.logoUrl);
-  const logo = logoUrl
-    ? '<img class="building-logo" src="' + escapeHtml(logoUrl) + '" alt="Building logo">'
-    : '<div class="building-logo-fallback">SP</div>';
+function wrapText(value: unknown, maxChars: number, maxLines = 5) {
+  const text = normalizePdfText(value);
+  if (!text) return [""];
+  const words = text.split(" ");
+  const lines: string[] = [];
+  let line = "";
 
-  const organizationList = summarizeVisitorReport(organizations, [
-    ...visitsByPeriod.today,
-    ...visitsByPeriod.week,
-    ...visitsByPeriod.month,
-    ...visits
+  for (const word of words) {
+    if (!line) {
+      line = word;
+    } else if ((line + " " + word).length <= maxChars) {
+      line += " " + word;
+    } else {
+      lines.push(line);
+      line = word;
+    }
+  }
+  if (line) lines.push(line);
+
+  if (lines.length > maxLines) {
+    const clipped = lines.slice(0, maxLines);
+    clipped[maxLines - 1] = clipped[maxLines - 1].replace(/[.,;:]?$/, "") + "...";
+    return clipped;
+  }
+  return lines;
+}
+
+function pdfNumber(value: number) {
+  return Number(value.toFixed(2)).toString();
+}
+
+function textCommand(value: unknown, x: number, top: number, size: number, bold = false, color = "0.10 0.16 0.20") {
+  const baseline = PAGE_HEIGHT - top - size;
+  const font = bold ? "F2" : "F1";
+  return color + " rg BT /" + font + " " + pdfNumber(size) + " Tf 1 0 0 1 " +
+    pdfNumber(x) + " " + pdfNumber(baseline) + " Tm " + pdfTextHex(value) + " Tj ET";
+}
+
+function rectCommand(x: number, top: number, width: number, height: number, fill: string, stroke = "0.82 0.87 0.88") {
+  const bottom = PAGE_HEIGHT - top - height;
+  return fill + " rg " + stroke + " RG 0.5 w " + pdfNumber(x) + " " + pdfNumber(bottom) + " " +
+    pdfNumber(width) + " " + pdfNumber(height) + " re B";
+}
+
+function lineCommand(x1: number, top: number, x2: number, color = "0.80 0.86 0.86", thickness = 0.7) {
+  const y = PAGE_HEIGHT - top;
+  return color + " RG " + pdfNumber(thickness) + " w " + pdfNumber(x1) + " " + pdfNumber(y) +
+    " m " + pdfNumber(x2) + " " + pdfNumber(y) + " l S";
+}
+
+async function loadLogoAsJpeg(logoUrl?: string | null): Promise<PdfLogo | null> {
+  if (!logoUrl || (!logoUrl.startsWith("https://") && !logoUrl.startsWith("data:image/"))) return null;
+  try {
+    const response = await fetch(logoUrl, { mode: "cors", credentials: "omit" });
+    if (!response.ok) return null;
+    const blob = await response.blob();
+    const bitmap = await createImageBitmap(blob);
+    const scale = Math.min(1, 420 / Math.max(bitmap.width, bitmap.height));
+    const width = Math.max(1, Math.round(bitmap.width * scale));
+    const height = Math.max(1, Math.round(bitmap.height * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext("2d");
+    if (!context) {
+      bitmap.close();
+      return null;
+    }
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, width, height);
+    context.drawImage(bitmap, 0, 0, width, height);
+    bitmap.close();
+
+    const base64 = canvas.toDataURL("image/jpeg", 0.9).split(",")[1];
+    if (!base64) return null;
+    const binary = window.atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
+    return { bytes, width, height };
+  } catch {
+    // Cross-origin logo storage may disallow canvas export; the PDF uses a branded fallback mark.
+    return null;
+  }
+}
+
+function concatBytes(parts: Uint8Array[]) {
+  const length = parts.reduce((total, part) => total + part.length, 0);
+  const result = new Uint8Array(length);
+  let offset = 0;
+  for (const part of parts) {
+    result.set(part, offset);
+    offset += part.length;
+  }
+  return result;
+}
+
+function makeStreamObject(dictionary: string, stream: Uint8Array) {
+  return concatBytes([
+    toAsciiBytes(dictionary + "\nstream\n"),
+    stream,
+    toAsciiBytes("\nendstream")
   ]);
-
-  const periodRows = organizationList.map((item) =>
-    "<tr><td><strong>" + escapeHtml(item.organization.name) + "</strong>" +
-    (item.organization.code ? '<div class="muted">' + escapeHtml(item.organization.code) + "</div>" : "") +
-    "</td><td class=\"num\">" + (dailySummary.get(item.organization.id) ?? 0) +
-    "</td><td class=\"num\">" + (weeklySummary.get(item.organization.id) ?? 0) +
-    "</td><td class=\"num\">" + (monthlySummary.get(item.organization.id) ?? 0) + "</td></tr>"
-  ).join("");
-
-  const periodTotals = "<tr class=\"total-row\"><td><strong>TOTAL VISITS</strong></td><td class=\"num\">" +
-    visitsByPeriod.today.length + "</td><td class=\"num\">" + visitsByPeriod.week.length +
-    "</td><td class=\"num\">" + visitsByPeriod.month.length + "</td></tr>";
-
-  const summaryRows = selectedSummary.map((item) =>
-    "<tr><td><strong>" + escapeHtml(item.organization.name) + "</strong>" +
-    (item.organization.code ? '<div class="muted">' + escapeHtml(item.organization.code) + "</div>" : "") +
-    "</td><td class=\"num\">" + item.visitors +
-    "</td><td class=\"num\">" + item.entered + "</td><td class=\"num\">" + item.exited +
-    "</td><td class=\"num\">" + item.pending + "</td><td class=\"num\">" + item.rejected + "</td></tr>"
-  ).join("");
-
-  const detailRows = visits.map((visit, index) =>
-    "<tr><td>" + (index + 1) + "</td><td><strong>" + escapeHtml(visit.fullName) +
-    "</strong><div class=\"muted\">" + escapeHtml(visit.phone || "—") + "</div></td><td>" +
-    escapeHtml(visit.organization?.name || "—") + "</td><td>" + escapeHtml(visit.purpose || "—") +
-    "</td><td>" + escapeHtml(formatReportDateTime(visit.registeredAt)) + "</td><td>" +
-    escapeHtml(statusLabel(visit.status)) + "</td><td>" +
-    escapeHtml(formatReportDateTime(visit.checkedInAt)) + "</td><td>" +
-    escapeHtml(formatReportDateTime(visit.checkedOutAt)) + "</td><td>" +
-    escapeHtml(visit.pass?.passNumber || "—") + "</td></tr>"
-  ).join("");
-
-  const periodRowsOrEmpty = periodRows ||
-    '<tr><td colspan="4" class="empty">No organizations are configured for this building.</td></tr>';
-  const organizationRowsOrEmpty = summaryRows ||
-    '<tr><td colspan="6" class="empty">No organizations are configured for this building.</td></tr>';
-  const visitDetails = detailRows ||
-    '<tr><td colspan="9" class="empty">No visitor registrations were recorded during this period.</td></tr>';
-  const selectedTotals = "<tr class=\"total-row\"><td><strong>TOTAL</strong></td><td class=\"num\">" +
-    visits.length + "</td><td class=\"num\">" + entered + "</td><td class=\"num\">" +
-    exited + "</td><td class=\"num\">" +
-    visits.filter((visit) => visit.status === "PENDING_APPROVAL").length + "</td><td class=\"num\">" +
-    visits.filter((visit) => ["REJECTED", "DENIED"].includes(visit.status)).length + "</td></tr>";
-
-  const css = [
-    "@page{size:A4 landscape;margin:12mm 10mm 18mm}",
-    "*{box-sizing:border-box}",
-    "body{margin:0;padding:0 0 18mm;font-family:Arial,Helvetica,sans-serif;color:#142033;font-size:10px;line-height:1.4;background:#fff}",
-    ".report-header{display:flex;align-items:center;gap:16px;border-bottom:3px solid #1b6a58;padding:0 0 14px;margin-bottom:16px}",
-    ".building-logo{width:74px;height:74px;object-fit:contain;border-radius:10px}",
-    ".building-logo-fallback{width:74px;height:74px;border-radius:10px;background:#123d35;color:#fff;display:flex;align-items:center;justify-content:center;font-size:25px;font-weight:800}",
-    ".heading{flex:1}.brand{font-size:10px;letter-spacing:2px;font-weight:800;color:#1b6a58}.heading h1{font-size:24px;line-height:1.15;margin:3px 0 6px;color:#12263b}.heading p{margin:2px 0;color:#526071}.right{text-align:right;min-width:145px}.right strong{font-size:12px}.muted{color:#667386;font-size:8px;margin-top:2px}",
-    ".kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 18px}.kpi{border:1px solid #dbe5e9;border-radius:8px;padding:11px 13px;background:#f7faf9}.kpi span{display:block;font-size:9px;color:#607081;text-transform:uppercase;letter-spacing:.7px}.kpi strong{display:block;margin-top:4px;font-size:23px;color:#164c40}",
-    "h2{font-size:14px;margin:17px 0 8px;color:#123d35;page-break-after:avoid}table{width:100%;border-collapse:collapse;table-layout:auto;margin-bottom:14px}thead{display:table-header-group}tr{page-break-inside:avoid}th{background:#173f37;color:white;text-align:left;font-size:8px;letter-spacing:.2px;padding:8px 7px}td{border:1px solid #dce4e7;padding:7px;vertical-align:top;overflow-wrap:anywhere}tbody tr:nth-child(even){background:#f6f9f8}.num{text-align:center;font-variant-numeric:tabular-nums}.total-row{background:#e9f4ef!important;font-weight:700}.total-row td{border-top:2px solid #1b6a58}.empty{text-align:center;padding:18px;color:#667386}",
-    ".details td{font-size:8px}.details th{font-size:7.5px}.details td:nth-child(1){width:24px;text-align:center}.details td:nth-child(2){min-width:105px}.details td:nth-child(4){min-width:100px}.details td:nth-child(5),.details td:nth-child(7),.details td:nth-child(8){min-width:100px}",
-    ".report-footer{position:fixed;bottom:-12mm;left:0;right:0;border-top:1px solid #cfdbdc;padding:6px 0 0;display:flex;justify-content:space-between;align-items:center;color:#65766f;font-size:8px}.report-footer strong{color:#1b6a58;letter-spacing:.4px}.no-data{color:#667386}",
-    "@media screen{body{max-width:1200px;margin:24px auto;padding:28px 30px 70px;box-shadow:0 2px 30px #1233}.report-footer{bottom:20px;left:30px;right:30px}}",
-    "@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.no-print{display:none!important}}"
-  ].join("");
-
-  return "<!doctype html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">" +
-    "<title>SmartPass360-" + escapeHtml(periodTitle.replaceAll(" ", "-")) + "-" + escapeHtml(dateKeyInDarEsSalaam(new Date())) + "</title><style>" + css + "</style></head><body>" +
-    '<header class="report-header">' + logo + '<div class="heading"><div class="brand">SMARTPASS360 · VISITOR ACCESS INTELLIGENCE</div>' +
-    "<h1>" + escapeHtml(building.name) + "</h1><p><strong>" + escapeHtml(periodTitle) + "</strong> · Reporting period: " +
-    escapeHtml(getReportRangeLabel(period)) + "</p><p>" + escapeHtml([building.address, building.city, building.country].filter(Boolean).join(", ") || building.code) +
-    "</p></div><div class=\"right\"><strong>Official Report</strong><div class=\"muted\">Generated: " +
-    escapeHtml(formatReportDateTime(new Date())) + "</div><div class=\"muted\">Time zone: East Africa Time (EAT)</div></div></header>" +
-    '<section class="kpis"><div class="kpi"><span>Visitors registered</span><strong>' + visits.length +
-    '</strong></div><div class="kpi"><span>Organizations visited</span><strong>' + uniqueOrganizationsVisited +
-    '</strong></div><div class="kpi"><span>Visitors entered</span><strong>' + entered +
-    '</strong></div><div class="kpi"><span>Visitors exited</span><strong>' + exited +
-    "</strong></div></section>" +
-    "<h2>Organization Visits by Period</h2><p class=\"no-data\">Counts are based on visitor registrations recorded by this building. The detailed visitor register below uses the selected reporting period.</p>" +
-    '<table><thead><tr><th>Organization</th><th>Today</th><th>This week</th><th>This month</th></tr></thead><tbody>' +
-    periodRowsOrEmpty + periodTotals + "</tbody></table>" +
-    "<h2>Selected Period Organization Breakdown</h2>" +
-    '<table><thead><tr><th>Organization</th><th>Visitors registered</th><th>Entered</th><th>Exited</th><th>Pending approval</th><th>Rejected / denied</th></tr></thead><tbody>' +
-    organizationRowsOrEmpty + selectedTotals + "</tbody></table>" +
-    "<h2>Visitor Register</h2><table class=\"details\"><thead><tr><th>No.</th><th>Visitor / phone</th><th>Organization</th><th>Purpose of visit</th><th>Registered (EAT)</th><th>Status</th><th>Entry (EAT)</th><th>Exit (EAT)</th><th>Pass number</th></tr></thead><tbody>" +
-    visitDetails + "</tbody></table>" +
-    '<footer class="report-footer"><span>Confidential · For authorized building management use</span><span><strong>SmartPass360</strong> by SmartCycle360</span></footer>' +
-    '<script>window.addEventListener("load",function(){setTimeout(function(){window.focus();window.print();},450);});</script></body></html>';
 }
 
-function showPopupMessage(popup: Window, message: string) {
-  if (popup.closed) return;
-  popup.document.open();
-  popup.document.write(
-    "<!doctype html><html><head><meta charset=\"utf-8\"><title>SmartPass360 PDF export issue</title>" +
-    "<style>body{font-family:Arial,sans-serif;padding:32px;color:#132b3d}h1{color:#176b58}p{line-height:1.6}</style></head><body>" +
-    "<h1>SmartPass360 report</h1><p>" + escapeHtml(message) + "</p><p>Close this window and retry the PDF export.</p></body></html>"
-  );
-  popup.document.close();
+function buildPdfBytes(pageContents: string[][], logo: PdfLogo | null) {
+  const objectStartId = logo ? 4 : 3;
+  const contentIds = pageContents.map((_, index) => objectStartId + index * 2);
+  const pageIds = pageContents.map((_, index) => objectStartId + index * 2 + 1);
+  const pagesRootId = objectStartId + pageContents.length * 2;
+  const catalogId = pagesRootId + 1;
+  const objects: Uint8Array[] = [];
+
+  function setObject(id: number, body: string | Uint8Array) {
+    objects[id - 1] = typeof body === "string" ? toAsciiBytes(body) : body;
+  }
+
+  setObject(1, "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>");
+  setObject(2, "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>");
+
+  if (logo) {
+    setObject(3, makeStreamObject(
+      "<< /Type /XObject /Subtype /Image /Width " + logo.width + " /Height " + logo.height +
+      " /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length " + logo.bytes.length + " >>",
+      logo.bytes
+    ));
+  }
+
+  for (let index = 0; index < pageContents.length; index += 1) {
+    const content = toAsciiBytes(pageContents[index].join("\n") + "\n");
+    const contentId = contentIds[index];
+    const pageId = pageIds[index];
+    setObject(contentId, makeStreamObject("<< /Length " + content.length + " >>", content));
+
+    const xObjectResource = logo ? "/XObject << /Im1 3 0 R >>" : "";
+    setObject(pageId,
+      "<< /Type /Page /Parent " + pagesRootId + " 0 R /MediaBox [0 0 " +
+      PAGE_WIDTH + " " + PAGE_HEIGHT + "] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> " +
+      xObjectResource + " >> /Contents " + contentId + " 0 R >>"
+    );
+  }
+
+  setObject(pagesRootId, "<< /Type /Pages /Kids [" + pageIds.map((id) => id + " 0 R").join(" ") +
+    "] /Count " + pageIds.length + " >>");
+  setObject(catalogId, "<< /Type /Catalog /Pages " + pagesRootId + " 0 R >>");
+
+  const header = toAsciiBytes("%PDF-1.4\n%SP360\n");
+  const pieces: Uint8Array[] = [header];
+  const offsets = new Array(objects.length + 1).fill(0);
+  let position = header.length;
+
+  for (let id = 1; id <= objects.length; id += 1) {
+    offsets[id] = position;
+    const prefix = toAsciiBytes(id + " 0 obj\n");
+    const suffix = toAsciiBytes("\nendobj\n");
+    pieces.push(prefix, objects[id - 1], suffix);
+    position += prefix.length + objects[id - 1].length + suffix.length;
+  }
+
+  const xrefOffset = position;
+  let xref = "xref\n0 " + (objects.length + 1) + "\n0000000000 65535 f \n";
+  for (let id = 1; id <= objects.length; id += 1) {
+    xref += String(offsets[id]).padStart(10, "0") + " 00000 n \n";
+  }
+  const trailer = "trailer\n<< /Size " + (objects.length + 1) + " /Root " + catalogId +
+    " 0 R >>\nstartxref\n" + xrefOffset + "\n%%EOF\n";
+  pieces.push(toAsciiBytes(xref + trailer));
+  return concatBytes(pieces);
+}
+
+class PdfReportComposer {
+  private pages: PdfPage[] = [];
+  private current!: PdfPage;
+
+  constructor(
+    private readonly building: BuildingSettings,
+    private readonly period: ReportPeriod,
+    private readonly logo: PdfLogo | null
+  ) {
+    this.newPage(true);
+  }
+
+  getPageCommands() {
+    this.addFooters();
+    return this.pages.map((page) => page.commands);
+  }
+
+  private addPageHeader(page: PdfPage, firstPage: boolean) {
+    const title = REPORT_PERIOD_LABELS[this.period] + " Visitor Report";
+    const range = getReportRangeLabel(this.period);
+    if (firstPage) {
+      if (this.logo) {
+        const width = Math.min(68, 68 * this.logo.width / Math.max(this.logo.width, this.logo.height));
+        const height = Math.min(68, 68 * this.logo.height / Math.max(this.logo.width, this.logo.height));
+        page.commands.push("q " + pdfNumber(width) + " 0 0 " + pdfNumber(height) + " " +
+          PAGE_LEFT + " " + pdfNumber(PAGE_HEIGHT - 24 - height) + " cm /Im1 Do Q");
+      } else {
+        page.commands.push(rectCommand(PAGE_LEFT, 25, 60, 60, "0.07 0.27 0.23", "0.07 0.27 0.23"));
+        page.commands.push(textCommand("SP", PAGE_LEFT + 15, 42, 24, true, "1 1 1"));
+      }
+
+      const titleX = 112;
+      page.commands.push(textCommand("SMARTPASS360 | VISITOR ACCESS INTELLIGENCE", titleX, 24, 9, true, "0.10 0.40 0.33"));
+      page.commands.push(textCommand(this.building.name, titleX, 41, 20, true, "0.08 0.16 0.23"));
+      page.commands.push(textCommand(title + " | Reporting period: " + range, titleX, 68, 9.5, true, "0.20 0.28 0.35"));
+      const address = [this.building.address, this.building.city, this.building.country].filter(Boolean).join(", ");
+      page.commands.push(textCommand(address || this.building.code || "Building report", titleX, 84, 8.5, false, "0.35 0.41 0.46"));
+      page.commands.push(textCommand("Generated: " + formatReportDateTime(new Date()) + " EAT", titleX, 97, 8, false, "0.35 0.41 0.46"));
+      page.commands.push(lineCommand(PAGE_LEFT, 108, PAGE_RIGHT, "0.10 0.42 0.34", 2.2));
+      page.y = 120;
+    } else {
+      if (this.logo) {
+        const width = Math.min(32, 32 * this.logo.width / Math.max(this.logo.width, this.logo.height));
+        const height = Math.min(32, 32 * this.logo.height / Math.max(this.logo.width, this.logo.height));
+        page.commands.push("q " + pdfNumber(width) + " 0 0 " + pdfNumber(height) + " " +
+          PAGE_LEFT + " " + pdfNumber(PAGE_HEIGHT - 17 - height) + " cm /Im1 Do Q");
+      } else {
+        page.commands.push(rectCommand(PAGE_LEFT, 17, 30, 30, "0.07 0.27 0.23", "0.07 0.27 0.23"));
+        page.commands.push(textCommand("SP", PAGE_LEFT + 6, 24, 12, true, "1 1 1"));
+      }
+      page.commands.push(textCommand(this.building.name, 72, 18, 12, true, "0.08 0.16 0.23"));
+      page.commands.push(textCommand(title + " | " + range, 72, 35, 8.5, false, "0.30 0.37 0.43"));
+      page.commands.push(lineCommand(PAGE_LEFT, 55, PAGE_RIGHT, "0.10 0.42 0.34", 1.5));
+      page.y = 67;
+    }
+  }
+
+  private newPage(firstPage = false) {
+    this.current = { commands: [], y: 0 };
+    this.pages.push(this.current);
+    this.addPageHeader(this.current, firstPage);
+  }
+
+  private ensureSpace(height: number) {
+    if (this.current.y + height > CONTENT_BOTTOM) this.newPage(false);
+  }
+
+  private drawSectionTitle(title: string, subtitle?: string) {
+    this.ensureSpace(subtitle ? 34 : 24);
+    this.current.commands.push(textCommand(title, PAGE_LEFT, this.current.y, 13, true, "0.07 0.25 0.22"));
+    this.current.y += 19;
+    if (subtitle) {
+      this.current.commands.push(textCommand(subtitle, PAGE_LEFT, this.current.y, 7.6, false, "0.36 0.42 0.47"));
+      this.current.y += 13;
+    }
+  }
+
+  drawKpis(visits: VisitorReportVisit[], organizationsVisited: number, entered: number, exited: number) {
+    const gap = 10;
+    const width = (PAGE_RIGHT - PAGE_LEFT - gap * 3) / 4;
+    const top = this.current.y;
+    const values = [
+      ["VISITS REGISTERED", String(visits.length)],
+      ["ORGANIZATIONS VISITED", String(organizationsVisited)],
+      ["ENTRY RECORDS", String(entered)],
+      ["EXIT RECORDS", String(exited)]
+    ];
+
+    values.forEach(([label, value], index) => {
+      const x = PAGE_LEFT + index * (width + gap);
+      this.current.commands.push(rectCommand(x, top, width, 48, "0.96 0.98 0.97", "0.84 0.89 0.89"));
+      this.current.commands.push(textCommand(label, x + 9, top + 7, 7, true, "0.35 0.43 0.47"));
+      this.current.commands.push(textCommand(value, x + 9, top + 21, 19, true, "0.08 0.31 0.26"));
+    });
+    this.current.y += 60;
+  }
+
+  drawTable(sectionTitle: string, columns: PdfColumn[], rows: PdfTableRow[], subtitle?: string) {
+    this.drawSectionTitle(sectionTitle, subtitle);
+    const drawHeader = () => {
+      const top = this.current.y;
+      const headerHeight = 27;
+      let x = PAGE_LEFT;
+      columns.forEach((column) => {
+        this.current.commands.push(rectCommand(x, top, column.width, headerHeight, "0.08 0.25 0.22", "0.08 0.25 0.22"));
+        const lines = wrapText(column.title, Math.max(7, Math.floor((column.width - 10) / 4.5)), 2);
+        lines.forEach((line, index) => {
+          this.current.commands.push(textCommand(line, x + 5, top + 6 + index * 8, 7.2, true, "1 1 1"));
+        });
+        x += column.width;
+      });
+      this.current.y += headerHeight;
+    };
+
+    this.ensureSpace(35);
+    drawHeader();
+
+    rows.forEach((row, index) => {
+      const fontSize = columns.length >= 8 ? 6.3 : 7.4;
+      const maxLinesPerCell = columns.length >= 8 ? 3 : 4;
+      const cellLines = columns.map((column, columnIndex) =>
+        wrapText(row.cells[columnIndex] ?? "", Math.max(5, Math.floor((column.width - 10) / (fontSize * 0.52))), maxLinesPerCell)
+      );
+      const maxLines = Math.max(1, ...cellLines.map((lines) => lines.length));
+      const rowHeight = Math.max(22, maxLines * (fontSize + 2.1) + 7);
+
+      if (this.current.y + rowHeight > CONTENT_BOTTOM) {
+        this.newPage(false);
+        drawHeader();
+      }
+
+      const top = this.current.y;
+      let x = PAGE_LEFT;
+      columns.forEach((column, columnIndex) => {
+        const fill = row.total ? "0.88 0.95 0.91" : index % 2 === 0 ? "1 1 1" : "0.96 0.98 0.97";
+        this.current.commands.push(rectCommand(x, top, column.width, rowHeight, fill, "0.84 0.88 0.89"));
+        const lines = cellLines[columnIndex].slice(0, maxLinesPerCell);
+        const textWidth = lines.reduce((max, line) => Math.max(max, line.length), 0);
+        const unusedWidth = Math.max(0, Math.floor((column.width - 10) / (fontSize * 0.52)) - textWidth);
+        const align = column.align ?? "left";
+        const textX = align === "right"
+          ? x + column.width - 5 - (textWidth * fontSize * 0.5)
+          : align === "center"
+            ? x + column.width / 2 - (textWidth * fontSize * 0.25)
+            : x + 5;
+        void unusedWidth;
+        lines.forEach((line, lineIndex) => {
+          this.current.commands.push(textCommand(line, textX, top + 4 + lineIndex * (fontSize + 2.1), fontSize, Boolean(row.total), row.total ? "0.08 0.30 0.25" : "0.10 0.16 0.20"));
+        });
+        x += column.width;
+      });
+      this.current.y += rowHeight;
+    });
+    this.current.y += 10;
+  }
+
+  private addFooters() {
+    const totalPages = this.pages.length;
+    this.pages.forEach((page, index) => {
+      page.commands.push(lineCommand(PAGE_LEFT, FOOTER_TOP, PAGE_RIGHT, "0.80 0.86 0.86", 0.7));
+      page.commands.push(textCommand("Confidential | For authorized building management use", PAGE_LEFT, FOOTER_TOP + 8, 7.3, false, "0.38 0.45 0.45"));
+      page.commands.push(textCommand("SmartPass360 by SmartCycle360", 548, FOOTER_TOP + 8, 7.8, true, "0.10 0.42 0.34"));
+      page.commands.push(textCommand("Page " + (index + 1) + " of " + totalPages, 756, FOOTER_TOP + 8, 7.3, false, "0.38 0.45 0.45"));
+    });
+  }
+}
+
+function safeFilename(value: string) {
+  return value.normalize("NFKD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9_-]+/g, "-").replace(/^-+|-+$/g, "").toLowerCase() || "building";
 }
 
 export async function getAllReportOrganizations() {
@@ -313,45 +567,123 @@ export async function getAllReportOrganizations() {
 }
 
 export async function exportVisitorReportPdf(period: ReportPeriod) {
-  // Open a report window synchronously within the button click to avoid popup blocking.
-  const popup = window.open("", "_blank");
-  if (!popup) {
-    throw new Error("Allow pop-ups for SmartPass360 to export the PDF report.");
+  const [daily, weekly, monthly, buildingResponse, organizations] = await Promise.all([
+    apiRequest<ReportResponse>("/visitors/report?period=today"),
+    apiRequest<ReportResponse>("/visitors/report?period=week"),
+    apiRequest<ReportResponse>("/visitors/report?period=month"),
+    getCurrentBuilding(),
+    getAllReportOrganizations()
+  ]);
+
+  const visitsByPeriod: VisitsByPeriod = {
+    today: daily.data ?? [],
+    week: weekly.data ?? [],
+    month: monthly.data ?? []
+  };
+  const visits = visitsByPeriod[period];
+  const building = buildingResponse.data;
+
+  if (!building?.id || !building.name) {
+    throw new Error("Building details could not be loaded. Check building settings and retry.");
   }
 
-  popup.document.open();
-  popup.document.write("<!doctype html><html><head><title>Preparing SmartPass360 PDF</title></head><body style=\"font-family:Arial,sans-serif;padding:32px;color:#173f37\"><h1>Preparing PDF report…</h1><p>Fetching building details and daily, weekly and monthly data.</p></body></html>");
-  popup.document.close();
+  const allPeriodVisits = [...visitsByPeriod.today, ...visitsByPeriod.week, ...visitsByPeriod.month, ...visits];
+  const organizationList = summarizeVisitorReport(organizations, allPeriodVisits).map((item) => item.organization);
+  const selectedSummary = summarizeVisitorReport(organizationList, visits);
+  const dailySummary = new Map(summarizeVisitorReport(organizationList, visitsByPeriod.today).map((item) => [item.organization.id, item.visitors]));
+  const weeklySummary = new Map(summarizeVisitorReport(organizationList, visitsByPeriod.week).map((item) => [item.organization.id, item.visitors]));
+  const monthlySummary = new Map(summarizeVisitorReport(organizationList, visitsByPeriod.month).map((item) => [item.organization.id, item.visitors]));
+  const entered = visits.filter((visit) => Boolean(visit.checkedInAt)).length;
+  const exited = visits.filter((visit) => Boolean(visit.checkedOutAt)).length;
+  const logo = await loadLogoAsJpeg(building.logoUrl);
+  const composer = new PdfReportComposer(building, period, logo);
 
-  try {
-    const [daily, weekly, monthly, buildingResponse, organizations] = await Promise.all([
-      apiRequest<ReportResponse>("/visitors/report?period=today"),
-      apiRequest<ReportResponse>("/visitors/report?period=week"),
-      apiRequest<ReportResponse>("/visitors/report?period=month"),
-      getCurrentBuilding(),
-      getAllReportOrganizations()
-    ]);
+  composer.drawKpis(visits, selectedSummary.filter((item) => item.visitors > 0).length, entered, exited);
 
-    const reports: VisitsByPeriod = {
-      today: daily.data ?? [],
-      week: weekly.data ?? [],
-      month: monthly.data ?? []
-    };
-    const visits = reports[period];
-    const building = buildingResponse.data;
+  const visitPeriodRows: PdfTableRow[] = selectedSummary.map((item) => ({
+    cells: [
+      item.organization.name,
+      String(dailySummary.get(item.organization.id) ?? 0),
+      String(weeklySummary.get(item.organization.id) ?? 0),
+      String(monthlySummary.get(item.organization.id) ?? 0)
+    ]
+  }));
+  visitPeriodRows.push({
+    total: true,
+    cells: ["TOTAL VISITS", String(visitsByPeriod.today.length), String(visitsByPeriod.week.length), String(visitsByPeriod.month.length)]
+  });
+  composer.drawTable("Organization Visits by Period", [
+    { title: "Organization", width: 360 },
+    { title: "Today", width: 140, align: "center" },
+    { title: "This week", width: 140, align: "center" },
+    { title: "This month", width: 142, align: "center" }
+  ], visitPeriodRows, "Counts are based on visitor registrations for this building. The detailed register below uses the selected period.");
 
-    if (!building?.id || !building.name) {
-      throw new Error("Building details could not be loaded. Check building settings and retry.");
-    }
+  const selectedRows: PdfTableRow[] = selectedSummary.map((item) => ({
+    cells: [
+      item.organization.name,
+      String(item.visitors),
+      String(item.entered),
+      String(item.exited),
+      String(item.pending),
+      String(item.rejected)
+    ]
+  }));
+  selectedRows.push({
+    total: true,
+    cells: [
+      "TOTAL",
+      String(visits.length),
+      String(entered),
+      String(exited),
+      String(visits.filter((visit) => visit.status === "PENDING_APPROVAL").length),
+      String(visits.filter((visit) => ["REJECTED", "DENIED"].includes(visit.status)).length)
+    ]
+  });
+  composer.drawTable("Selected Period Organization Breakdown", [
+    { title: "Organization", width: 342 },
+    { title: "Registered", width: 88, align: "center" },
+    { title: "Entered", width: 86, align: "center" },
+    { title: "Exited", width: 86, align: "center" },
+    { title: "Pending", width: 88, align: "center" },
+    { title: "Rejected / denied", width: 92, align: "center" }
+  ], selectedRows);
 
-    const html = reportHtml(period, building, visits, organizations, reports);
-    if (popup.closed) return;
-    popup.document.open();
-    popup.document.write(html);
-    popup.document.close();
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "The PDF report could not be generated.";
-    showPopupMessage(popup, message);
-    throw error;
-  }
+  const visitorRows: PdfTableRow[] = visits.map((visit, index) => ({
+    cells: [
+      String(index + 1),
+      visit.fullName + " / " + (visit.phone || "—"),
+      visit.organization?.name || "—",
+      visit.purpose || "—",
+      formatReportDateTime(visit.registeredAt),
+      statusLabel(visit.status),
+      formatReportDateTime(visit.checkedInAt),
+      formatReportDateTime(visit.checkedOutAt),
+      visit.pass?.passNumber || "—"
+    ]
+  }));
+  composer.drawTable("Visitor Register", [
+    { title: "No.", width: 25, align: "center" },
+    { title: "Visitor / phone", width: 105 },
+    { title: "Organization", width: 105 },
+    { title: "Purpose", width: 100 },
+    { title: "Registered (EAT)", width: 105 },
+    { title: "Status", width: 72 },
+    { title: "Entry (EAT)", width: 90 },
+    { title: "Exit (EAT)", width: 90 },
+    { title: "Pass no.", width: 80 }
+  ], visitorRows.length ? visitorRows : [{ cells: ["—", "No registrations", "—", "No visitor registrations were recorded during this period.", "—", "—", "—", "—", "—"] }]);
+
+  const pdfBytes = buildPdfBytes(composer.getPageCommands(), logo);
+  const blob = new Blob([pdfBytes], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = "smartpass360-" + safeFilename(building.name) + "-" +
+    period + "-visitor-report-" + dateKeyInDarEsSalaam(new Date()) + ".pdf";
+  anchor.style.display = "none";
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 30_000);
 }
