@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import QRCode from "qrcode";
 
+import { downloadMobileVisitorTicketImage } from "../utils/visitor-pass-image";
 import { ApiError } from "../api/api-client";
 import {
   getPublicRegistrationConfig,
@@ -87,7 +88,9 @@ const copy = {
     issuedHelp: "Onyesha QR hii kwenye lango kwa ajili ya kuscan. Tiketi ni halali hadi muda ulioonyeshwa.",
     passNumber: "Namba ya tiketi",
     validUntil: "Halali hadi",
-    print: "Chapisha / Hifadhi tiketi",
+    print: "Chapisha tiketi",
+    savePhoto: "Pakua tiketi kama picha",
+    savingPhoto: "Inatengeneza picha...",
     newRegistration: "Sajili mgeni mwingine",
     statusRetry: "Hatuwezi kupata hali ya usajili kwa sasa. Tutaendelea kujaribu.",
     invalidKiosk: "QR hii ya kiosk si halali, au kiosk haipokei usajili kwa sasa.",
@@ -136,7 +139,9 @@ const copy = {
     issuedHelp: "Show this QR code at the gate to be scanned. The ticket is valid until the time shown.",
     passNumber: "Ticket number",
     validUntil: "Valid until",
-    print: "Print / save ticket",
+    print: "Print ticket",
+    savePhoto: "Download ticket image",
+    savingPhoto: "Creating image...",
     newRegistration: "Register another visitor",
     statusRetry: "We cannot retrieve your registration status right now. We will keep trying.",
     invalidKiosk: "This kiosk QR is invalid, or the kiosk is not accepting registrations right now.",
@@ -185,6 +190,7 @@ export function PublicVisitorRegistrationPage() {
   const [formError, setFormError] = useState<string | null>(null);
   const [registration, setRegistration] = useState<SavedRegistration | null>(() => getSavedRegistration(kioskId));
   const [issuedQrImage, setIssuedQrImage] = useState<string | null>(null);
+  const [isSavingTicketImage, setIsSavingTicketImage] = useState(false);
 
   const configQuery = useQuery({
     queryKey: ["public-kiosk-registration-config", kioskId],
@@ -298,6 +304,29 @@ export function PublicVisitorRegistrationPage() {
 
   function printTicket() {
     window.print();
+  }
+
+  async function saveTicketImage() {
+    if (!registration || !status?.pass || !status.visitor || !status.qrValue || !issuedQrImage) return;
+    setIsSavingTicketImage(true);
+    try {
+      await downloadMobileVisitorTicketImage({
+        passNumber: status.pass.passNumber,
+        qrValue: status.qrValue,
+        fullName: status.visitor.fullName,
+        organizationName: status.visitor.organizationName,
+        siteName: status.visitor.siteName,
+        departmentOrOffice: status.visitor.departmentOrOffice,
+        hostName: status.visitor.hostName,
+        purpose: status.visitor.purpose,
+        issuedAt: status.pass.issuedAt,
+        validUntil: status.pass.validUntil
+      }, issuedQrImage);
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : "Unable to save the visitor ticket image.");
+    } finally {
+      setIsSavingTicketImage(false);
+    }
   }
 
   if (!isUuid(kioskId)) {
@@ -478,7 +507,12 @@ export function PublicVisitorRegistrationPage() {
                   <strong>{displayDate(status.pass.validUntil)}</strong>
                 </div>
                 <p className="mobile-registration__ticket-help">{t.issuedHelp}</p>
-                <button type="button" onClick={printTicket}>{t.print}</button>
+                <div className="mobile-registration__ticket-actions">
+                  <button type="button" onClick={printTicket}>{t.print}</button>
+                  <button type="button" className="mobile-registration__ticket-save" onClick={() => void saveTicketImage()} disabled={isSavingTicketImage || !issuedQrImage}>
+                    {isSavingTicketImage ? t.savingPhoto : t.savePhoto}
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="mobile-registration__pending-card">
