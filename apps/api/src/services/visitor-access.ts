@@ -9,7 +9,12 @@ export const visitorScanSchema = z.object({
   direction: z.enum(["ENTRY", "EXIT"]).optional(), requestId: z.string().uuid().optional()
 });
 
-export async function validateVisitorScan(siteId: string, input: z.infer<typeof visitorScanSchema>) {
+export async function validateVisitorScan(
+  siteId: string,
+  input: z.infer<typeof visitorScanSchema>,
+  options: { hardwareAvailable?: boolean } = {}
+) {
+  const hardwareAvailable = options.hardwareAvailable ?? false;
   // Serializable retries and a row lock protect authoritative state from concurrent scanners.
   for (let attempt = 0; ; attempt++) {
     try {
@@ -32,6 +37,7 @@ export async function validateVisitorScan(siteId: string, input: z.infer<typeof 
         const { direction, denialReason } = visitorAccessDecision({
           buildingActive: Boolean(site?.isActive && site.status === "ACTIVE"),
           gate, pass, last, now, membershipActive: Boolean(membership), formatValid,
+          hardwareAvailable,
           requestedDirection: input.direction
         });
 
@@ -39,8 +45,17 @@ export async function validateVisitorScan(siteId: string, input: z.infer<typeof 
           siteId, requestId: input.requestId, organizationId: pass?.organizationId ?? gate?.organizationId,
           visitId: pass?.visitId, visitorPassId: pass?.id, gateId: gate?.id,
           direction: input.direction ?? direction, decision: denialReason ? "DENIED" : "GRANTED",
-          denialReason, scannedAt: now, turnstileOpened: !denialReason,
-          metadata: { commandIssued: denialReason ? "KEEP_LOCKED" : "UNLOCK", requestedGateId: input.gateId }
+          denialReason, scannedAt: now,
+          turnstileOpened: hardwareAvailable && !denialReason,
+          metadata: {
+            validationMode: hardwareAvailable ? "HARDWARE" : "SOFTWARE",
+            commandIssued: denialReason
+              ? "KEEP_LOCKED"
+              : hardwareAvailable
+                ? "UNLOCK"
+                : "VALIDATED_ONLY",
+            requestedGateId: input.gateId
+          }
         } });
         if (!denialReason && pass) {
           await tx.visitRequest.update({ where: { id: pass.visitId }, data: direction === "ENTRY" ? { status: "INSIDE", checkedInAt: now } : { status: "CHECKED_OUT", checkedOutAt: now } });
@@ -51,7 +66,12 @@ export async function validateVisitorScan(siteId: string, input: z.infer<typeof 
           direction: event.direction, activityType: event.direction,
           eventId: event.id, accessEventId: event.id, passId: pass?.id, passNumber: pass?.passNumber,
           visitorName: pass?.visit.visitor.fullName, gateName: gate?.name,
-          turnstileCommand: denialReason ? "KEEP_LOCKED" : "UNLOCK", timestamp: now,
+          turnstileCommand: denialReason
+            ? "KEEP_LOCKED"
+            : hardwareAvailable
+              ? "UNLOCK"
+              : "VALIDATED_ONLY",
+          timestamp: now,
           message: denialReason ? `Access denied: ${denialReason}` : `Visitor ${direction === "ENTRY" ? "entry" : "exit"} granted.`
         };
       }, { isolationLevel: "Serializable" });
