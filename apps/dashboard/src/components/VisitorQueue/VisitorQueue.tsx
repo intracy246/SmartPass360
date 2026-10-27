@@ -21,7 +21,7 @@ type IssuedQueueTicket = {
 
 type ApproveAndPrintInput = {
   visitId: string;
-  printWindow: Window | null;
+  printWindow: Window;
 };
 
 type QueueVisit = {
@@ -97,7 +97,7 @@ export function VisitorQueue() {
       setIssuedTicket(pass);
       setTicketActionError(null);
 
-      if (variables.printWindow && !variables.printWindow.closed) {
+      if (!variables.printWindow.closed) {
         setTicketAction("print");
         try {
           await printVisitorPass({
@@ -127,7 +127,7 @@ export function VisitorQueue() {
       ]);
     },
     onError: (_error, variables) => {
-      if (variables.printWindow && !variables.printWindow.closed) {
+      if (!variables.printWindow.closed) {
         variables.printWindow.close();
       }
     }
@@ -136,11 +136,16 @@ export function VisitorQueue() {
   function approveAndPrint(visitId: string) {
     setTicketActionError(null);
     const printWindow = window.open("", "_blank", "width=420,height=720");
-    if (printWindow) {
-      printWindow.document.open();
-      printWindow.document.write("<!doctype html><html><head><title>SmartPass360</title></head><body style='font-family:Arial,sans-serif;padding:24px;color:#173f37'><h2>SmartPass360</h2><p>Approving the visit and preparing its printable access pass…</p></body></html>");
-      printWindow.document.close();
+    if (!printWindow) {
+      setTicketActionError("The pass was not approved because the browser blocked the print window. Allow pop-ups for SmartPass360, then try again.");
+      return;
     }
+
+    // Reserve a window during this user click to satisfy browser popup policies.
+    // Approval is intentionally not submitted if a printable window cannot be created.
+    printWindow.document.open();
+    printWindow.document.write("<!doctype html><html><head><title>SmartPass360</title></head><body style='font-family:Arial,sans-serif;padding:24px;color:#173f37'><h2>SmartPass360</h2><p>Approving the visit and preparing its printable access pass…</p></body></html>");
+    printWindow.document.close();
     approval.mutate({ visitId, printWindow });
   }
 
@@ -250,9 +255,9 @@ export function VisitorQueue() {
               Close
             </button>
           </div>
-          {ticketActionError && <p className="visitor-queue__error" role="alert">{ticketActionError}</p>}
         </section>
       )}
+      {ticketActionError && <p className="visitor-queue__error" role="alert">{ticketActionError}</p>}
       {(queue.error || approval.error) && (
         <p className="visitor-queue__error" role="alert">{(queue.error || approval.error)?.message}</p>
       )}
