@@ -159,6 +159,7 @@ export function ReportsPage() {
         </div>
       </section>
 
+      <p className="reports-page__export-note">PDF export downloads a .pdf file directly. Each report includes the building name and logo (when configured), daily/weekly/monthly organization totals, the selected-period breakdown, and the detailed visitor register.</p>
       {exportError && <p className="reports-page__error" role="alert">{exportError}</p>}
       {reportError && (
         <div className="reports-page__error" role="alert">
