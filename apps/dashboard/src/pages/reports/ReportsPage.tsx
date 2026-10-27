@@ -8,7 +8,6 @@ import {
   exportVisitorReportPdf,
   formatReportDateTime,
   getReportRangeLabel,
-  REPORT_PERIOD_LABELS,
   summarizeVisitorReport,
   type ReportOrganization,
   type ReportPeriod,
