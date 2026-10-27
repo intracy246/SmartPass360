@@ -47,6 +47,7 @@ type VisitsByPeriod = Record<ReportPeriod, VisitorReportVisit[]>;
 export type OrganizationReportSummary = {
   organization: ReportOrganization;
   visitors: number;
+  visits: number;
   entered: number;
   exited: number;
   pending: number;
@@ -143,6 +144,7 @@ export function summarizeVisitorReport(
       return {
         organization,
         visitors: organizationVisits.length,
+        visits: organizationVisits.length,
         entered: organizationVisits.filter((visit) => Boolean(visit.checkedInAt)).length,
         exited: organizationVisits.filter((visit) => Boolean(visit.checkedOutAt)).length,
         pending: organizationVisits.filter((visit) => visit.status === "PENDING_APPROVAL").length,
@@ -179,11 +181,11 @@ function reportHtml(
   organizations: ReportOrganization[],
   visitsByPeriod: VisitsByPeriod
 ) {
-  const summary = summarizeVisitorReport(organizations, visits);
+  const selectedSummary = summarizeVisitorReport(organizations, visits);
   const dailySummary = new Map(summarizeVisitorReport(organizations, visitsByPeriod.today).map((item) => [item.organization.id, item.visitors]));
   const weeklySummary = new Map(summarizeVisitorReport(organizations, visitsByPeriod.week).map((item) => [item.organization.id, item.visitors]));
   const monthlySummary = new Map(summarizeVisitorReport(organizations, visitsByPeriod.month).map((item) => [item.organization.id, item.visitors]));
-  const organizationsVisited = summary.filter((item) => item.visitors > 0).length;
+  const uniqueOrganizationsVisited = selectedSummary.filter((item) => item.visitors > 0).length;
   const entered = visits.filter((visit) => Boolean(visit.checkedInAt)).length;
   const exited = visits.filter((visit) => Boolean(visit.checkedOutAt)).length;
   const periodTitle = REPORT_PERIOD_LABELS[period] + " Visitor Report";
@@ -192,24 +194,31 @@ function reportHtml(
     ? '<img class="building-logo" src="' + escapeHtml(logoUrl) + '" alt="Building logo">'
     : '<div class="building-logo-fallback">SP</div>';
 
-  const periodRows = summary.map((item) =>
+  const organizationList = summarizeVisitorReport(organizations, [
+    ...visitsByPeriod.today,
+    ...visitsByPeriod.week,
+    ...visitsByPeriod.month,
+    ...visits
+  ]);
+
+  const periodRows = organizationList.map((item) =>
     "<tr><td><strong>" + escapeHtml(item.organization.name) + "</strong>" +
     (item.organization.code ? '<div class="muted">' + escapeHtml(item.organization.code) + "</div>" : "") +
-    "</td><td class=\\"num\\">" + (dailySummary.get(item.organization.id) ?? 0) +
-    "</td><td class=\\"num\\">" + (weeklySummary.get(item.organization.id) ?? 0) +
-    "</td><td class=\\"num\\">" + (monthlySummary.get(item.organization.id) ?? 0) + "</td></tr>"
+    "</td><td class=\"num\">" + (dailySummary.get(item.organization.id) ?? 0) +
+    "</td><td class=\"num\">" + (weeklySummary.get(item.organization.id) ?? 0) +
+    "</td><td class=\"num\">" + (monthlySummary.get(item.organization.id) ?? 0) + "</td></tr>"
   ).join("");
 
-  const periodTotals = "<tr class=\\"total-row\\"><td><strong>TOTAL VISITS</strong></td><td class=\\"num\\">" +
-    visitsByPeriod.today.length + "</td><td class=\\"num\\">" + visitsByPeriod.week.length +
-    "</td><td class=\\"num\\">" + visitsByPeriod.month.length + "</td></tr>";
+  const periodTotals = "<tr class=\"total-row\"><td><strong>TOTAL VISITS</strong></td><td class=\"num\">" +
+    visitsByPeriod.today.length + "</td><td class=\"num\">" + visitsByPeriod.week.length +
+    "</td><td class=\"num\">" + visitsByPeriod.month.length + "</td></tr>";
 
-  const summaryRows = summary.map((item) =>
+  const summaryRows = selectedSummary.map((item) =>
     "<tr><td><strong>" + escapeHtml(item.organization.name) + "</strong>" +
     (item.organization.code ? '<div class="muted">' + escapeHtml(item.organization.code) + "</div>" : "") +
-    "</td><td class=\\"num\\">" + item.visitors +
-    "</td><td class=\\"num\\">" + item.entered + "</td><td class=\\"num\\">" + item.exited +
-    "</td><td class=\\"num\\">" + item.pending + "</td><td class=\\"num\\">" + item.rejected + "</td></tr>"
+    "</td><td class=\"num\">" + item.visitors +
+    "</td><td class=\"num\">" + item.entered + "</td><td class=\"num\">" + item.exited +
+    "</td><td class=\"num\">" + item.pending + "</td><td class=\"num\">" + item.rejected + "</td></tr>"
   ).join("");
 
   const detailRows = visits.map((visit, index) =>
@@ -223,11 +232,13 @@ function reportHtml(
     escapeHtml(visit.pass?.passNumber || "—") + "</td></tr>"
   ).join("");
 
-  const organizationSummary = summaryRows ||
+  const periodRowsOrEmpty = periodRows ||
+    '<tr><td colspan="4" class="empty">No organizations are configured for this building.</td></tr>';
+  const organizationRowsOrEmpty = summaryRows ||
     '<tr><td colspan="6" class="empty">No organizations are configured for this building.</td></tr>';
   const visitDetails = detailRows ||
     '<tr><td colspan="9" class="empty">No visitor registrations were recorded during this period.</td></tr>';
-  const totals = "<tr class=\"total-row\"><td><strong>TOTAL</strong></td><td class=\"num\">" +
+  const selectedTotals = "<tr class=\"total-row\"><td><strong>TOTAL</strong></td><td class=\"num\">" +
     visits.length + "</td><td class=\"num\">" + entered + "</td><td class=\"num\">" +
     exited + "</td><td class=\"num\">" +
     visits.filter((visit) => visit.status === "PENDING_APPROVAL").length + "</td><td class=\"num\">" +
@@ -257,16 +268,16 @@ function reportHtml(
     "</p></div><div class=\"right\"><strong>Official Report</strong><div class=\"muted\">Generated: " +
     escapeHtml(formatReportDateTime(new Date())) + "</div><div class=\"muted\">Time zone: East Africa Time (EAT)</div></div></header>" +
     '<section class="kpis"><div class="kpi"><span>Visitors registered</span><strong>' + visits.length +
-    '</strong></div><div class="kpi"><span>Organizations visited</span><strong>' + organizationsVisited +
+    '</strong></div><div class="kpi"><span>Organizations visited</span><strong>' + uniqueOrganizationsVisited +
     '</strong></div><div class="kpi"><span>Visitors entered</span><strong>' + entered +
     '</strong></div><div class="kpi"><span>Visitors exited</span><strong>' + exited +
     "</strong></div></section>" +
-    "<h2>Organization Visits by Period</h2><p class="no-data">Counts are based on visitor registrations recorded by this building during each period. The detailed visitor register below uses the selected report period.</p>" +
+    "<h2>Organization Visits by Period</h2><p class=\"no-data\">Counts are based on visitor registrations recorded by this building. The detailed visitor register below uses the selected reporting period.</p>" +
     '<table><thead><tr><th>Organization</th><th>Today</th><th>This week</th><th>This month</th></tr></thead><tbody>' +
-    (periodRows || '<tr><td colspan="4" class="empty">No organizations are configured for this building.</td></tr>') + periodTotals + "</tbody></table>" +
+    periodRowsOrEmpty + periodTotals + "</tbody></table>" +
     "<h2>Selected Period Organization Breakdown</h2>" +
     '<table><thead><tr><th>Organization</th><th>Visitors registered</th><th>Entered</th><th>Exited</th><th>Pending approval</th><th>Rejected / denied</th></tr></thead><tbody>' +
-    organizationSummary + totals + "</tbody></table>" +
+    organizationRowsOrEmpty + selectedTotals + "</tbody></table>" +
     "<h2>Visitor Register</h2><table class=\"details\"><thead><tr><th>No.</th><th>Visitor / phone</th><th>Organization</th><th>Purpose of visit</th><th>Registered (EAT)</th><th>Status</th><th>Entry (EAT)</th><th>Exit (EAT)</th><th>Pass number</th></tr></thead><tbody>" +
     visitDetails + "</tbody></table>" +
     '<footer class="report-footer"><span>Confidential · For authorized building management use</span><span><strong>SmartPass360</strong> by SmartCycle360</span></footer>' +
@@ -277,9 +288,9 @@ function showPopupMessage(popup: Window, message: string) {
   if (popup.closed) return;
   popup.document.open();
   popup.document.write(
-    "<!doctype html><html><head><meta charset=\"utf-8\"><title>SmartPass360 report</title>" +
+    "<!doctype html><html><head><meta charset=\"utf-8\"><title>SmartPass360 PDF export issue</title>" +
     "<style>body{font-family:Arial,sans-serif;padding:32px;color:#132b3d}h1{color:#176b58}p{line-height:1.6}</style></head><body>" +
-    "<h1>SmartPass360 report</h1><p>" + escapeHtml(message) + "</p><p>You can close this window and retry the export.</p></body></html>"
+    "<h1>SmartPass360 report</h1><p>" + escapeHtml(message) + "</p><p>Close this window and retry the PDF export.</p></body></html>"
   );
   popup.document.close();
 }
@@ -302,14 +313,14 @@ async function fetchAllReportOrganizations() {
 }
 
 export async function exportVisitorReportPdf(period: ReportPeriod) {
-  // Open the window synchronously from the click so popup protection allows the PDF export.
+  // Open a report window synchronously within the button click to avoid popup blocking.
   const popup = window.open("", "_blank");
   if (!popup) {
     throw new Error("Allow pop-ups for SmartPass360 to export the PDF report.");
   }
 
   popup.document.open();
-  popup.document.write("<!doctype html><html><head><title>Preparing SmartPass360 PDF</title></head><body style="font-family:Arial,sans-serif;padding:32px;color:#173f37"><h1>Preparing PDF report…</h1><p>Fetching daily, weekly and monthly visitor data.</p></body></html>");
+  popup.document.write("<!doctype html><html><head><title>Preparing SmartPass360 PDF</title></head><body style=\"font-family:Arial,sans-serif;padding:32px;color:#173f37\"><h1>Preparing PDF report…</h1><p>Fetching building details and daily, weekly and monthly data.</p></body></html>");
   popup.document.close();
 
   try {
@@ -330,7 +341,7 @@ export async function exportVisitorReportPdf(period: ReportPeriod) {
     const building = buildingResponse.data;
 
     if (!building?.id || !building.name) {
-      throw new Error("Building details could not be loaded. Check the building settings and try again.");
+      throw new Error("Building details could not be loaded. Check building settings and retry.");
     }
 
     const html = reportHtml(period, building, visits, organizations, reports);
