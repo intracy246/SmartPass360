@@ -204,6 +204,29 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
   }, [kioskConfigQuery.data]);
 
   const building = kioskConfigQuery.data?.data.site;
+  const publicRegistrationUrl = registeredKioskId
+    ? `https://kiosk.smartpass.smartcycle360.com/register?kioskId=${encodeURIComponent(registeredKioskId)}`
+    : null;
+  const [publicRegistrationQr, setPublicRegistrationQr] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    setPublicRegistrationQr(null);
+
+    if (!publicRegistrationUrl) return () => { active = false; };
+
+    void QRCode.toDataURL(publicRegistrationUrl, {
+      width: 360,
+      margin: 3,
+      errorCorrectionLevel: "M"
+    }).then((dataUrl) => {
+      if (active) setPublicRegistrationQr(dataUrl);
+    }).catch(() => {
+      if (active) setPublicRegistrationQr(null);
+    });
+
+    return () => { active = false; };
+  }, [publicRegistrationUrl]);
 
   const registrationMutation = useMutation({
     mutationFn: registerVisitorFromKiosk,
@@ -382,6 +405,29 @@ export function KioskRegistrationPage({ onActivationInvalid }: { onActivationInv
               <span>Endelea kwa Kiswahili</span>
             </button>
           </div>
+
+          <section className="kiosk-language-qr" aria-labelledby="kiosk-language-qr-title">
+            <div className="kiosk-language-qr__copy">
+              <p>SCAN TO REGISTER · JISAJILI KWA SIMU</p>
+              <h2 id="kiosk-language-qr-title">Use your phone</h2>
+              <span>Scan this code, submit your visitor details, then wait for Security or Reception approval.</span>
+              <small>Scan QR · Jisajili · Subiri idhini</small>
+            </div>
+
+            <div className="kiosk-language-qr__frame">
+              {publicRegistrationQr ? (
+                <img
+                  src={publicRegistrationQr}
+                  alt={`Scan to register at ${building?.name ?? "this SmartPass360 kiosk"}`}
+                />
+              ) : registeredKioskId ? (
+                <span>Preparing registration QR…</span>
+              ) : (
+                <span>Activate this kiosk to enable its visitor QR code.</span>
+              )}
+            </div>
+            <strong className="kiosk-language-qr__site">{building?.name ?? "SmartPass360"}</strong>
+          </section>
         </div>
       </main>
     );
