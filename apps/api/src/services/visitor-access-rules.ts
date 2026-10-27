@@ -5,6 +5,7 @@ type ScanState = {
   last: { direction: string; scannedAt: Date } | null;
   membershipActive: boolean;
   formatValid: boolean;
+  hardwareAvailable: boolean;
   requestedDirection?: "ENTRY" | "EXIT";
   now: Date;
 };
@@ -15,7 +16,7 @@ export function visitorAccessDecision(state: ScanState) {
   let denialReason: string | null = null;
   if (!state.buildingActive) denialReason = "BUILDING_INACTIVE";
   else if (!gate) denialReason = "WRONG_GATE";
-  else if (!gate.isActive || gate.status !== "ONLINE" || !gate.organization.isActive) denialReason = "GATE_UNAVAILABLE";
+  else if (!gate.isActive || (state.hardwareAvailable && gate.status !== "ONLINE") || !gate.organization.isActive) denialReason = "GATE_UNAVAILABLE";
   else if (!pass) denialReason = state.formatValid ? "UNKNOWN_PASS" : "INVALID_QR_FORMAT";
   else if (pass.organizationId !== gate.organizationId) denialReason = "WRONG_GATE";
   else if (!state.membershipActive) denialReason = "ORGANIZATION_INACTIVE";
