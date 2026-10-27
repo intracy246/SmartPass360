@@ -20,6 +20,7 @@ import { FormField } from "../../components/Forms/FormField";
 import { VisitorPassPreview } from "../../components/VisitorPass/VisitorPassPreview";
 import { VisitorQueue } from "../../components/VisitorQueue/VisitorQueue";
 import { printVisitorPass } from "../../utils/visitor-pass-print";
+import { downloadVisitorPassImage } from "../../utils/visitor-pass-image";
 
 import type {
   CreateVisitPayload,
@@ -225,6 +226,23 @@ export function VisitorsPage() {
     }
   }
 
+  async function handleDownloadImage() {
+    if (!issuedRegistration) return;
+    try {
+      setErrorMessage(null);
+      await downloadVisitorPassImage({
+        ...issuedRegistration.pass,
+        fullName: issuedRegistration.fullName,
+        organizationName: issuedRegistration.organizationName,
+        departmentOrOffice: issuedRegistration.departmentOrOffice,
+        hostName: issuedRegistration.hostName,
+        purpose: issuedRegistration.purposeOfVisit
+      });
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "The visitor ticket image could not be saved.");
+    }
+  }
+
   const previewSource = issuedRegistration ?? form;
   const previewPass = issuedRegistration?.pass;
 
@@ -291,9 +309,14 @@ export function VisitorsPage() {
                 Pass {issuedRegistration.pass.passNumber} is ready to print.
               </span>
             </div>
-            <GlassButton type="button" variant="success" onClick={() => void handlePrint()}>
-              Print Visitor Pass
-            </GlassButton>
+            <div className="visitor-form__issued-actions">
+              <GlassButton type="button" variant="success" onClick={() => void handlePrint()}>
+                Print Visitor Pass
+              </GlassButton>
+              <GlassButton type="button" variant="secondary" onClick={() => void handleDownloadImage()}>
+                Download Ticket PNG
+              </GlassButton>
+            </div>
           </div>
         ) : null}
 
