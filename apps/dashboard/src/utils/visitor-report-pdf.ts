@@ -590,9 +590,9 @@ export async function exportVisitorReportPdf(period: ReportPeriod) {
   const allPeriodVisits = [...visitsByPeriod.today, ...visitsByPeriod.week, ...visitsByPeriod.month, ...visits];
   const organizationList = summarizeVisitorReport(organizations, allPeriodVisits).map((item) => item.organization);
   const selectedSummary = summarizeVisitorReport(organizationList, visits);
-  const dailySummary = new Map(summarizeVisitorReport(organizationList, visitsByPeriod.today).map((item) => [item.organization.id, item.visitors]));
-  const weeklySummary = new Map(summarizeVisitorReport(organizationList, visitsByPeriod.week).map((item) => [item.organization.id, item.visitors]));
-  const monthlySummary = new Map(summarizeVisitorReport(organizationList, visitsByPeriod.month).map((item) => [item.organization.id, item.visitors]));
+  const dailySummary = new Map(summarizeVisitorReport(organizationList, visitsByPeriod.today).map((item) => [item.organization.id, item.visitors] as const));
+  const weeklySummary = new Map(summarizeVisitorReport(organizationList, visitsByPeriod.week).map((item) => [item.organization.id, item.visitors] as const));
+  const monthlySummary = new Map(summarizeVisitorReport(organizationList, visitsByPeriod.month).map((item) => [item.organization.id, item.visitors] as const));
   const entered = visits.filter((visit) => Boolean(visit.checkedInAt)).length;
   const exited = visits.filter((visit) => Boolean(visit.checkedOutAt)).length;
   const logo = await loadLogoAsJpeg(building.logoUrl);
