@@ -21,8 +21,8 @@ function escapeHtml(value: string) {
     .replaceAll("'", "&#039;");
 }
 
-export async function printVisitorPass(pass: PrintableVisitorPass) {
-  const printWindow = window.open("", "_blank", "width=420,height=720");
+export async function printVisitorPass(pass: PrintableVisitorPass, reservedWindow?: Window | null) {
+  const printWindow = reservedWindow ?? window.open("", "_blank", "width=420,height=720");
   if (!printWindow) {
     throw new Error("Allow pop-ups to print the visitor pass.");
   }
@@ -44,7 +44,10 @@ export async function printVisitorPass(pass: PrintableVisitorPass) {
       body{font-family:Arial,sans-serif;margin:0;padding:24px;text-align:center;color:#101827}
       .ticket{max-width:340px;margin:0 auto}.meta{font-size:13px;color:#465268}
       img{width:260px;height:260px}.destination{margin:8px 0}
-      @media print{@page{size:80mm auto;margin:4mm}body{padding:0}.ticket{max-width:72mm}}
+      .return-notice{margin-top:18px;padding-top:12px;border-top:1px dashed #94a3b8;font-size:12px;font-weight:800;line-height:1.5;color:#123d35}
+      .return-notice span{display:block;margin-top:4px;font-size:11px;font-weight:600;color:#334155}
+      .footer-brand{margin-top:12px;font-size:10px;letter-spacing:.5px;color:#64748b}
+      @media print{@page{size:80mm auto;margin:4mm}body{padding:0}.ticket{max-width:72mm}.return-notice{break-inside:avoid}}
     </style></head><body><div class="ticket">
       <h2>SMARTPASS360</h2><strong>VISITOR ACCESS PASS</strong>
       <h3>${escapeHtml(pass.fullName)}</h3>
