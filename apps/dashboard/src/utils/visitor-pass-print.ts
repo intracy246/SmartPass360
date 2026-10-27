@@ -40,6 +40,7 @@ export async function printVisitorPass(pass: PrintableVisitorPass, reservedWindo
       .filter(Boolean)
       .join(" · ");
 
+    printWindow.document.open();
     printWindow.document.write(`<!doctype html><html><head><title>${escapeHtml(pass.passNumber)}</title><style>
       body{font-family:Arial,sans-serif;margin:0;padding:24px;text-align:center;color:#101827}
       .ticket{max-width:340px;margin:0 auto}.meta{font-size:13px;color:#465268}
@@ -56,7 +57,7 @@ export async function printVisitorPass(pass: PrintableVisitorPass, reservedWindo
       ${pass.purpose ? `<p class="meta">${escapeHtml(pass.purpose)}</p>` : ""}
       <p>Pass: <strong>${escapeHtml(pass.passNumber)}</strong></p>
       <img src="${escapeHtml(qrImage)}" alt="Visitor QR" />
-      <p class="meta">Issued: ${escapeHtml(new Date(pass.issuedAt).toLocaleString())}</p>
+      <p class="meta">Issued: ${escapeHtml(new Date(pass.issuedAt).toLocaleString("en-GB", { timeZone: "Africa/Dar_es_Salaam" }))}</p>
       <p class="meta">Valid until: ${escapeHtml(new Date(pass.validUntil).toLocaleString("en-GB", { timeZone: "Africa/Dar_es_Salaam" }))}</p>
       <div class="return-notice">TAFADHALI RUDISHA TIKETI HII KWA MLINZI UNAPOTOKA.<span>PLEASE RETURN THIS PASS TO SECURITY WHEN YOU EXIT.</span></div>
       <div class="footer-brand">SmartPass360 by SmartCycle360</div>
