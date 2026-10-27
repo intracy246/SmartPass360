@@ -41,7 +41,7 @@ export type AccessValidationResult = {
     gateName?: string;
     timestamp: string;
     message: string;
-    turnstileCommand: "UNLOCK" | "KEEP_LOCKED";
+    turnstileCommand: "UNLOCK" | "KEEP_LOCKED" | "VALIDATED_ONLY";
   };
 };
 
