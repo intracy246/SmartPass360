@@ -181,7 +181,6 @@ function reportHtml(
   const uniqueVisitors = new Set(visits.map((visit) => visit.visitorId || visit.id)).size;
   const entered = visits.filter((visit) => Boolean(visit.checkedInAt)).length;
   const exited = visits.filter((visit) => Boolean(visit.checkedOutAt)).length;
-  const reportDate = formatReportDate(new Date());
   const periodTitle = REPORT_PERIOD_LABELS[period] + " Visitor Report";
   const logoUrl = safeLogoUrl(building.logoUrl);
   const logo = logoUrl
