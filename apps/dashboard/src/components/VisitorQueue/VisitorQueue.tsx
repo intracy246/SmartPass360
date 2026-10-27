@@ -35,7 +35,7 @@ function csvCell(value: unknown) {
   let text = value == null ? "" : String(value);
 
   // Prevent spreadsheet formula execution from untrusted visitor-entered text.
-  if (/^[\\s]*[=+@-]/.test(text)) {
+  if (/^[\u0000-\u0020]*[=+@-]/.test(text)) {
     text = `'${text}`;
   }
 
