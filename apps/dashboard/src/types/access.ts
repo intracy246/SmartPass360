@@ -76,6 +76,7 @@ export type PermanentPassScanPayload = {
 export type PermanentPassScanResult = {
   decision: "GRANTED" | "DENIED";
   denialReason?: string;
+  message?: string;
   activityType?: "ENTRY" | "EXIT";
   turnstileCommand: "UNLOCK" | "KEEP_LOCKED" | "VALIDATED_ONLY";
   accessEventId?: string;
