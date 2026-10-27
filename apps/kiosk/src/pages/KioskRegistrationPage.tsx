@@ -5,6 +5,8 @@ import {
   type FormEvent
 } from "react";
 
+import QRCode from "qrcode";
+
 import {
   useMutation,
   useQuery
