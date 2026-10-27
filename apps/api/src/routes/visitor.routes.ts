@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { Router } from "express";
+import { Router, type RequestHandler } from "express";
 import { z } from "zod";
 
 import { prisma } from "../lib/prisma.js";
@@ -70,6 +70,74 @@ function reportDateRange(period: ReportPeriod, now = new Date()) {
     lt: new Date(`${endDate}T00:00:00.000+03:00`)
   };
 }
+
+
+const publicRegistrationSchema = z.object({
+  kioskId: z.string().uuid(),
+  organizationId: z.string().uuid(),
+  fullName: z.string().trim().min(3).max(200),
+  phoneNumber: z.string().trim().min(7).max(40),
+  identificationType: z.enum(["NATIONAL_ID", "PASSPORT", "DRIVING_LICENCE", "VOTER_ID", "OTHER", "NONE"]).default("NONE"),
+  identificationNumber: z.string().trim().max(200).optional(),
+  companyName: z.string().trim().max(200).optional(),
+  vehicleRegistrationNumber: z.string().trim().max(80).optional(),
+  departmentOrOffice: z.string().trim().max(200).optional(),
+  hostName: z.string().trim().max(200).optional(),
+  purposeOfVisit: z.string().trim().max(1000).optional()
+}).superRefine((value, context) => {
+  if (value.identificationType !== "NONE" && !value.identificationNumber?.trim()) {
+    context.addIssue({
+      code: "custom",
+      path: ["identificationNumber"],
+      message: "Identification number is required for the selected identification type."
+    });
+  }
+});
+
+const publicRegistrationStatusSchema = z.object({
+  kioskId: z.string().uuid(),
+  visitId: z.string().uuid(),
+  receiptToken: z.string().regex(/^[A-Za-z0-9_-]{43}$/)
+});
+
+function createPublicRateLimit(maxRequests: number, windowMs: number): RequestHandler {
+  const requests = new Map<string, { count: number; resetAt: number }>();
+
+  return (request, response, next) => {
+    const now = Date.now();
+    const forwardedIp = request.get("cf-connecting-ip")?.split(",")[0]?.trim();
+    const clientIp = forwardedIp || request.ip || request.socket.remoteAddress || "unknown";
+    let bucket = requests.get(clientIp);
+
+    if (!bucket || bucket.resetAt <= now) {
+      bucket = { count: 0, resetAt: now + windowMs };
+      requests.set(clientIp, bucket);
+    }
+
+    if (bucket.count >= maxRequests) {
+      response.setHeader("Retry-After", String(Math.max(1, Math.ceil((bucket.resetAt - now) / 1000))));
+      return response.status(429).json({
+        error: {
+          code: "RATE_LIMITED",
+          message: "Too many requests. Please wait a few minutes and try again."
+        }
+      });
+    }
+
+    bucket.count += 1;
+
+    if (requests.size > 5000) {
+      for (const [ip, item] of requests) {
+        if (item.resetAt <= now) requests.delete(ip);
+      }
+    }
+
+    return next();
+  };
+}
+
+const publicRegistrationRateLimit = createPublicRateLimit(8, 15 * 60 * 1000);
+const publicStatusRateLimit = createPublicRateLimit(120, 15 * 60 * 1000);
 
 export const visitorRouter = Router();
 
@@ -332,6 +400,243 @@ visitorRouter.post("/register", requireBuilding, async (request, response, next)
           validFrom: result.pass.validFrom,
           validUntil: result.pass.validUntil
         }
+      }
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+visitorRouter.post("/self-service/register", publicRegistrationRateLimit, async (request, response, next) => {
+  try {
+    const parsed = publicRegistrationSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return response.status(400).json({
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Please check the visitor details and try again.",
+          details: parsed.error.flatten()
+        }
+      });
+    }
+
+    const receiptToken = crypto.randomBytes(32).toString("base64url");
+    const result = await prisma.$transaction(async (tx) => {
+      const kiosk = await tx.kiosk.findFirst({
+        where: {
+          id: parsed.data.kioskId,
+          isActive: true,
+          site: { isActive: true, status: "ACTIVE" }
+        },
+        select: { id: true, siteId: true }
+      });
+      if (!kiosk) return { kind: "kiosk-unavailable" as const };
+
+      const membership = await tx.siteOrganization.findFirst({
+        where: {
+          siteId: kiosk.siteId,
+          organizationId: parsed.data.organizationId,
+          isActive: true,
+          organization: { isActive: true },
+          site: { isActive: true, status: "ACTIVE" }
+        },
+        select: { id: true }
+      });
+      if (!membership) return { kind: "organization-unavailable" as const };
+
+      const visitor = await tx.visitor.create({
+        data: {
+          organizationId: parsed.data.organizationId,
+          fullName: parsed.data.fullName,
+          idType: parsed.data.identificationType === "NONE" ? undefined : parsed.data.identificationType,
+          idNumberEncrypted: parsed.data.identificationType === "NONE" ? undefined : parsed.data.identificationNumber,
+          phone: parsed.data.phoneNumber,
+          company: parsed.data.companyName || undefined,
+          vehicleNumber: parsed.data.vehicleRegistrationNumber || undefined
+        }
+      });
+
+      const visit = await tx.visitRequest.create({
+        data: {
+          siteId: kiosk.siteId,
+          kioskId: kiosk.id,
+          source: "MOBILE_QR",
+          kioskReceiptHash: hashToken(receiptToken),
+          organizationId: parsed.data.organizationId,
+          visitorId: visitor.id,
+          visitorType: "WALK_IN",
+          purpose: parsed.data.purposeOfVisit || "",
+          destinationOffice: parsed.data.departmentOrOffice || undefined,
+          hostNameSnapshot: parsed.data.hostName || undefined,
+          approvalRequired: true,
+          status: "PENDING_APPROVAL"
+        },
+        select: { id: true, createdAt: true }
+      });
+
+      return { kind: "created" as const, visit };
+    });
+
+    if (result.kind === "kiosk-unavailable") {
+      return response.status(404).json({
+        error: { code: "KIOSK_NOT_AVAILABLE", message: "This kiosk is inactive or no longer accepting registrations." }
+      });
+    }
+    if (result.kind === "organization-unavailable") {
+      return response.status(400).json({
+        error: { code: "ORGANIZATION_NOT_AVAILABLE", message: "Please select an active organization for this building." }
+      });
+    }
+
+    response.setHeader("Cache-Control", "no-store");
+    return response.status(201).json({
+      success: true,
+      data: {
+        kioskId: parsed.data.kioskId,
+        visitId: result.visit.id,
+        referenceNumber: result.visit.id.slice(0, 8).toUpperCase(),
+        status: "PENDING_APPROVAL",
+        registeredAt: result.visit.createdAt,
+        receiptToken
+      }
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+visitorRouter.post("/self-service/status", publicStatusRateLimit, async (request, response, next) => {
+  try {
+    const parsed = publicRegistrationStatusSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return response.status(400).json({
+        error: { code: "VALIDATION_ERROR", message: "Invalid registration receipt." }
+      });
+    }
+
+    const { kioskId, visitId, receiptToken } = parsed.data;
+    const passToken = crypto.createHmac("sha256", receiptToken)
+      .update(`visitor-pass:${visitId}`)
+      .digest("base64url");
+
+    const result = await prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM visit_requests WHERE id = ${visitId}::uuid FOR UPDATE`;
+
+      const visit = await tx.visitRequest.findFirst({
+        where: {
+          id: visitId,
+          kioskId,
+          source: "MOBILE_QR",
+          kioskReceiptHash: hashToken(receiptToken)
+        },
+        include: { ...visitInclude, pass: true }
+      });
+
+      if (!visit) return { kind: "invalid" as const };
+
+      if (visit.status === "REJECTED" || visit.status === "DENIED") {
+        return {
+          kind: "rejected" as const,
+          referenceNumber: visit.id.slice(0, 8).toUpperCase()
+        };
+      }
+
+      if (!["APPROVED", "PASS_ISSUED"].includes(visit.status) || !visit.approvedAt) {
+        return {
+          kind: "pending" as const,
+          referenceNumber: visit.id.slice(0, 8).toUpperCase()
+        };
+      }
+
+      const membership = await tx.siteOrganization.findFirst({
+        where: {
+          siteId: visit.siteId!,
+          organizationId: visit.organizationId,
+          isActive: true,
+          organization: { isActive: true },
+          site: { isActive: true, status: "ACTIVE" }
+        },
+        select: { id: true }
+      });
+
+      if (!membership) return { kind: "unavailable" as const };
+
+      const now = new Date();
+      let pass = visit.pass;
+
+      if (pass) {
+        if (
+          pass.status !== "ACTIVE" ||
+          pass.validUntil <= now ||
+          pass.qrTokenHash !== hashToken(passToken)
+        ) {
+          return { kind: "unavailable" as const };
+        }
+      } else {
+        const issued = await issueVisitorPass(tx, {
+          visitId: visit.id,
+          organizationId: visit.organizationId,
+          token: passToken,
+          validFrom: now
+        });
+        pass = issued.pass;
+      }
+
+      return {
+        kind: "issued" as const,
+        referenceNumber: visit.id.slice(0, 8).toUpperCase(),
+        pass: {
+          passNumber: pass.passNumber,
+          status: pass.status,
+          issuedAt: pass.issuedAt,
+          validFrom: pass.validFrom,
+          validUntil: pass.validUntil
+        },
+        visitor: {
+          fullName: visit.visitor.fullName,
+          organizationName: visit.organization.name,
+          siteName: visit.site?.name ?? "SmartPass360",
+          departmentOrOffice: visit.destinationOffice,
+          hostName: visit.hostNameSnapshot,
+          purpose: visit.purpose
+        },
+        qrValue: visitorPassQrValue(passToken)
+      };
+    });
+
+    response.setHeader("Cache-Control", "no-store");
+
+    if (result.kind === "invalid") {
+      return response.status(404).json({
+        error: { code: "RECEIPT_INVALID", message: "This registration could not be verified." }
+      });
+    }
+    if (result.kind === "rejected") {
+      return response.status(200).json({
+        success: true,
+        data: { status: "REJECTED", referenceNumber: result.referenceNumber }
+      });
+    }
+    if (result.kind === "unavailable") {
+      return response.status(409).json({
+        error: { code: "PASS_NOT_AVAILABLE", message: "The pass is no longer available. Please contact Reception or Security." }
+      });
+    }
+    if (result.kind === "pending") {
+      return response.status(200).json({
+        success: true,
+        data: { status: "PENDING_APPROVAL", referenceNumber: result.referenceNumber }
+      });
+    }
+
+    return response.status(200).json({
+      success: true,
+      data: {
+        status: "PASS_ISSUED",
+        referenceNumber: result.referenceNumber,
+        pass: result.pass,
+        visitor: result.visitor,
+        qrValue: result.qrValue
       }
     });
   } catch (error) {
