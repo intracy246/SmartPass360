@@ -57,8 +57,10 @@ export async function printVisitorPass(pass: PrintableVisitorPass, reservedWindo
       <p>Pass: <strong>${escapeHtml(pass.passNumber)}</strong></p>
       <img src="${escapeHtml(qrImage)}" alt="Visitor QR" />
       <p class="meta">Issued: ${escapeHtml(new Date(pass.issuedAt).toLocaleString())}</p>
-      <p class="meta">Valid until: ${escapeHtml(new Date(pass.validUntil).toLocaleString())}</p>
-    </div><script>window.onload=()=>{window.print();setTimeout(()=>window.close(),500)}</script></body></html>`);
+      <p class="meta">Valid until: ${escapeHtml(new Date(pass.validUntil).toLocaleString("en-GB", { timeZone: "Africa/Dar_es_Salaam" }))}</p>
+      <div class="return-notice">TAFADHALI RUDISHA TIKETI HII KWA MLINZI UNAPOTOKA.<span>PLEASE RETURN THIS PASS TO SECURITY WHEN YOU EXIT.</span></div>
+      <div class="footer-brand">SmartPass360 by SmartCycle360</div>
+    </div><script>window.addEventListener("load",()=>{window.focus();setTimeout(()=>window.print(),250)});window.addEventListener("afterprint",()=>setTimeout(()=>window.close(),250));</script></body></html>`);
     printWindow.document.close();
   } catch (error) {
     printWindow.close();
