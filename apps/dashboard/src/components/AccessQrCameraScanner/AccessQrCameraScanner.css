@@ -1,0 +1,441 @@
+.access-qr-camera {
+  min-width: 0;
+  margin: 0 0 22px;
+  padding: clamp(16px, 2.4vw, 26px);
+  overflow: hidden;
+  border: 1px solid rgba(103, 217, 255, .22);
+  border-radius: 24px;
+  background:
+    radial-gradient(ellipse at top right, rgba(59, 130, 246, .16), transparent 36%),
+    linear-gradient(145deg, rgba(14, 29, 51, .97), rgba(6, 17, 32, .98));
+  box-shadow: 0 22px 60px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .035);
+  color: #f8f8ff;
+}
+
+.access-qr-camera__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.access-qr-camera__header > div {
+  min-width: 0;
+}
+
+.access-qr-camera__eyebrow {
+  color: #67d9ff;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: .16em;
+}
+
+.access-qr-camera__header h2 {
+  margin: 7px 0;
+  font-size: clamp(21px, 2.2vw, 29px);
+  line-height: 1.2;
+  letter-spacing: -.035em;
+}
+
+.access-qr-camera__header p {
+  max-width: 780px;
+  margin: 0;
+  color: #91a6c1;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.access-qr-camera__mode {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 11px;
+  border: 1px solid rgba(52, 211, 153, .22);
+  border-radius: 999px;
+  background: rgba(52, 211, 153, .07);
+  color: #6ee7b7;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: .07em;
+  white-space: nowrap;
+}
+
+.access-qr-camera__setup {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(210px, .6fr);
+  align-items: end;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.access-qr-camera__gate {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+}
+
+.access-qr-camera__gate > span {
+  color: #c9d8ea;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.access-qr-camera__gate select {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid rgba(125, 207, 255, .25);
+  border-radius: 13px;
+  outline: none;
+  background: #08172a;
+  color: #f8f8ff;
+  font: inherit;
+  font-size: 13px;
+}
+
+.access-qr-camera__gate select:focus {
+  border-color: #67d9ff;
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, .1);
+}
+
+.access-qr-camera__gate option {
+  background: #08172a;
+  color: #f8f8ff;
+}
+
+.access-qr-camera__gate small {
+  color: #758ba8;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.access-qr-camera__camera-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.access-qr-camera__camera-actions button {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  border: 1px solid rgba(125, 207, 255, .26);
+  border-radius: 13px;
+  background: linear-gradient(135deg, #0e7490, #2563eb 62%, #6050d9);
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: .045em;
+  cursor: pointer;
+  box-shadow: 0 10px 26px rgba(37, 99, 235, .18);
+  transition: filter 150ms ease, transform 150ms ease;
+}
+
+.access-qr-camera__camera-actions button:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.access-qr-camera__camera-actions button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.access-qr-camera__camera-actions .access-qr-camera__stop {
+  border-color: rgba(251, 113, 133, .28);
+  background: rgba(159, 18, 57, .2);
+  color: #fecdd3;
+  box-shadow: none;
+}
+
+.access-qr-camera__preview {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(100%, 760px);
+  min-height: 240px;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px dashed rgba(125, 207, 255, .24);
+  border-radius: 19px;
+  background:
+    radial-gradient(circle at center, rgba(34, 211, 238, .06), transparent 50%),
+    #020a16;
+  isolation: isolate;
+}
+
+.access-qr-camera__preview.is-active {
+  border-style: solid;
+  border-color: rgba(103, 217, 255, .42);
+}
+
+.access-qr-camera__preview video {
+  display: block;
+  width: 100%;
+  max-height: min(56vh, 540px);
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: #020a16;
+}
+
+.access-qr-camera__placeholder {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  max-width: 390px;
+  padding: 28px;
+  text-align: center;
+}
+
+.access-qr-camera__placeholder > span {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border: 1px solid rgba(103, 217, 255, .2);
+  border-radius: 17px;
+  background: rgba(34, 211, 238, .07);
+  color: #67d9ff;
+  font-size: 27px;
+}
+
+.access-qr-camera__placeholder strong {
+  color: #eaf4ff;
+  font-size: 14px;
+}
+
+.access-qr-camera__placeholder p {
+  margin: 0;
+  color: #7d93af;
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.access-qr-camera__aim {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  width: min(60%, 290px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border: 2px solid rgba(103, 255, 207, .92);
+  border-radius: 20px;
+  box-shadow: 0 0 0 200vmax rgba(2, 10, 22, .12), 0 0 28px rgba(52, 211, 153, .17);
+  pointer-events: none;
+}
+
+.access-qr-camera__aim::before,
+.access-qr-camera__aim::after {
+  position: absolute;
+  content: "";
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: rgba(103, 255, 207, .75);
+}
+
+.access-qr-camera__aim::before {
+  top: 50%;
+}
+
+.access-qr-camera__aim::after {
+  display: none;
+}
+
+.access-qr-camera__preview-hint {
+  position: absolute;
+  z-index: 3;
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 9px;
+  background: rgba(2, 10, 22, .72);
+  color: #d2e8ff;
+  font-size: 10px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+.access-qr-camera__notice,
+.access-qr-camera__error,
+.access-qr-camera__status {
+  margin: 0 0 13px;
+  padding: 12px 14px;
+  border: 1px solid rgba(125, 207, 255, .18);
+  border-radius: 12px;
+  background: rgba(59, 130, 246, .07);
+  color: #b4d5f8;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.access-qr-camera__error {
+  border-color: rgba(251, 113, 133, .25);
+  background: rgba(159, 18, 57, .12);
+  color: #fecdd3;
+}
+
+.access-qr-camera__status {
+  border-color: rgba(103, 217, 255, .18);
+  color: #a9e4ff;
+}
+
+.access-qr-camera__result {
+  margin-top: 14px;
+}
+
+.access-qr-camera__decision {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-top: 16px;
+  padding: 18px;
+  border: 1px solid rgba(251, 113, 133, .24);
+  border-radius: 16px;
+  background: rgba(159, 18, 57, .1);
+}
+
+.access-qr-camera__decision.is-granted {
+  border-color: rgba(52, 211, 153, .28);
+  background: rgba(6, 78, 59, .16);
+}
+
+.access-qr-camera__decision-mark {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  border-radius: 14px;
+  background: rgba(251, 113, 133, .12);
+  color: #fda4af;
+  font-size: 24px;
+  font-weight: 950;
+}
+
+.access-qr-camera__decision.is-granted .access-qr-camera__decision-mark {
+  background: rgba(52, 211, 153, .12);
+  color: #6ee7b7;
+}
+
+.access-qr-camera__decision-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.access-qr-camera__decision-copy > span {
+  color: #8ea4be;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: .13em;
+}
+
+.access-qr-camera__decision-copy h3 {
+  margin: 5px 0;
+  color: #fecdd3;
+  font-size: 20px;
+}
+
+.access-qr-camera__decision.is-granted .access-qr-camera__decision-copy h3 {
+  color: #6ee7b7;
+}
+
+.access-qr-camera__decision-copy > p {
+  margin: 6px 0 0;
+  color: #c2d0e3;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.access-qr-camera__decision-copy .access-qr-camera__software-note {
+  padding-left: 10px;
+  border-left: 2px solid rgba(251, 191, 36, .6);
+  color: #f4d89a;
+  font-size: 11px;
+}
+
+.access-qr-camera__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 13px;
+}
+
+.access-qr-camera__meta span {
+  color: #92a6bf;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+
+.access-qr-camera__meta strong {
+  color: #ecf5ff;
+}
+
+.access-qr-camera__footnote {
+  margin: 14px 0 0;
+  color: #7086a3;
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+@media (max-width: 760px) {
+  .access-qr-camera {
+    padding: 16px;
+    border-radius: 19px;
+  }
+
+  .access-qr-camera__header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .access-qr-camera__mode {
+    white-space: normal;
+  }
+
+  .access-qr-camera__setup {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .access-qr-camera__camera-actions button {
+    min-height: 50px;
+  }
+
+  .access-qr-camera__preview {
+    min-height: 210px;
+  }
+
+  .access-qr-camera__preview video {
+    aspect-ratio: 3 / 4;
+    max-height: 55vh;
+  }
+
+  .access-qr-camera__aim {
+    width: min(66%, 280px);
+    border-radius: 16px;
+  }
+
+  .access-qr-camera__decision {
+    padding: 13px;
+    gap: 11px;
+  }
+
+  .access-qr-camera__decision-mark {
+    width: 37px;
+    height: 37px;
+    border-radius: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .access-qr-camera__camera-actions button {
+    transition: none;
+  }
+}
