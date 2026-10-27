@@ -102,6 +102,17 @@
   overflow-wrap: anywhere;
 }
 
+.reports-page__export-note {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  border: 1px solid rgba(52, 211, 153, .2);
+  border-radius: 10px;
+  background: rgba(52, 211, 153, .045);
+  color: #9bb8b2;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
 .reports-page__metrics {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
