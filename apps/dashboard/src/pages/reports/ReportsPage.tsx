@@ -67,7 +67,7 @@ export function ReportsPage() {
     () => summarizeVisitorReport(organizations, visits),
     [organizations, visits]
   );
-  const uniqueVisitors = new Set(visits.map((visit) => visit.visitorId || visit.id)).size;
+  const organizationsVisited = summaries.filter((item) => item.visitors > 0).length;
   const entered = visits.filter((visit) => Boolean(visit.checkedInAt)).length;
   const exited = visits.filter((visit) => Boolean(visit.checkedOutAt)).length;
   const isLoading = reportQuery.isPending || buildingQuery.isPending || organizationsQuery.isPending;
@@ -141,14 +141,14 @@ export function ReportsPage() {
 
       <section className="reports-page__metrics" aria-label="Visitor report summary">
         <article className="reports-page__metric">
-          <span>Recorded visits</span>
+          <span>Visitors registered</span>
           <strong>{isLoading ? "—" : visits.length}</strong>
-          <small>Registrations in selected period</small>
+          <small>Visitor registrations during this period</small>
         </article>
         <article className="reports-page__metric">
-          <span>Unique visitors</span>
-          <strong>{isLoading ? "—" : uniqueVisitors}</strong>
-          <small>Each visitor counted once overall</small>
+          <span>Organizations visited</span>
+          <strong>{isLoading ? "—" : organizationsVisited}</strong>
+          <small>Organizations with at least one visitor</small>
         </article>
         <article className="reports-page__metric">
           <span>Entered</span>
@@ -178,8 +178,7 @@ export function ReportsPage() {
               <thead>
                 <tr>
                   <th>Organization</th>
-                  <th>Unique visitors</th>
-                  <th>Total visits</th>
+                  <th>Visitors registered</th>
                   <th>Entered</th>
                   <th>Exited</th>
                   <th>Pending</th>
@@ -194,7 +193,6 @@ export function ReportsPage() {
                       <small>{item.organization.code ?? (item.organization.isActive === false ? "Inactive" : "")}</small>
                     </td>
                     <td>{item.visitors}</td>
-                    <td>{item.visits}</td>
                     <td>{item.entered}</td>
                     <td>{item.exited}</td>
                     <td>{item.pending}</td>
@@ -203,7 +201,6 @@ export function ReportsPage() {
                 ))}
                 <tr className="reports-page__total-row">
                   <td><strong>TOTAL</strong></td>
-                  <td>{uniqueVisitors}</td>
                   <td>{visits.length}</td>
                   <td>{entered}</td>
                   <td>{exited}</td>
@@ -211,7 +208,7 @@ export function ReportsPage() {
                   <td>{visits.filter((visit) => ["REJECTED", "DENIED"].includes(visit.status)).length}</td>
                 </tr>
                 {summaries.length === 0 && (
-                  <tr><td colSpan={7} className="reports-page__empty">No organizations are assigned to this building.</td></tr>
+                  <tr><td colSpan={6} className="reports-page__empty">No organizations are assigned to this building.</td></tr>
                 )}
               </tbody>
             </table>
