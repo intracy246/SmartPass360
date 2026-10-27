@@ -18,9 +18,11 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
+  overflow: hidden;
 }
 
 .sidebar__brand {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -65,8 +67,36 @@
 
 .sidebar__navigation {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
   gap: 8px;
+  flex: 1 1 auto;
+  min-height: 0;
   margin-top: 24px;
+  padding-right: 4px;
+  margin-right: -4px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(125, 207, 255, 0.35) transparent;
+}
+
+.sidebar__navigation::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar__navigation::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar__navigation::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(125, 207, 255, 0.35);
+}
+
+.sidebar__navigation::-webkit-scrollbar-thumb:hover {
+  background: rgba(125, 207, 255, 0.6);
 }
 
 .sidebar__link {
@@ -127,6 +157,7 @@
 }
 
 .sidebar__footer {
+  flex: 0 0 auto;
   margin-top: auto;
   display: flex;
   align-items: center;
@@ -167,10 +198,17 @@
   .sidebar {
     position: static;
     width: auto;
+    height: auto;
     margin: 14px;
+    overflow: visible;
   }
 
   .sidebar__navigation {
+    flex: initial;
+    min-height: auto;
+    padding-right: 0;
+    margin-right: 0;
+    overflow: visible;
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
