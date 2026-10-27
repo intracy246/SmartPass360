@@ -130,7 +130,7 @@ function statusLabel(value: string) {
   return value
     .replaceAll("_", " ")
     .toLowerCase()
-    .replace(/\\b[a-z]/g, (character) => character.toUpperCase());
+    .replace(/\b[a-z]/g, (character) => character.toUpperCase());
 }
 
 export function summarizeVisitorReport(
