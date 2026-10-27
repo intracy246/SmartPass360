@@ -295,7 +295,7 @@ function showPopupMessage(popup: Window, message: string) {
   popup.document.close();
 }
 
-async function fetchAllReportOrganizations() {
+export async function getAllReportOrganizations() {
   const organizations: ReportOrganization[] = [];
   let page = 1;
   let totalPages = 1;
@@ -329,7 +329,7 @@ export async function exportVisitorReportPdf(period: ReportPeriod) {
       apiRequest<ReportResponse>("/visitors/report?period=week"),
       apiRequest<ReportResponse>("/visitors/report?period=month"),
       getCurrentBuilding(),
-      fetchAllReportOrganizations()
+      getAllReportOrganizations()
     ]);
 
     const reports: VisitsByPeriod = {
