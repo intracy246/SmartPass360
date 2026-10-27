@@ -677,6 +677,212 @@ function hashQrToken(token: string) {
 }
 
 accessRouter.post(
+  "/permanent-pass/validate",
+  requireBuilding,
+  async (request, response, next) => {
+    try {
+      const parsed = scanSchema.safeParse(request.body);
+      if (!parsed.success) {
+        return response.status(400).json({
+          decision: "DENIED",
+          turnstileCommand: "KEEP_LOCKED",
+          error: {
+            code: "VALIDATION_ERROR",
+            message: "A permanent-pass QR and valid gate ID are required.",
+            details: parsed.error.flatten()
+          }
+        });
+      }
+
+      const user = response.locals.authUser as AuthUser;
+      const token = extractPermanentPassToken(parsed.data.qrCode);
+      if (!token) {
+        return response.status(200).json({
+          decision: "DENIED",
+          denialReason: "INVALID_QR_FORMAT",
+          activityType: "ENTRY",
+          turnstileCommand: "KEEP_LOCKED",
+          message: "This QR is not a SmartPass360 permanent-pass credential."
+        });
+      }
+
+      const result = await prisma.$transaction(async (tx) => {
+        if (parsed.data.requestId) {
+          const duplicate = await tx.permanentPassAccessEvent.findFirst({
+            where: {
+              gateId: parsed.data.gateId,
+              metadata: { path: ["requestId"], equals: parsed.data.requestId }
+            },
+            orderBy: { occurredAt: "desc" }
+          });
+          if (duplicate) {
+            const duplicatePass = await tx.permanentPass.findUnique({
+              where: { id: duplicate.permanentPassId },
+              select: { passNumber: true, fullName: true }
+            });
+            return {
+              decision: duplicate.decision,
+              denialReason: duplicate.denialReason ?? undefined,
+              activityType: duplicate.activityType,
+              turnstileCommand: "KEEP_LOCKED" as const,
+              accessEventId: duplicate.id,
+              duplicate: true,
+              message: "Duplicate scan request; no new gate command.",
+              holder: duplicatePass ? { passNumber: duplicatePass.passNumber, fullName: duplicatePass.fullName } : undefined
+            };
+          }
+        }
+
+        const gate = await tx.gate.findFirst({
+          where: {
+            id: parsed.data.gateId,
+            isActive: true,
+            organization: {
+              isActive: true,
+              siteOrganizations: { some: { siteId: user.siteId!, isActive: true } }
+            }
+          },
+          include: {
+            organization: {
+              select: {
+                id: true,
+                name: true,
+                isActive: true,
+                siteOrganizations: {
+                  where: { isActive: true },
+                  select: { siteId: true, site: { select: { isActive: true, status: true } } }
+                }
+              }
+            }
+          }
+        });
+
+        if (!gate) {
+          return {
+            decision: "DENIED" as const,
+            denialReason: "WRONG_GATE",
+            activityType: "ENTRY" as const,
+            turnstileCommand: "KEEP_LOCKED" as const,
+            message: "This gate is not active or does not belong to your building."
+          };
+        }
+
+        await tx.$queryRaw`SELECT id FROM permanent_passes WHERE qr_token_hash = ${hashQrToken(token)} FOR UPDATE`;
+        const permanentPass = await tx.permanentPass.findUnique({
+          where: { qrTokenHash: hashQrToken(token) },
+          include: {
+            organization: {
+              select: {
+                id: true,
+                name: true,
+                isActive: true,
+                siteOrganizations: {
+                  where: { isActive: true },
+                  select: { siteId: true }
+                }
+              }
+            }
+          }
+        });
+
+        if (!permanentPass) {
+          const event = null;
+          return {
+            decision: "DENIED" as const,
+            denialReason: "INVALID_CREDENTIAL",
+            activityType: "ENTRY" as const,
+            turnstileCommand: "KEEP_LOCKED" as const,
+            message: "No active permanent pass matches this QR.",
+            event
+          };
+        }
+
+        const now = new Date();
+        const activityType = permanentPass.isCurrentlyInside ? "EXIT" as const : "ENTRY" as const;
+        const gateSites = gate.organization.siteOrganizations;
+        const passSiteIds = new Set(permanentPass.organization.siteOrganizations.map((item) => item.siteId));
+        const sharedSite = gateSites.find((item) => passSiteIds.has(item.siteId) && item.siteId === user.siteId);
+
+        let denialReason: string | null = null;
+        if (!sharedSite) denialReason = "BUILDING_MISMATCH";
+        else if (!sharedSite.site.isActive || sharedSite.site.status !== "ACTIVE") denialReason = "BUILDING_INACTIVE";
+        else if (!permanentPass.organization.isActive && activityType !== "EXIT") denialReason = "ORGANIZATION_INACTIVE";
+        else if (permanentPass.status !== "ACTIVE" && activityType !== "EXIT") denialReason = `PASS_${permanentPass.status}`;
+        else if (permanentPass.validFrom.getTime() > now.getTime() && activityType !== "EXIT") denialReason = "PASS_NOT_YET_VALID";
+        else if (
+          activityType !== "EXIT" &&
+          permanentPass.expiryType === "FIXED_DATE" &&
+          permanentPass.expiresAt &&
+          permanentPass.expiresAt.getTime() <= now.getTime()
+        ) denialReason = "PASS_EXPIRED";
+        else if (gate.direction !== "BIDIRECTIONAL" && gate.direction !== activityType) {
+          denialReason = activityType === "ENTRY" ? "ENTRY_NOT_ALLOWED_AT_GATE" : "EXIT_NOT_ALLOWED_AT_GATE";
+        }
+
+        const event = await tx.permanentPassAccessEvent.create({
+          data: {
+            organizationId: permanentPass.organizationId,
+            permanentPassId: permanentPass.id,
+            gateId: gate.id,
+            activityType,
+            decision: denialReason ? "DENIED" : "GRANTED",
+            denialReason,
+            turnstileOpened: false,
+            metadata: {
+              validationMode: "SOFTWARE",
+              commandIssued: denialReason ? "KEEP_LOCKED" : "VALIDATED_ONLY",
+              gateCode: gate.code,
+              gateName: gate.name,
+              requestId: parsed.data.requestId ?? null,
+              validatedBy: user.username
+            }
+          }
+        });
+
+        if (!denialReason) {
+          await tx.permanentPass.update({
+            where: { id: permanentPass.id },
+            data: {
+              isCurrentlyInside: activityType === "ENTRY",
+              lastActivityType: activityType,
+              lastActivityAt: now
+            }
+          });
+        }
+
+        return {
+          decision: denialReason ? "DENIED" as const : "GRANTED" as const,
+          denialReason: denialReason ?? undefined,
+          activityType,
+          turnstileCommand: denialReason ? "KEEP_LOCKED" as const : "VALIDATED_ONLY" as const,
+          accessEventId: event.id,
+          occurredAt: event.occurredAt.toISOString(),
+          message: denialReason
+            ? `Access denied: ${denialReason}.`
+            : `Permanent pass ${activityType.toLowerCase()} validated and recorded. No physical turnstile was actuated.`,
+          gate: { id: gate.id, code: gate.code, name: gate.name, direction: gate.direction },
+          holder: {
+            permanentPassId: permanentPass.id,
+            passNumber: permanentPass.passNumber,
+            fullName: permanentPass.fullName,
+            staffNumber: permanentPass.staffNumber,
+            department: permanentPass.department,
+            position: permanentPass.position,
+            holderType: permanentPass.holderType,
+            photoUrl: permanentPass.photoUrl
+          }
+        };
+      }, { isolationLevel: "Serializable" });
+
+      response.setHeader("Cache-Control", "no-store");
+      return response.status(200).json(result);
+    } catch (error) {
+      return next(error);
+    }
+  }
+);
+
+accessRouter.post(
   "/permanent-pass/scan",
   async (request, response, next) => {
     try {
