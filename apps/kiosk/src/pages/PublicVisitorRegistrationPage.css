@@ -502,9 +502,24 @@
   font-size: 12px;
 }
 
-.mobile-registration__ticket button {
+.mobile-registration__ticket-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 13px;
+}
+
+.mobile-registration__ticket-actions button {
   width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
   border-color: transparent;
+  font-size: 12px;
+}
+
+.mobile-registration__ticket-actions .mobile-registration__ticket-save {
+  border-color: rgba(37, 99, 235, .22);
+  background: linear-gradient(135deg, #0e7490, #2563eb);
 }
 
 .mobile-registration__new {
@@ -657,6 +672,10 @@
   .mobile-registration__ticket {
     padding: 16px;
     border-radius: 17px;
+  }
+
+  .mobile-registration__ticket-actions {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
