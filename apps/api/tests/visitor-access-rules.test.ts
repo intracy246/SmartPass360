@@ -5,7 +5,7 @@ import { visitorAccessDecision } from "../src/services/visitor-access-rules";
 
 function validState(): Parameters<typeof visitorAccessDecision>[0] {
   return {
-    buildingActive: true, membershipActive: true, formatValid: true,
+    buildingActive: true, membershipActive: true, formatValid: true, hardwareAvailable: true,
     gate: { isActive: true, status: "ONLINE", organizationId: "same-organization", direction: "BIDIRECTIONAL", organization: { isActive: true } },
     pass: { organizationId: "same-organization", status: "ACTIVE", validFrom: new Date(0), validUntil: new Date(100000), visit: { approvedAt: new Date(1), status: "PASS_ISSUED" } },
     last: null, now: new Date(10000)
@@ -68,6 +68,22 @@ test("building, membership, organization and gate restrictions fail closed", () 
   assert.equal(visitorAccessDecision(state).denialReason, "WRONG_GATE");
   state.gate!.organizationId = state.pass!.organizationId; state.gate!.direction = "EXIT";
   assert.equal(visitorAccessDecision(state).denialReason, "WRONG_GATE_DIRECTION");
+  state.gate!.status = "OFFLINE";
+  assert.equal(visitorAccessDecision(state).denialReason, "GATE_UNAVAILABLE");
+});
+
+test("software scanning can validate at an active checkpoint before turnstile hardware is installed", () => {
+  const state = validState();
+  state.hardwareAvailable = false;
+  state.gate!.status = "OFFLINE";
+  assert.deepEqual(visitorAccessDecision(state), { direction: "ENTRY", denialReason: null });
+  state.gate!.isActive = false;
+  assert.equal(visitorAccessDecision(state).denialReason, "GATE_UNAVAILABLE");
+});
+
+test("physical hardware mode fails closed when the gate controller is offline", () => {
+  const state = validState();
+  state.hardwareAvailable = true;
   state.gate!.status = "OFFLINE";
   assert.equal(visitorAccessDecision(state).denialReason, "GATE_UNAVAILABLE");
 });
