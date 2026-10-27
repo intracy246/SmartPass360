@@ -19,6 +19,11 @@ type IssuedQueueTicket = {
   validUntil: string;
 };
 
+type ApproveAndPrintInput = {
+  visitId: string;
+  printWindow: Window | null;
+};
+
 type QueueVisit = {
   id: string;
   visitorId?: string;
@@ -82,21 +87,62 @@ export function VisitorQueue() {
   );
 
   const approval = useMutation({
-    mutationFn: (visitId: string) =>
+    mutationFn: ({ visitId }: ApproveAndPrintInput) =>
       apiRequest<{ success: boolean; data: { pass: IssuedQueueTicket } }>(
         `/visitors/${encodeURIComponent(visitId)}/approve-and-issue`,
         { method: "POST" }
       ),
-    onSuccess: async (response) => {
-      setIssuedTicket(response.data.pass);
+    onSuccess: async (response, variables) => {
+      const pass = response.data.pass;
+      setIssuedTicket(pass);
       setTicketActionError(null);
+
+      if (variables.printWindow && !variables.printWindow.closed) {
+        setTicketAction("print");
+        try {
+          await printVisitorPass({
+            passNumber: pass.passNumber,
+            qrValue: pass.qrValue,
+            fullName: pass.fullName,
+            organizationName: pass.organizationName,
+            departmentOrOffice: pass.departmentOrOffice ?? undefined,
+            hostName: pass.hostName ?? undefined,
+            purpose: pass.purpose ?? undefined,
+            issuedAt: pass.issuedAt,
+            validUntil: pass.validUntil
+          }, variables.printWindow);
+        } catch (error) {
+          setTicketActionError(error instanceof Error ? error.message : "The pass was approved, but automatic printing failed.");
+        } finally {
+          setTicketAction(null);
+        }
+      } else {
+        setTicketActionError("The pass was approved, but the browser blocked automatic printing. Select Print ticket below to retry.");
+      }
+
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["visitor-queue"] }),
         queryClient.invalidateQueries({ queryKey: ["visitor-operations"] }),
         queryClient.invalidateQueries({ queryKey: ["operations-summary"] })
       ]);
+    },
+    onError: (_error, variables) => {
+      if (variables.printWindow && !variables.printWindow.closed) {
+        variables.printWindow.close();
+      }
     }
   });
+
+  function approveAndPrint(visitId: string) {
+    setTicketActionError(null);
+    const printWindow = window.open("", "_blank", "width=420,height=720");
+    if (printWindow) {
+      printWindow.document.open();
+      printWindow.document.write("<!doctype html><html><head><title>SmartPass360</title></head><body style='font-family:Arial,sans-serif;padding:24px;color:#173f37'><h2>SmartPass360</h2><p>Approving the visit and preparing its printable access pass…</p></body></html>");
+      printWindow.document.close();
+    }
+    approval.mutate({ visitId, printWindow });
+  }
 
   async function printIssuedTicket() {
     if (!issuedTicket) return;
@@ -244,9 +290,9 @@ export function VisitorQueue() {
                       <button
                         type="button"
                         disabled={approval.isPending}
-                        onClick={() => approval.mutate(visit.id)}
+                        onClick={() => approveAndPrint(visit.id)}
                       >
-                        Approve & issue ticket
+                        Approve & print pass
                       </button>
                     )
                     : "—"}
