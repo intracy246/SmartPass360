@@ -12,7 +12,7 @@ accessRouter.post("/validate", requireBuilding, async (request, response, next) 
     const parsed = visitorScanSchema.safeParse(request.body);
     if (!parsed.success) return response.status(400).json({ decision: "DENIED", turnstileCommand: "KEEP_LOCKED", error: { code: "VALIDATION_ERROR", message: "A visitor QR, valid gate ID and optional direction are required." } });
     const user = response.locals.authUser as AuthUser;
-    const result = await validateVisitorScan(user.siteId!, parsed.data);
+    const result = await validateVisitorScan(user.siteId!, parsed.data, { hardwareAvailable: false });
     return response.json({ success: true, ...result, data: result });
   } catch (error) { return next(error); }
 });
@@ -41,7 +41,7 @@ accessRouter.post("/hardware/qr-scan", async (request, response, next) => {
     const permanentPrefix = "smartpass360://permanent-pass/";
 
     if (parsed.data.credential.startsWith(visitorPrefix)) {
-      const result = await validateVisitorScan(device.siteId, parsed.data);
+      const result = await validateVisitorScan(device.siteId, parsed.data, { hardwareAvailable: true });
       await prisma.gateAccessDevice.update({ where: { id: device.id }, data: { lastSeenAt: new Date() } });
       return response.json({ success: true, credentialType: "VISITOR", ...result, data: result });
     }
