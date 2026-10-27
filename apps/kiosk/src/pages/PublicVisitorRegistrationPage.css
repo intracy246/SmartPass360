@@ -1,0 +1,716 @@
+.mobile-registration {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: clamp(14px, 4vw, 34px);
+  color: #f8f8ff;
+  background:
+    radial-gradient(ellipse at 10% 0%, rgba(59, 130, 246, .2), transparent 32rem),
+    radial-gradient(ellipse at 100% 15%, rgba(139, 92, 246, .15), transparent 30rem),
+    #061225;
+}
+
+.mobile-registration *,
+.mobile-registration *::before,
+.mobile-registration *::after {
+  box-sizing: border-box;
+}
+
+.mobile-registration__container {
+  width: min(100%, 820px);
+  margin: 0 auto;
+}
+
+.mobile-registration__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  border: 1px solid rgba(148, 163, 184, .2);
+  border-radius: 22px;
+  background: rgba(12, 27, 48, .82);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, .2);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.mobile-registration__brand {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.mobile-registration__mark {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #22d3ee, #3b82f6 55%, #8b5cf6);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 950;
+  box-shadow: 0 10px 28px rgba(59, 130, 246, .24);
+}
+
+.mobile-registration__mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mobile-registration__brand > div:last-child {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.mobile-registration__brand strong {
+  font-size: 14px;
+  letter-spacing: .035em;
+}
+
+.mobile-registration__brand span {
+  color: #d8e5f8;
+  font-size: 13px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.mobile-registration__brand small {
+  color: #8296b2;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.mobile-registration__language {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 0 13px;
+  border: 1px solid rgba(125, 207, 255, .24);
+  border-radius: 12px;
+  background: rgba(59, 130, 246, .12);
+  color: #a9e4ff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.mobile-registration__intro {
+  padding: clamp(26px, 6vw, 48px) 4px 24px;
+}
+
+.mobile-registration__eyebrow {
+  margin: 0 0 10px;
+  color: #67d9ff;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.mobile-registration__intro h1,
+.mobile-registration__confirmation h1 {
+  margin: 0;
+  color: #f8f8ff;
+  font-size: clamp(30px, 6vw, 43px);
+  line-height: 1.1;
+  letter-spacing: -.04em;
+  overflow-wrap: anywhere;
+}
+
+.mobile-registration__intro > p:last-child {
+  max-width: 660px;
+  margin: 14px 0 0;
+  color: #a0b1c9;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.mobile-registration__form {
+  display: grid;
+  gap: 16px;
+}
+
+.mobile-registration__section {
+  min-width: 0;
+  padding: clamp(16px, 4vw, 24px);
+  border: 1px solid rgba(148, 163, 184, .17);
+  border-radius: 22px;
+  background:
+    linear-gradient(145deg, rgba(16, 33, 56, .91), rgba(8, 20, 37, .95));
+  box-shadow: 0 22px 55px rgba(0, 0, 0, .15), inset 0 1px 0 rgba(255, 255, 255, .035);
+}
+
+.mobile-registration__section-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  margin-bottom: 21px;
+}
+
+.mobile-registration__section-heading > span {
+  display: grid;
+  place-items: center;
+  width: 35px;
+  height: 35px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(103, 217, 255, .28);
+  border-radius: 11px;
+  background: rgba(34, 211, 238, .09);
+  color: #67d9ff;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.mobile-registration__section-heading h2 {
+  margin: 0;
+  color: #f1f6ff;
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+.mobile-registration__section-heading p {
+  margin: 6px 0 0;
+  color: #8296b2;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.mobile-registration__field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin-bottom: 15px;
+  color: #c9d8ea;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.mobile-registration__field:last-child {
+  margin-bottom: 0;
+}
+
+.mobile-registration__field input,
+.mobile-registration__field select,
+.mobile-registration__field textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid rgba(148, 163, 184, .23);
+  border-radius: 13px;
+  outline: none;
+  background: rgba(3, 11, 24, .64);
+  color: #f8f8ff;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 450;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+}
+
+.mobile-registration__field textarea {
+  min-height: 96px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.mobile-registration__field input::placeholder,
+.mobile-registration__field textarea::placeholder {
+  color: #657b98;
+}
+
+.mobile-registration__field input:focus,
+.mobile-registration__field select:focus,
+.mobile-registration__field textarea:focus {
+  border-color: rgba(103, 217, 255, .72);
+  background: rgba(3, 11, 24, .85);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, .1);
+}
+
+.mobile-registration__field input:disabled {
+  opacity: .58;
+  cursor: not-allowed;
+}
+
+.mobile-registration__field option {
+  background: #0b1729;
+  color: #f8f8ff;
+}
+
+.mobile-registration__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.mobile-registration__actions {
+  display: grid;
+  grid-template-columns: minmax(120px, .85fr) minmax(0, 1.6fr);
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.mobile-registration__actions button,
+.mobile-registration__confirmation button,
+.mobile-registration__message button {
+  min-width: 0;
+  min-height: 50px;
+  padding: 12px 16px;
+  border: 1px solid rgba(125, 207, 255, .2);
+  border-radius: 14px;
+  background: linear-gradient(135deg, #3185f4, #7656e9);
+  color: #fff;
+  font: inherit;
+  font-weight: 850;
+  cursor: pointer;
+  box-shadow: 0 12px 30px rgba(59, 130, 246, .2);
+  transition: transform 140ms ease, filter 140ms ease;
+}
+
+.mobile-registration__actions button:hover:not(:disabled),
+.mobile-registration__confirmation button:hover,
+.mobile-registration__message button:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.mobile-registration__actions button:disabled {
+  opacity: .58;
+  cursor: wait;
+  transform: none;
+}
+
+.mobile-registration__actions .mobile-registration__secondary {
+  border-color: rgba(148, 163, 184, .2);
+  background: rgba(255, 255, 255, .045);
+  color: #c6d4e7;
+  box-shadow: none;
+}
+
+.mobile-registration__privacy {
+  margin: 0;
+  color: #7186a3;
+  font-size: 11px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.mobile-registration__alert {
+  margin: 0 0 16px;
+  padding: 13px 15px;
+  border: 1px solid rgba(251, 113, 133, .3);
+  border-radius: 13px;
+  background: rgba(159, 18, 57, .17);
+  color: #fecdd3;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.mobile-registration__confirmation,
+.mobile-registration__message {
+  margin-top: clamp(24px, 6vw, 52px);
+  padding: clamp(20px, 5vw, 34px);
+  border: 1px solid rgba(148, 163, 184, .19);
+  border-radius: 24px;
+  background:
+    linear-gradient(145deg, rgba(16, 33, 56, .94), rgba(8, 20, 37, .96));
+  box-shadow: 0 25px 80px rgba(0, 0, 0, .24);
+  text-align: center;
+}
+
+.mobile-registration__state-icon {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 19px;
+  border: 1px solid rgba(125, 207, 255, .24);
+  border-radius: 19px;
+  background: rgba(59, 130, 246, .13);
+  color: #9ae6ff;
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.mobile-registration__state-icon.is-issued {
+  border-color: rgba(52, 211, 153, .35);
+  background: rgba(52, 211, 153, .12);
+  color: #6ee7b7;
+}
+
+.mobile-registration__state-icon.is-rejected {
+  border-color: rgba(251, 113, 133, .35);
+  background: rgba(251, 113, 133, .12);
+  color: #fda4af;
+}
+
+.mobile-registration__confirmation h1 {
+  font-size: clamp(25px, 5vw, 36px);
+}
+
+.mobile-registration__reference {
+  margin: 16px 0 0;
+  color: #93a8c3;
+  font-size: 13px;
+}
+
+.mobile-registration__reference strong {
+  color: #fff;
+  letter-spacing: .06em;
+}
+
+.mobile-registration__status-copy {
+  color: #fdc6ce;
+  line-height: 1.7;
+}
+
+.mobile-registration__pending-card {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin-top: 22px;
+  padding: 24px 18px;
+  border: 1px solid rgba(103, 217, 255, .17);
+  border-radius: 18px;
+  background: rgba(59, 130, 246, .07);
+}
+
+.mobile-registration__pending-card strong {
+  color: #dceeff;
+  font-size: 15px;
+}
+
+.mobile-registration__pending-card p {
+  max-width: 450px;
+  margin: 0;
+  color: #99aec8;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.mobile-registration__pending-card small {
+  color: #6d83a0;
+  font-size: 11px;
+}
+
+.mobile-registration__pulse {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #22d3ee;
+  box-shadow: 0 0 0 6px rgba(34, 211, 238, .1), 0 0 20px rgba(34, 211, 238, .55);
+  animation: mobile-registration-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes mobile-registration-pulse {
+  0%, 100% { opacity: .65; transform: scale(.94); }
+  50% { opacity: 1; transform: scale(1.06); }
+}
+
+.mobile-registration__ticket {
+  width: min(100%, 410px);
+  margin: 23px auto 0;
+  padding: 22px;
+  border: 1px solid rgba(52, 211, 153, .28);
+  border-radius: 21px;
+  background: linear-gradient(160deg, #f8fbff, #eaf4ff);
+  color: #102039;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, .23);
+}
+
+.mobile-registration__ticket-heading {
+  display: grid;
+  gap: 5px;
+  padding-bottom: 14px;
+  border-bottom: 1px dashed rgba(16, 32, 57, .2);
+  text-align: center;
+}
+
+.mobile-registration__ticket-heading span {
+  color: #2468a4;
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: .1em;
+}
+
+.mobile-registration__ticket-heading strong {
+  font-size: 11px;
+  letter-spacing: .12em;
+}
+
+.mobile-registration__ticket-qr {
+  display: block;
+  width: min(100%, 250px);
+  aspect-ratio: 1;
+  height: auto;
+  margin: 18px auto 12px;
+  border: 8px solid #fff;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(15, 23, 42, .08);
+}
+
+.mobile-registration__ticket h2 {
+  margin: 10px 0 7px;
+  font-size: 22px;
+  overflow-wrap: anywhere;
+}
+
+.mobile-registration__ticket > p {
+  margin: 6px 0;
+  color: #50617a;
+  font-size: 12px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.mobile-registration__ticket-number,
+.mobile-registration__ticket-validity {
+  display: grid;
+  gap: 4px;
+  margin-top: 13px;
+  padding: 12px;
+  border: 1px solid rgba(16, 32, 57, .1);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, .68);
+  text-align: left;
+}
+
+.mobile-registration__ticket-number span,
+.mobile-registration__ticket-validity span {
+  color: #62738b;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.mobile-registration__ticket-number strong,
+.mobile-registration__ticket-validity strong {
+  color: #102039;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.mobile-registration__ticket .mobile-registration__ticket-help {
+  margin: 15px 0 12px;
+  color: #405674;
+  font-size: 12px;
+}
+
+.mobile-registration__ticket button {
+  width: 100%;
+  border-color: transparent;
+}
+
+.mobile-registration__new {
+  margin-top: 18px;
+  background: rgba(255, 255, 255, .05) !important;
+  box-shadow: none !important;
+}
+
+.mobile-registration__message {
+  width: min(100%, 500px);
+  margin: 12vh auto 0;
+}
+
+.mobile-registration__message .mobile-registration__mark {
+  margin: 0 auto 20px;
+}
+
+.mobile-registration__message h1 {
+  font-size: clamp(24px, 5vw, 34px);
+  overflow-wrap: anywhere;
+}
+
+.mobile-registration__message p {
+  color: #90a6c3;
+  line-height: 1.7;
+}
+
+.mobile-registration__footer {
+  margin: 25px 0 10px;
+  color: #647993;
+  font-size: 11px;
+  text-align: center;
+}
+
+@media (max-width: 520px) {
+  .mobile-registration {
+    padding: 12px;
+  }
+
+  .mobile-registration__header {
+    padding: 12px;
+    border-radius: 18px;
+    gap: 8px;
+  }
+
+  .mobile-registration__mark {
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+  }
+
+  .mobile-registration__brand {
+    gap: 10px;
+  }
+
+  .mobile-registration__brand strong {
+    font-size: 12px;
+  }
+
+  .mobile-registration__brand span {
+    font-size: 12px;
+  }
+
+  .mobile-registration__brand small {
+    max-width: 230px;
+    font-size: 10px;
+  }
+
+  .mobile-registration__language {
+    min-height: 36px;
+    padding: 0 10px;
+    font-size: 11px;
+  }
+
+  .mobile-registration__intro {
+    padding: 27px 3px 19px;
+  }
+
+  .mobile-registration__intro h1 {
+    font-size: clamp(29px, 8vw, 36px);
+  }
+
+  .mobile-registration__intro > p:last-child {
+    margin-top: 11px;
+    font-size: 13px;
+    line-height: 1.65;
+  }
+
+  .mobile-registration__section {
+    padding: 15px;
+    border-radius: 18px;
+  }
+
+  .mobile-registration__section-heading {
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .mobile-registration__section-heading > span {
+    width: 31px;
+    height: 31px;
+    border-radius: 10px;
+  }
+
+  .mobile-registration__section-heading h2 {
+    font-size: 16px;
+  }
+
+  .mobile-registration__section-heading p {
+    font-size: 11px;
+  }
+
+  .mobile-registration__field {
+    gap: 7px;
+    margin-bottom: 13px;
+    font-size: 12px;
+  }
+
+  .mobile-registration__field input,
+  .mobile-registration__field select,
+  .mobile-registration__field textarea {
+    min-height: 46px;
+    padding: 11px 12px;
+    border-radius: 12px;
+    font-size: 16px;
+  }
+
+  .mobile-registration__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .mobile-registration__actions {
+    grid-template-columns: minmax(0, .8fr) minmax(0, 1.5fr);
+    gap: 8px;
+  }
+
+  .mobile-registration__actions button {
+    min-height: 49px;
+    padding: 10px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+  }
+
+  .mobile-registration__confirmation {
+    padding: 20px 14px;
+    border-radius: 20px;
+  }
+
+  .mobile-registration__ticket {
+    padding: 16px;
+    border-radius: 17px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-registration__pulse {
+    animation: none;
+  }
+
+  .mobile-registration__actions button,
+  .mobile-registration__confirmation button {
+    transition: none;
+  }
+}
+
+@media print {
+  body {
+    background: #fff !important;
+  }
+
+  .mobile-registration {
+    min-height: initial;
+    padding: 0;
+    background: #fff;
+    color: #111;
+  }
+
+  .mobile-registration__header,
+  .mobile-registration__intro,
+  .mobile-registration__eyebrow,
+  .mobile-registration__reference,
+  .mobile-registration__pending-card,
+  .mobile-registration__state-icon,
+  .mobile-registration__new,
+  .mobile-registration__footer,
+  .mobile-registration__confirmation > h1,
+  .mobile-registration__ticket button {
+    display: none !important;
+  }
+
+  .mobile-registration__confirmation {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: #fff;
+    box-shadow: none;
+  }
+
+  .mobile-registration__ticket {
+    width: 100%;
+    max-width: 380px;
+    margin: 0 auto;
+    border: 1px solid #ddd;
+    box-shadow: none;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
