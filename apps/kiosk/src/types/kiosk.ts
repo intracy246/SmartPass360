@@ -93,3 +93,54 @@ export type KioskBuildingConfigResponse = {
     organizations: OrganizationOption[];
   };
 };
+
+
+export type PublicVisitorRegistrationPayload = {
+  kioskId: string;
+  organizationId: string;
+  fullName: string;
+  phoneNumber: string;
+  identificationType: VisitorIdentificationType;
+  identificationNumber?: string;
+  companyName?: string;
+  vehicleRegistrationNumber?: string;
+  departmentOrOffice?: string;
+  hostName?: string;
+  purposeOfVisit?: string;
+};
+
+export type PublicVisitorRegistrationResult = {
+  success: boolean;
+  data: {
+    kioskId: string;
+    visitId: string;
+    referenceNumber: string;
+    status: "PENDING_APPROVAL";
+    registeredAt: string;
+    receiptToken: string;
+  };
+};
+
+export type PublicVisitorStatusResponse = {
+  success: boolean;
+  data: {
+    status: "PENDING_APPROVAL" | "REJECTED" | "PASS_ISSUED";
+    referenceNumber: string;
+    pass?: {
+      passNumber: string;
+      status: string;
+      issuedAt: string;
+      validFrom: string;
+      validUntil: string;
+    };
+    visitor?: {
+      fullName: string;
+      organizationName: string;
+      siteName: string;
+      departmentOrOffice?: string | null;
+      hostName?: string | null;
+      purpose: string;
+    };
+    qrValue?: string;
+  };
+};
