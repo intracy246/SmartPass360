@@ -16,16 +16,29 @@ Unknown vehicles stay locked and enter Security approval. After approval the edg
 
 Induction loops, photocells, anti-crush sensors, emergency release, and local manual override remain hard-wired safety functions independent of the API.
 
-## QR scanner and pedestrian turnstile
-Topology: 2D QR scanner -> trusted local edge adapter -> SmartPass360 access API -> isolated relay/controller -> turnstile.
+## QR scanner, software checkpoint, and pedestrian turnstile
+
+### Software-only checkpoint (no turnstile installed yet)
+The signed-in Security/Reception browser uses the selected gate and the authenticated API:
+- Visitor pass QR: POST /api/v1/access/validate.
+- Permanent pass QR: POST /api/v1/access/permanent-pass/validate.
+
+These endpoints enforce the signed-in building and selected active gate, validate credential status and validity, apply entry/exit and anti-passback rules, and record the event. For software-only scans they return VALIDATED_ONLY and set turnstileOpened=false. This records the decision; it does not open a physical gate.
+
+Visitor tickets issued through kiosk/mobile or staff registration use the standard 24-hour validity window. Only permanent passes use their separately configured LIFETIME or FIXED_DATE expiry.
+
+### Hardware integration
+Topology: 2D QR scanner -> trusted local edge adapter -> SmartPass360 hardware API -> isolated relay/controller -> turnstile.
 
 Visitor QR: POST /api/v1/access/hardware/qr-scan with x-gate-device-key. Send credential, gateId, optional direction, and a unique UUID requestId.
 
 Permanent pass QR: POST /api/v1/access/permanent-pass/scan with x-gate-device-key. Send qrCode, gateId, and a unique UUID requestId. Scanner retries with the same requestId return no new unlock command.
 
-Actuate only for a granted response whose turnstileCommand is UNLOCK. Never unlock on malformed responses, errors, timeouts, or denial. A USB HID scanner may feed the edge app, but a public browser must not directly control a turnstile relay.
+Actuate only for a granted response whose turnstileCommand is UNLOCK. Never unlock on malformed responses, errors, timeouts, or denial. A USB HID scanner may feed the trusted edge app, but a public browser must never directly control a turnstile relay.
 
-After the local controller has actually pulsed the relay, POST /api/v1/access/hardware/ack using the same x-gate-device-key. Send eventId from the granted scan response, gateId, opened: true only after actuator confirmation, or opened: false with failureCode if the relay/controller reports failure. The access event is not marked as physically opened until this acknowledgement succeeds. Retrying the acknowledgement is idempotent and does not issue another unlock.
+After the local controller has actually pulsed the relay, acknowledge visitor events using POST /api/v1/access/hardware/ack, and permanent-pass events using POST /api/v1/access/hardware/permanent-pass/ack. Use the same x-gate-device-key. Send eventId from the granted scan response, gateId, opened=true only after actuator confirmation, or opened=false with failureCode if the relay/controller reports failure. An event is not marked physically opened until its acknowledgement succeeds. Acknowledgement does not issue another unlock.
+
+Without the physical scanner/controller/relay, only software validation can be tested. Final physical opening and entry/exit acceptance require the real hardware connected to a trusted local edge adapter.
 
 ## Thermal printer
 Visitor tickets are formatted for 80 mm thermal media. Kiosk auto-print is enabled by default. Set VITE_KIOSK_AUTO_PRINT=false only for an intentionally manual-print deployment.
