@@ -219,7 +219,15 @@ export function VisitorQueue() {
                 </td>
                 <td>
                   {visit.status === "PENDING_APPROVAL"
-                    ? <button type="button" disabled={approval.isPending} onClick={() => approval.mutate(visit.id)}>Approve visitor</button>
+                    ? (
+                      <button
+                        type="button"
+                        disabled={approval.isPending}
+                        onClick={() => approval.mutate(visit.id)}
+                      >
+                        {visit.source === "MOBILE_QR" ? "Approve & release QR ticket" : "Approve visitor"}
+                      </button>
+                    )
                     : "—"}
                 </td>
               </tr>
