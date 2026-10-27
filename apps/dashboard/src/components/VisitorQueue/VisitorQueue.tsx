@@ -1,9 +1,24 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "../../api/api-client";
+import { printVisitorPass } from "../../utils/visitor-pass-print";
+import { downloadVisitorPassImage } from "../../utils/visitor-pass-image";
 import "./VisitorQueue.css";
 
 type ReportPeriod = "today" | "week" | "month";
+
+type IssuedQueueTicket = {
+  passNumber: string;
+  qrValue: string;
+  fullName: string;
+  organizationName: string;
+  departmentOrOffice?: string | null;
+  hostName?: string | null;
+  purpose?: string | null;
+  issuedAt: string;
+  validFrom: string;
+  validUntil: string;
+};
 
 type QueueVisit = {
   id: string;
@@ -122,6 +137,9 @@ export function VisitorQueue() {
   const [reportPeriod, setReportPeriod] = useState<ReportPeriod>("today");
   const [isExporting, setIsExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
+  const [issuedTicket, setIssuedTicket] = useState<IssuedQueueTicket | null>(null);
+  const [ticketActionError, setTicketActionError] = useState<string | null>(null);
+  const [ticketAction, setTicketAction] = useState<"print" | "download" | null>(null);
 
   const queue = useQuery({
     queryKey: ["visitor-queue", "today"],
@@ -137,11 +155,13 @@ export function VisitorQueue() {
 
   const approval = useMutation({
     mutationFn: (visitId: string) =>
-      apiRequest<{ success: boolean; data: { id: string; status: string } }>(
-        `/visitors/${encodeURIComponent(visitId)}/approve`,
+      apiRequest<{ success: boolean; data: { pass: IssuedQueueTicket } }>(
+        `/visitors/${encodeURIComponent(visitId)}/approve-and-issue`,
         { method: "POST" }
       ),
-    onSuccess: async () => {
+    onSuccess: async (response) => {
+      setIssuedTicket(response.data.pass);
+      setTicketActionError(null);
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["visitor-queue"] }),
         queryClient.invalidateQueries({ queryKey: ["visitor-operations"] }),
@@ -149,6 +169,42 @@ export function VisitorQueue() {
       ]);
     }
   });
+
+  async function printIssuedTicket() {
+    if (!issuedTicket) return;
+    setTicketAction("print");
+    setTicketActionError(null);
+    try {
+      await printVisitorPass({
+        passNumber: issuedTicket.passNumber,
+        qrValue: issuedTicket.qrValue,
+        fullName: issuedTicket.fullName,
+        organizationName: issuedTicket.organizationName,
+        departmentOrOffice: issuedTicket.departmentOrOffice ?? undefined,
+        hostName: issuedTicket.hostName ?? undefined,
+        purpose: issuedTicket.purpose ?? undefined,
+        issuedAt: issuedTicket.issuedAt,
+        validUntil: issuedTicket.validUntil
+      });
+    } catch (error) {
+      setTicketActionError(error instanceof Error ? error.message : "The visitor ticket could not be printed.");
+    } finally {
+      setTicketAction(null);
+    }
+  }
+
+  async function downloadIssuedTicket() {
+    if (!issuedTicket) return;
+    setTicketAction("download");
+    setTicketActionError(null);
+    try {
+      await downloadVisitorPassImage(issuedTicket);
+    } catch (error) {
+      setTicketActionError(error instanceof Error ? error.message : "The visitor ticket image could not be saved.");
+    } finally {
+      setTicketAction(null);
+    }
+  }
 
   async function exportReport() {
     setIsExporting(true);
@@ -207,6 +263,30 @@ export function VisitorQueue() {
       </header>
 
       {exportError && <p className="visitor-queue__error" role="alert">{exportError}</p>}
+      {issuedTicket && (
+        <section className="visitor-queue__issued-ticket" aria-label="Approved visitor ticket">
+          <div className="visitor-queue__issued-ticket-copy">
+            <span>PASS ISSUED · VALID FOR 24 HOURS</span>
+            <h3>{issuedTicket.fullName}</h3>
+            <p>{issuedTicket.organizationName} · {issuedTicket.passNumber}</p>
+            <p>Valid until {new Date(issuedTicket.validUntil).toLocaleString("en-GB", { timeZone: "Africa/Dar_es_Salaam" })}</p>
+            <small>Ticket QR is ready. Print a physical ticket or download the complete ticket as a PNG image.</small>
+          </div>
+          <img src={issuedTicket.qrValue} alt="Approved visitor ticket QR code" />
+          <div className="visitor-queue__ticket-actions">
+            <button type="button" onClick={() => void printIssuedTicket()} disabled={ticketAction !== null}>
+              {ticketAction === "print" ? "Preparing print…" : "Print ticket"}
+            </button>
+            <button type="button" onClick={() => void downloadIssuedTicket()} disabled={ticketAction !== null}>
+              {ticketAction === "download" ? "Creating image…" : "Download PNG"}
+            </button>
+            <button type="button" className="visitor-queue__ticket-dismiss" onClick={() => setIssuedTicket(null)} disabled={ticketAction !== null}>
+              Close
+            </button>
+          </div>
+          {ticketActionError && <p className="visitor-queue__error" role="alert">{ticketActionError}</p>}
+        </section>
+      )}
       {(queue.error || approval.error) && (
         <p className="visitor-queue__error" role="alert">{(queue.error || approval.error)?.message}</p>
       )}
@@ -246,7 +326,7 @@ export function VisitorQueue() {
                         disabled={approval.isPending}
                         onClick={() => approval.mutate(visit.id)}
                       >
-                        {visit.source === "MOBILE_QR" ? "Approve & release QR ticket" : "Approve visitor"}
+                        Approve & issue ticket
                       </button>
                     )
                     : "—"}
