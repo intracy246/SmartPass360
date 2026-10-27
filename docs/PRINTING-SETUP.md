@@ -1,30 +1,45 @@
-# SmartPass360 Reception Printer Setup
+# SmartPass360 Reception Printing Setup
 
 ## Visitor workflow
 
-1. Connect a supported printer to the Reception/Security computer using USB, the network, or Bluetooth.
-2. Install the manufacturer's driver and print an operating-system test page.
-3. Set the intended printer as the computer's default printer. For thermal printers, select the 80 mm paper/roll size in printer preferences.
-4. Open the SmartPass360 dashboard on that same computer and allow pop-ups for the dashboard site.
-5. In Visitor Queue, select **Approve & print pass**. SmartPass360 approves the pending visit, opens the pass in a reserved print window, and invokes the browser print operation automatically.
-6. Confirm the print dialog uses the intended printer and correct paper size. The printed pass contains English and Kiswahili instructions to return the pass to Security when the visitor exits.
+1. Connect a supported printer to the Reception/Security computer using USB, Bluetooth, or a supported network connection.
+2. Install the printer driver or pair it in the operating system, then print a test page.
+3. Set the intended printer as the operating-system default printer. For thermal printers, select the correct 80 mm paper/roll size in printer preferences.
+4. Open SmartPass360 in Chrome on that same computer and allow pop-ups for the dashboard site.
+5. In Visitor Queue, click **Approve & auto-print pass**. The app approves the pending visit, issues its pass, and automatically invokes the browser print function in the window reserved by that click.
+6. Test several passes. The printed pass includes the QR code, visitor and organization details, validity, a return-to-Security notice in Kiswahili and English, and **SmartPass360 by SmartCycle360** branding.
 
-## Silent printing on a dedicated reception computer
+## Silent printing on a dedicated Reception/Security computer
 
-A normal browser is not permitted to silently send a website's print job directly to a physical printer. It will open the system/browser print dialog. To print without a confirmation dialog, configure a dedicated, trusted Reception/Security computer with Chrome/Chromium kiosk printing and a tested default printer.
+A normal website cannot silently send a print job to a physical printer because browsers protect users from unwanted printing. Without kiosk-printing mode, Chrome may show the print dialog. To print without an additional print-dialog confirmation, configure a dedicated, trusted Reception/Security workstation with Chrome/Chromium kiosk printing and a tested default printer.
 
-On a managed Windows workstation, create a dedicated browser shortcut with the appropriate installed Chrome path and the flags below:
+### Windows
 
-```text
---kiosk-printing --kiosk https://smartpass.smartcycle360.com
+1. Pair/install the printer in Windows, select it as the default, and print a Windows test page.
+2. Close all Chrome windows.
+3. Create a dedicated Chrome shortcut. Its target should be the installed Chrome executable followed by these arguments:
+   `--kiosk-printing https://smartpass.smartcycle360.com/visitors`
+
+   Example:
+   `"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --kiosk-printing https://smartpass.smartcycle360.com/visitors`
+
+   Adjust the executable path if Chrome is installed elsewhere. The `--kiosk-printing` argument enables silent printing; it does not install, connect, or choose the printer for you.
+4. Start Chrome using this shortcut, sign in to SmartPass360, and keep the dedicated session open. Test the complete **Approve & auto-print pass** workflow with a test visitor before production use.
+
+### Linux
+
+Install/pair the printer, set it as the OS default, and test it. Launch the dedicated browser with the flag (the browser executable can vary by distribution):
+
+```bash
+chromium --kiosk-printing https://smartpass.smartcycle360.com/visitors
 ```
 
-If Chrome is installed elsewhere, adjust the executable path. Sign in to SmartPass360 in that dedicated browser session, set the correct printer as the OS default, and test several sample passes before operational use. Keep the workstation physically controlled; do not enable silent printing on shared or personal devices.
+Use the installed Chrome/Chromium command for your distribution. Sign in and test a sample pass.
 
-Bluetooth and USB are transport options handled by the operating system/printer driver. SmartPass360 does not pair with a printer itself. The printer must be paired/connected, online, loaded with paper, and selected as default for kiosk printing to work reliably.
+## Important limitations and recovery
 
-## Failure handling
-
-- If pop-ups are blocked, SmartPass360 does not approve the visit; allow pop-ups and retry.
-- If the pass is issued but printing fails, use the visible **Print ticket** recovery action and check the browser printer settings.
-- Never treat a pass as physically printed until the printer has produced the ticket. Keep Security's access-control procedure in place if a printer or workstation is offline.
+- USB, Bluetooth, and network printing are supported through the workstation operating system and printer driver; SmartPass360 does not itself pair with Bluetooth devices.
+- Silent printing only works if the controlled browser session is launched with kiosk-printing mode and the intended printer is online, loaded with paper, and configured as default.
+- If pop-ups are blocked, SmartPass360 cannot complete the approve-and-print flow; allow pop-ups and retry.
+- If a pass is issued but paper does not print, check the printer/default-paper settings and use **Print ticket** in the issued-pass panel to retry. Avoid repeated clicks that could produce duplicate passes.
+- Enable silent printing only on a physically controlled Reception/Security workstation, not on a personal or shared browsing device.
