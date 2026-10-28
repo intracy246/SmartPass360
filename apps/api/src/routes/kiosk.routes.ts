@@ -237,7 +237,10 @@ kioskRouter.post("/activate", async (request, response, next) => {
         where: { ...available, deviceId: parsed.data.deviceId },
         data: { lastSeenAt: new Date() }
       });
-      return heartbeat.count ? tx.kiosk.findUniqueOrThrow({ where: { id: kiosk.id } }) : null;
+      return heartbeat.count ? tx.kiosk.findUniqueOrThrow({
+        where: { id: kiosk.id },
+        select: { id: true, siteId: true, name: true, code: true, location: true, isActive: true, deviceId: true, activatedAt: true, lastSeenAt: true, createdAt: true, updatedAt: true }
+      }) : null;
     });
 
     if (!updated) {
@@ -454,7 +457,8 @@ kioskRouter.get("/:kioskId/config", async (request, response, next) => {
 
     const updated = await prisma.kiosk.update({
       where: { id: kiosk.id },
-      data: { lastSeenAt: new Date() }
+      data: { lastSeenAt: new Date() },
+      select: { id: true, siteId: true, name: true, code: true, location: true, isActive: true, deviceId: true, activatedAt: true, lastSeenAt: true, createdAt: true, updatedAt: true }
     });
 
     return response.status(200).json({
