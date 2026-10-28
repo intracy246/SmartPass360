@@ -5,6 +5,7 @@ import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { Prisma } from "../generated/prisma/client.js";
 import { requireBuilding, type AuthUser } from "../middleware/auth.middleware.js";
+import { kioskActivationRateLimit } from "../middleware/login-rate-limit.middleware.js";
 
 export const kioskRouter = Router();
 
@@ -83,7 +84,8 @@ kioskRouter.patch("/sites/:siteId/settings", requireBuilding, async (request, re
       data: {
         name: parsed.data.name,
         logoUrl: parsed.data.logoUrl ?? null
-      }
+      },
+      select: { id: true, name: true, code: true, logoUrl: true, status: true, isActive: true, updatedAt: true }
     });
 
     return response.status(200).json({
@@ -102,7 +104,7 @@ kioskRouter.get("/", requireBuilding, async (_request, response, next) => {
     const kiosks = await prisma.kiosk.findMany({
       where: { siteId: user.siteId! },
       orderBy: { createdAt: "desc" },
-      include: { site: true }
+      select: { id: true, siteId: true, name: true, code: true, location: true, isActive: true, deviceId: true, activatedAt: true, lastSeenAt: true, createdAt: true, updatedAt: true }
     });
 
     return response.status(200).json({
@@ -137,7 +139,7 @@ kioskRouter.post("/", requireBuilding, async (request, response, next) => {
         location: parsed.data.location || undefined,
         activationCode: createActivationCode()
       },
-      include: { site: true }
+      select: { id: true, siteId: true, name: true, code: true, location: true, activationCode: true, isActive: true, deviceId: true, activatedAt: true, lastSeenAt: true, createdAt: true, updatedAt: true }
     });
 
     return response.status(201).json({
@@ -149,7 +151,7 @@ kioskRouter.post("/", requireBuilding, async (request, response, next) => {
   }
 });
 
-kioskRouter.post("/activate", async (request, response, next) => {
+kioskRouter.post("/activate", kioskActivationRateLimit, async (request, response, next) => {
   try {
     const parsed = activateSchema.safeParse(request.body);
 
@@ -236,7 +238,10 @@ kioskRouter.post("/activate", async (request, response, next) => {
         where: { ...available, deviceId: parsed.data.deviceId },
         data: { lastSeenAt: new Date() }
       });
-      return heartbeat.count ? tx.kiosk.findUniqueOrThrow({ where: { id: kiosk.id } }) : null;
+      return heartbeat.count ? tx.kiosk.findUniqueOrThrow({
+        where: { id: kiosk.id },
+        select: { id: true, siteId: true, name: true, code: true, location: true, isActive: true, deviceId: true, activatedAt: true, lastSeenAt: true, createdAt: true, updatedAt: true }
+      }) : null;
     });
 
     if (!updated) {
@@ -301,7 +306,10 @@ kioskRouter.patch<{ kioskId: string }>("/:kioskId", requireBuilding, async (requ
         location: parsed.data.location ?? null,
         isActive: parsed.data.isActive ?? existing.isActive
       },
-      include: { site: true }
+      select: {
+        id: true, siteId: true, name: true, code: true, location: true,
+        isActive: true, deviceId: true, activatedAt: true, lastSeenAt: true, createdAt: true, updatedAt: true
+      }
     });
 
     return response.status(200).json({ success: true, data: updated });
@@ -450,7 +458,8 @@ kioskRouter.get("/:kioskId/config", async (request, response, next) => {
 
     const updated = await prisma.kiosk.update({
       where: { id: kiosk.id },
-      data: { lastSeenAt: new Date() }
+      data: { lastSeenAt: new Date() },
+      select: { id: true, siteId: true, name: true, code: true, location: true, isActive: true, deviceId: true, activatedAt: true, lastSeenAt: true, createdAt: true, updatedAt: true }
     });
 
     return response.status(200).json({

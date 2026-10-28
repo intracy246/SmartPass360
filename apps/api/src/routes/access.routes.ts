@@ -567,10 +567,9 @@ accessRouter.get("/gate-devices", requireBuilding, async (_request, response, ne
     const user = response.locals.authUser as AuthUser;
     const devices = await prisma.gateAccessDevice.findMany({
       where: { siteId: user.siteId! },
-      include: {
-        gate: {
-          select: { id: true, code: true, name: true, direction: true, status: true }
-        }
+      select: {
+        id: true, name: true, isActive: true, lastSeenAt: true, createdAt: true,
+        gate: { select: { id: true, code: true, name: true, direction: true, status: true } }
       },
       orderBy: { createdAt: "desc" }
     });

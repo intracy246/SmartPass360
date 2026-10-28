@@ -66,6 +66,8 @@ if (!ownerPassword) configurationErrors.push("OWNER_PASSWORD");
 
 if (configured.NODE_ENV === "production") {
   if (authJwtSecret === developmentJwtSecret) configurationErrors.push("AUTH_JWT_SECRET");
+  if (!configured.PERMANENT_PASS_QR_ENCRYPTION_KEY) configurationErrors.push("PERMANENT_PASS_QR_ENCRYPTION_KEY");
+  if (configured.PERMANENT_PASS_QR_ENCRYPTION_KEY === authJwtSecret) configurationErrors.push("PERMANENT_PASS_QR_ENCRYPTION_KEY");
   if (ownerUsername === "smartcycle") configurationErrors.push("OWNER_USERNAME");
   if (ownerPassword === developmentOwnerPassword) configurationErrors.push("OWNER_PASSWORD");
   if (!configured.CORS_ORIGIN?.trim()) configurationErrors.push("CORS_ORIGIN");
@@ -80,6 +82,7 @@ if (configurationErrors.length > 0) {
 export const env = {
   ...configured,
   AUTH_JWT_SECRET: authJwtSecret!,
+  PERMANENT_PASS_QR_ENCRYPTION_KEY: configured.PERMANENT_PASS_QR_ENCRYPTION_KEY ?? (configured.NODE_ENV !== "production" ? authJwtSecret! : ""),
   OWNER_USERNAME: ownerUsername!,
   OWNER_PASSWORD: ownerPassword!,
   CORS_ORIGIN: configured.CORS_ORIGIN ?? ""

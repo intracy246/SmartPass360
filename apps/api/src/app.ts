@@ -63,7 +63,7 @@ app.use(
 
 app.use(express.json({ limit: "1mb" }));
 
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: "100kb", parameterLimit: 1000 }));
 
 app.get("/api/v1/ready", async (_request, response) => {
   try {
