@@ -139,7 +139,7 @@ kioskRouter.post("/", requireBuilding, async (request, response, next) => {
         location: parsed.data.location || undefined,
         activationCode: createActivationCode()
       },
-      select: { id: true, siteId: true, name: true, code: true, location: true, isActive: true, deviceId: true, activatedAt: true, lastSeenAt: true, createdAt: true, updatedAt: true }
+      select: { id: true, siteId: true, name: true, code: true, location: true, activationCode: true, isActive: true, deviceId: true, activatedAt: true, lastSeenAt: true, createdAt: true, updatedAt: true }
     });
 
     return response.status(201).json({
