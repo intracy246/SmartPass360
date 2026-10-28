@@ -1,35 +1,49 @@
 # SmartPass360 production 403 diagnostic runbook
 
-## What the dashboard source confirms
+## Confirmed production symptom
 
-The dashboard calls these API paths:
+The Owner Dashboard at `https://smartpass.smartcycle360.com/owner` calls:
 
-- `GET /api/v1/access/operations-summary`
-- `GET /api/v1/vehicle-access/requests`
+- `GET /api/v1/auth/buildings`
 
-Both endpoints use the `requireBuilding` middleware. That middleware returns HTTP 403 with `FORBIDDEN / Building access required.` whenever the bearer token is missing, its HMAC signature cannot be verified, it has expired, the token scope is not `BUILDING`, or `siteId` is absent.
+The browser response captured on 2026-10-28 was HTTP `403 Forbidden` with:
 
-The dashboard stores the current token under `smartpass360.token` and sends it as a Bearer token on API calls. A successful building login returns a token signed using the API process's `AUTH_JWT_SECRET`. Therefore, a secret mismatch between API instances/restarts or a stale/invalid browser token can produce this symptom. A token for the OWNER scope also correctly fails these building-only routes.
+```json
+{"error":{"code":"FORBIDDEN","message":"Owner access required."}}
+```
 
-The dashboard deployment's configured `VITE_API_BASE_URL` is build-time configuration. The production project currently lists it as `https://api.smartcycle360.com/api/v1`. Check the deployed asset/request URL if there is any doubt about which API hostname was compiled into the current client.
+Source code confirms this response is produced by `requireOwner` in `apps/api/src/middleware/auth.middleware.ts` when the API cannot read a valid signed user from the request or the token's `scope` is not `OWNER`. The endpoint is mounted from `ownerRouter` at `/api/v1/auth`, and `GET /buildings` specifically uses `requireOwner`.
 
-## Safe triage sequence
+This differs from the `Building access required.` response produced by `requireBuilding` on Building-dashboard APIs. Do not treat the current Owner Dashboard 403 as a Building-scope issue.
 
-1. Open browser DevTools → Network. Select the failing `operations-summary` request and record (do not share the token itself): Request URL, status, response JSON, `x-request-id`, and whether the request has an `Authorization: Bearer` header.
-2. Confirm the login request returned HTTP 200, with `data.user.scope === "BUILDING"` and a non-empty `data.user.siteId`. Never paste the returned token into an issue, screenshot, or chat.
-3. If the browser session was logged in before an API restart/reconfiguration, sign out by clearing only the SmartPass360 session keys in DevTools Application → Local Storage (`smartpass360.token`, `smartpass360.user`), then sign in again. This obtains a freshly signed token. Do not clear unrelated application storage.
-4. Compare the API process's effective `AUTH_JWT_SECRET` across all live API processes/containers. Compare securely on the server; do not print or paste the secret. All API replicas must use the same secret, and it must remain stable across restarts.
-5. Use the response's `x-request-id` to find the corresponding API log entry. The API's Pino logger redacts Authorization headers. Do not enable token/header logging to debug this.
-6. If a fresh BUILDING login still gets 403, check whether the logged-in account's database site ID is present and whether all requests are routed to the intended API deployment. Keep `requireBuilding` in place; do not turn off authorization or change the 403 to a success response as a workaround.
+## Safe triage sequence for the Owner Dashboard
+
+1. In Chrome DevTools → Network, select the failed `buildings` request and confirm its Request URL is the expected production host. Under Request Headers, check whether `Authorization: Bearer …` is present. Never copy or share the token itself.
+2. In the same Network panel, select the `/auth/login` request. Confirm it returns HTTP 200 and the response user's `scope` is `OWNER`. Do not share the response token or login credentials.
+3. If the browser might have an older session, clear only `smartpass360.token` and `smartpass360.user` from DevTools → Application → Local Storage for the SmartPass360 site, then sign in again with the issued Owner credentials and retry the buildings request.
+4. If a fresh Owner login succeeds but `GET /auth/buildings` still returns this 403, compare the effective `AUTH_JWT_SECRET` configuration of all live API instances securely on the server. Do not print or share the secret. All replicas must use the same secret and keep it stable across restarts.
+5. Record the failed request's `x-request-id` response header (if present) and locate that ID in the API logs. The Pino logger is configured to redact Authorization and Cookie headers. Do not enable token/header logging as a workaround.
+6. If login fails or the returned scope is not `OWNER`, inspect the Owner credentials and production API configuration. Do not bypass the middleware or change a 403 into success.
+
+## Related Building-dashboard endpoints
+
+The Building dashboard APIs `/api/v1/access/operations-summary` and `/api/v1/vehicle-access/requests` use `requireBuilding`. These endpoints return `403 FORBIDDEN / Building access required.` when the signed token is missing/invalid/expired, the scope is not `BUILDING`, or `siteId` is missing. Diagnose these separately from the confirmed Owner Dashboard response above.
+
+## Production configuration
+
+The dashboard's `VITE_API_BASE_URL` is build-time configuration. The production dashboard project has been configured with `https://api.smartcycle360.com/api/v1`. Confirm the deployed Request URL matches the intended host, especially if deployment settings changed.
+
+The API signs session tokens using `AUTH_JWT_SECRET`. All live API replicas must use the same secret. Never log or paste the secret or bearer tokens.
 
 ## Regression checks before shipping
 
-- A valid, unexpired BUILDING token with a site ID can pass `requireBuilding`.
-- Missing token, bad signature, expired token, OWNER token, and BUILDING token without a site ID are rejected.
-- Login never sends an old browser token; authenticated non-login API requests send the newly saved token.
-- Production build uses the intended API base URL.
-- Run the repository's root `npm run typecheck` and `npm run build`, plus any auth middleware/API client tests.
+- Owner login returns a signed token whose user scope is `OWNER`.
+- A valid, unexpired Owner token can access `GET /api/v1/auth/buildings`.
+- Missing/invalid/expired tokens and non-Owner tokens are rejected by `requireOwner`.
+- A valid Building token with a site ID can pass `requireBuilding`; invalid scope, missing site ID, and invalid/expired tokens are rejected.
+- Login requests do not forward stale browser Authorization tokens; authenticated API requests send the current token.
+- Run dashboard/API typecheck and builds plus relevant authentication tests before release.
 
 ## Current diagnostic limit
 
-Repository code confirms the rejection conditions, but code inspection alone does not prove which condition triggered in production. The live API response body and request ID, effective API runtime configuration, and corresponding server log are required to identify the exact cause before changing auth logic.
+The production response now confirms the Owner authorization middleware is rejecting the buildings request. The screenshot alone cannot distinguish a missing/invalid signature from a valid token whose scope is not `OWNER`. The login request result, presence of Authorization header, and corresponding API logs (using `x-request-id`) are needed to identify which condition is happening. Keep access control enabled while diagnosing.
