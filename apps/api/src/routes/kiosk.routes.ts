@@ -83,7 +83,8 @@ kioskRouter.patch("/sites/:siteId/settings", requireBuilding, async (request, re
       data: {
         name: parsed.data.name,
         logoUrl: parsed.data.logoUrl ?? null
-      }
+      },
+      select: { id: true, name: true, code: true, logoUrl: true, status: true, isActive: true, updatedAt: true }
     });
 
     return response.status(200).json({
