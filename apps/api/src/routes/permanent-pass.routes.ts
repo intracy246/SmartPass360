@@ -94,7 +94,7 @@ function createQrToken() {
 }
 
 function permanentQrEncryptionKey() {
-  const secret = env.PERMANENT_PASS_QR_ENCRYPTION_KEY ?? env.AUTH_JWT_SECRET;
+  const secret = env.PERMANENT_PASS_QR_ENCRYPTION_KEY;
   return crypto.createHash("sha256").update(secret).digest();
 }
 
