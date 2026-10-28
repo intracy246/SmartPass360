@@ -23,7 +23,7 @@ describe("apiRequest authorization header", () => {
     );
     globalThis.fetch = fetchMock;
 
-    await apiRequest("/auth/login", { method: "POST", body: { username: "building-admin", password: "not-a-real-password" } });
+    await apiRequest("/auth/login", { method: "POST", body: { username: "owner-user", password: "not-a-real-password" } });
 
     const [, init] = fetchMock.mock.calls[0] as [RequestInfo | URL, RequestInit];
     const headers = new Headers(init.headers);
@@ -31,7 +31,7 @@ describe("apiRequest authorization header", () => {
   });
 
   it("sends the saved token on authenticated non-login requests", async () => {
-    window.localStorage.setItem("smartpass360.token", "building-token");
+    window.localStorage.setItem("smartpass360.token", "owner-token");
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(JSON.stringify({ success: true, data: [] }), {
         status: 200,
@@ -40,18 +40,34 @@ describe("apiRequest authorization header", () => {
     );
     globalThis.fetch = fetchMock;
 
-    await apiRequest("/access/operations-summary");
+    await apiRequest("/auth/buildings");
 
     const [, init] = fetchMock.mock.calls[0] as [RequestInfo | URL, RequestInit];
     const headers = new Headers(init.headers);
-    expect(headers.get("Authorization")).toBe("Bearer building-token");
+    expect(headers.get("Authorization")).toBe("Bearer owner-token");
   });
 
-  it("surfaces the API's building authorization rejection without masking it", async () => {
+  it("surfaces the Owner API's 403 without masking its reason", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ error: { code: "FORBIDDEN", message: "Owner access required." } }), {
+        status: 403,
+        headers: { "content-type": "application/json", "x-request-id": "test-owner-request-id" }
+      })
+    );
+    globalThis.fetch = fetchMock;
+
+    await expect(apiRequest("/auth/buildings")).rejects.toMatchObject({
+      name: "ApiError",
+      status: 403,
+      message: "Owner access required."
+    } satisfies Partial<ApiError>);
+  });
+
+  it("surfaces the Building API's 403 without masking its reason", async () => {
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(JSON.stringify({ error: { code: "FORBIDDEN", message: "Building access required." } }), {
         status: 403,
-        headers: { "content-type": "application/json", "x-request-id": "test-request-id" }
+        headers: { "content-type": "application/json", "x-request-id": "test-building-request-id" }
       })
     );
     globalThis.fetch = fetchMock;
