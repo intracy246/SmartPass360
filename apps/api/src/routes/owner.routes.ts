@@ -6,6 +6,7 @@ import { z } from "zod";
 import { env } from "../config/env.js";
 import { prisma } from "../lib/prisma.js";
 import { requireBuilding, requireOwner, signAuthToken, type AuthUser } from "../middleware/auth.middleware.js";
+import { loginRateLimit } from "../middleware/login-rate-limit.middleware.js";
 
 export const ownerRouter = Router();
 
@@ -65,7 +66,7 @@ const updateBuildingSchema = z.object({
   isActive: z.boolean().optional()
 });
 
-ownerRouter.post("/login", async (request, response) => {
+ownerRouter.post("/login", loginRateLimit, async (request, response) => {
   const parsed = loginSchema.safeParse(request.body);
   if (!parsed.success) {
     return response.status(400).json({
