@@ -301,7 +301,10 @@ kioskRouter.patch<{ kioskId: string }>("/:kioskId", requireBuilding, async (requ
         location: parsed.data.location ?? null,
         isActive: parsed.data.isActive ?? existing.isActive
       },
-      include: { site: true }
+      select: {
+        id: true, siteId: true, name: true, code: true, location: true,
+        isActive: true, deviceId: true, activatedAt: true, lastSeenAt: true, createdAt: true, updatedAt: true
+      }
     });
 
     return response.status(200).json({ success: true, data: updated });
