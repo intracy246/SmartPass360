@@ -29,14 +29,19 @@ export async function apiRequest<T>(
     ? endpoint
     : `/${endpoint}`;
 
+  // Avoid sending a stale session token with login requests.
+  // The server issues the correct role-scoped token after credentials are verified.
+  const token = window.localStorage.getItem("smartpass360.token");
+  const isLoginRequest = normalizedEndpoint === "/auth/login" && options.method?.toUpperCase() === "POST";
+
   const response = await fetch(
     `${environment.apiBaseUrl}${normalizedEndpoint}`,
     {
       ...options,
       headers: {
         "Content-Type": "application/json",
-        ...(window.localStorage.getItem("smartpass360.token")
-          ? { Authorization: `Bearer ${window.localStorage.getItem("smartpass360.token")}` }
+        ...(!isLoginRequest && token
+          ? { Authorization: `Bearer ${token}` }
           : {}),
         ...options.headers
       },
