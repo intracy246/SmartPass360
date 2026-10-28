@@ -93,8 +93,10 @@ function createQrToken() {
   return crypto.randomBytes(32).toString("base64url");
 }
 
-function permanentQrEncryptionKey() {
-  const secret = env.PERMANENT_PASS_QR_ENCRYPTION_KEY;
+function permanentQrEncryptionKey(version: "v1" | "v2" = "v2") {
+  // v1 credentials were encrypted using AUTH_JWT_SECRET before key separation.
+  // Keep the legacy key path until stored v1 ciphertext has been re-encrypted.
+  const secret = version === "v1" ? env.AUTH_JWT_SECRET : env.PERMANENT_PASS_QR_ENCRYPTION_KEY;
   return crypto.createHash("sha256").update(secret).digest();
 }
 
@@ -103,17 +105,17 @@ function encryptQrToken(token: string) {
   const cipher = crypto.createCipheriv("aes-256-gcm", permanentQrEncryptionKey(), iv);
   const ciphertext = Buffer.concat([cipher.update(token, "utf8"), cipher.final()]);
   const authTag = cipher.getAuthTag();
-  return `v1.${iv.toString("base64url")}.${authTag.toString("base64url")}.${ciphertext.toString("base64url")}`;
+  return `v2.${iv.toString("base64url")}.${authTag.toString("base64url")}.${ciphertext.toString("base64url")}`;
 }
 
 function decryptQrToken(value: string) {
   const [version, ivValue, authTagValue, ciphertextValue] = value.split(".");
-  if (version !== "v1" || !ivValue || !authTagValue || !ciphertextValue) {
+  if ((version !== "v1" && version !== "v2") || !ivValue || !authTagValue || !ciphertextValue) {
     throw new Error("Unsupported permanent QR credential format.");
   }
   const decipher = crypto.createDecipheriv(
     "aes-256-gcm",
-    permanentQrEncryptionKey(),
+    permanentQrEncryptionKey(version as "v1" | "v2"),
     Buffer.from(ivValue, "base64url")
   );
   decipher.setAuthTag(Buffer.from(authTagValue, "base64url"));
