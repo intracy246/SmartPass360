@@ -33,3 +33,18 @@ Status: assessment and implementation plan; not a security certification.
 - Do not rotate secrets on a live system without ensuring all API instances share the correct replacement values and QR data remains decryptable.
 - Never paste private keys, database URLs, JWT secrets, device keys, session tokens, or production `.env` contents into issues, chat, shell history, or repository files.
 - Do not deploy a security branch directly to production before tests and the rollback procedure pass.
+
+
+## Implemented in this security branch (not yet production-approved)
+
+- URL-encoded payloads are limited to 100 KB and 1,000 parameters.
+- Login and kiosk activation endpoints have in-process throttling and return HTTP 429 with Retry-After after repeated attempts. This does not replace upstream WAF/CDN throttling and is per API process.
+- Production configuration requires a dedicated `PERMANENT_PASS_QR_ENCRYPTION_KEY`, different from `AUTH_JWT_SECRET`. New encrypted QR credentials use format `v2`; existing `v1` credentials are still decryptable with the legacy JWT secret during migration. Keep the old JWT secret available until stored v1 credentials have been re-encrypted, then retire the legacy decryption path in a separate change.
+- Kiosk list and device/config responses are narrowed so the stored activation code is not repeatedly returned. Kiosk creation still returns its activation code once because the existing dashboard displays it for device provisioning.
+- Gate-device list returns explicit non-secret fields; the stored device key hash is not returned.
+- Public health response no longer discloses the runtime environment.
+- `apps/api/.env.example` explains the separate QR encryption key setting.
+
+## Validation state
+
+These changes were committed to an isolated branch. The connected workflow has not run the project build, typecheck, or smoke/integration suite. Do not merge or deploy until the local and production-like checks pass. The branch has not changed database schema or access-policy business rules.
