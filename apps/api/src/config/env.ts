@@ -82,7 +82,7 @@ if (configurationErrors.length > 0) {
 export const env = {
   ...configured,
   AUTH_JWT_SECRET: authJwtSecret!,
-  PERMANENT_PASS_QR_ENCRYPTION_KEY: configured.PERMANENT_PASS_QR_ENCRYPTION_KEY ?? (isDevelopment ? authJwtSecret! : ""),
+  PERMANENT_PASS_QR_ENCRYPTION_KEY: configured.PERMANENT_PASS_QR_ENCRYPTION_KEY ?? (configured.NODE_ENV !== "production" ? authJwtSecret! : ""),
   OWNER_USERNAME: ownerUsername!,
   OWNER_PASSWORD: ownerPassword!,
   CORS_ORIGIN: configured.CORS_ORIGIN ?? ""
