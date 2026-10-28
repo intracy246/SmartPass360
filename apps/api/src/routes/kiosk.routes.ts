@@ -5,6 +5,7 @@ import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { Prisma } from "../generated/prisma/client.js";
 import { requireBuilding, type AuthUser } from "../middleware/auth.middleware.js";
+import { kioskActivationRateLimit } from "../middleware/login-rate-limit.middleware.js";
 
 export const kioskRouter = Router();
 
@@ -150,7 +151,7 @@ kioskRouter.post("/", requireBuilding, async (request, response, next) => {
   }
 });
 
-kioskRouter.post("/activate", async (request, response, next) => {
+kioskRouter.post("/activate", kioskActivationRateLimit, async (request, response, next) => {
   try {
     const parsed = activateSchema.safeParse(request.body);
 
