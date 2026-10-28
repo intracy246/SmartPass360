@@ -17,6 +17,7 @@ Object.assign(process.env, {
   PORT: String(port),
   CORS_ORIGIN: "https://dashboard.example.test",
   AUTH_JWT_SECRET: "smoke-test-only-random-secret-never-use-in-production",
+  PERMANENT_PASS_QR_ENCRYPTION_KEY: "smoke-test-only-distinct-qr-encryption-key",
   OWNER_USERNAME: "smoke-test-owner",
   OWNER_PASSWORD: "smoke-test-owner-password"
 });
