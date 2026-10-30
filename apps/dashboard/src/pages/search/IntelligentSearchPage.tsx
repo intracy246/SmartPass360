@@ -38,7 +38,7 @@ export function IntelligentSearchPage() {
         <button type="submit" disabled={input.trim().length < 2 || results.isFetching}>Search</button>
       </form>
       {query ? <p className="intelligent-search__meta">{results.isFetching ? "Searching this building…" : results.data ? results.data.meta.total + " matching records" : ""}</p> : <p className="intelligent-search__meta">Enter at least two characters. Search results are restricted to the signed-in building.</p>}
-      {results.isError ? <div className="intelligent-search__state error" role="alert">{results.error instanceof Error ? results.error.message : "Search failed."}</div> : null}
+      {results.isError ? <div className="intelligent-search__state error" role="alert">{results.error instanceof Error ? `${results.error.message}${"status" in results.error ? ` (HTTP ${results.error.status})` : ""}` : "Search failed."}</div> : null}
       {results.isPending && query ? <div className="intelligent-search__state">Loading records…</div> : null}
       {results.isSuccess && records.length === 0 ? <div className="intelligent-search__state">No matching records were found in this building.</div> : null}
       <section className="intelligent-search__results">
