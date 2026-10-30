@@ -59,21 +59,29 @@ export function VisitorNotifications() {
           try {
             const context = audioContextRef.current ?? new AudioContext();
             audioContextRef.current = context;
-            if (context.state === "suspended") await context.resume();
-            const startAt = context.currentTime;
-            [0, 0.26, 0.52].forEach((offset, index) => {
-              const oscillator = context.createOscillator();
-              const gain = context.createGain();
-              oscillator.type = "sine";
-              oscillator.frequency.value = index === 1 ? 1046 : 880;
-              gain.gain.setValueAtTime(0.0001, startAt + offset);
-              gain.gain.exponentialRampToValueAtTime(0.18, startAt + offset + 0.025);
-              gain.gain.exponentialRampToValueAtTime(0.0001, startAt + offset + 0.2);
-              oscillator.connect(gain);
-              gain.connect(context.destination);
-              oscillator.start(startAt + offset);
-              oscillator.stop(startAt + offset + 0.22);
-            });
+            const playChime = () => {
+              const startAt = context.currentTime;
+              [0, 0.26, 0.52].forEach((offset, index) => {
+                const oscillator = context.createOscillator();
+                const gain = context.createGain();
+                oscillator.type = "sine";
+                oscillator.frequency.value = index === 1 ? 1046 : 880;
+                gain.gain.setValueAtTime(0.0001, startAt + offset);
+                gain.gain.exponentialRampToValueAtTime(0.18, startAt + offset + 0.025);
+                gain.gain.exponentialRampToValueAtTime(0.0001, startAt + offset + 0.2);
+                oscillator.connect(gain);
+                gain.connect(context.destination);
+                oscillator.start(startAt + offset);
+                oscillator.stop(startAt + offset + 0.22);
+              });
+            };
+            if (context.state === "suspended") {
+              void context.resume().then(playChime).catch((error) => {
+                console.warn("SmartPass360 visitor alert sound could not resume.", error);
+              });
+            } else {
+              playChime();
+            }
           } catch (error) {
             console.warn("SmartPass360 visitor alert sound could not play.", error);
           }
