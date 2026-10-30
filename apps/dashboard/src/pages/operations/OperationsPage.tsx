@@ -19,18 +19,7 @@ import { downloadVisitorPassImage } from "../../utils/visitor-pass-image";
 
 import "./OperationsPage.css";
 
-type IssuedVisitorTicket = {
-  passNumber: string;
-  qrValue: string;
-  fullName: string;
-  organizationName: string;
-  departmentOrOffice?: string | null;
-  hostName?: string | null;
-  purpose?: string | null;
-  issuedAt: string;
-  validFrom: string;
-  validUntil: string;
-};
+type IssuedVisitorTicket = import("../../api/visitor-api").IssuedVisitorTicket;
 
 function formatDate(value?: string | null) {
   if (!value) return "—";
@@ -95,6 +84,7 @@ export function OperationsPage() {
     printWindow.document.close();
     visitorReview.mutate({ visitId, decision: "APPROVE", printWindow });
   }
+
   const visitorCheckout = useMutation({
     mutationFn: checkOutVisitor,
     onSuccess: refresh
