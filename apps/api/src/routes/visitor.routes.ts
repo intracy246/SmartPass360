@@ -678,13 +678,14 @@ visitorRouter.get("/search", requireBuilding, async (request, response, next) =>
           OR: [
             { visitor: { fullName: { contains: query, mode: "insensitive" } } },
             { visitor: { phone: { contains: query, mode: "insensitive" } } },
+            { visitor: { idNumberEncrypted: { equals: query } } },
             { visitor: { company: { contains: query, mode: "insensitive" } } },
             { visitor: { vehicleNumber: { contains: query, mode: "insensitive" } } },
             { destinationOffice: { contains: query, mode: "insensitive" } },
             { hostNameSnapshot: { contains: query, mode: "insensitive" } },
             { purpose: { contains: query, mode: "insensitive" } },
             { organization: { name: { contains: query, mode: "insensitive" } } },
-            { pass: { is: { passNumber: { contains: query, mode: "insensitive" } } }
+            { pass: { is: { passNumber: { contains: query, mode: "insensitive" } } } }
           ]
         },
         include: visitInclude,
