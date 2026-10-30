@@ -671,7 +671,7 @@ visitorRouter.get("/search", requireBuilding, async (request, response, next) =>
     const query = parsed.data.q;
     const normalizedPlate = query.toUpperCase().replace(/[^A-Z0-9]/g, "");
 
-    const [visits, permanentPasses, organizations] = await Promise.all([
+    const [visits, organizations, permanentPasses] = await Promise.all([
       prisma.visitRequest.findMany({
         where: {
           siteId,
@@ -693,6 +693,19 @@ visitorRouter.get("/search", requireBuilding, async (request, response, next) =>
         },
         include: visitInclude,
         orderBy: { createdAt: "desc" },
+        take: 50
+      }),
+      prisma.organization.findMany({
+        where: {
+          isActive: true,
+          siteOrganizations: { some: { siteId, isActive: true } },
+          OR: [
+            { name: { contains: query, mode: "insensitive" } },
+            { code: { contains: query, mode: "insensitive" } }
+          ]
+        },
+        select: { id: true, name: true, code: true, createdAt: true, updatedAt: true },
+        orderBy: { name: "asc" },
         take: 50
       }),
       prisma.organization.findMany({
