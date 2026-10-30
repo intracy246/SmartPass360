@@ -73,7 +73,7 @@ export function checkOutVisitor(visitId: string) {
 
 export type IntelligentSearchResult = {
   id: string;
-  recordType: "VISITOR" | "PERMANENT_PASS";
+  recordType: "VISITOR" | "PERMANENT_PASS" | "ORGANIZATION";
   fullName: string;
   phone: string | null;
   company: string | null;
