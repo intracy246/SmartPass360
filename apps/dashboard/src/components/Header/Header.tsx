@@ -3,8 +3,18 @@ import { useNavigate } from "react-router-dom";
 import "./Header.css";
 
 export function Header() {
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [time, setTime] = useState(new Date());
   const navigate = useNavigate();
+
+  async function toggleNotifications() {
+    const next = !notificationsEnabled;
+    if (next && "Notification" in window && Notification.permission === "default") {
+      await Notification.requestPermission();
+    }
+    window.dispatchEvent(new CustomEvent("smartpass360:visitor-alert-settings", { detail: { enabled: next } }));
+    setNotificationsEnabled(next);
+  }
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -65,7 +75,14 @@ export function Header() {
 
         <div className="online-dot"/>
 
-        <button className="notification-button">
+        <button
+          className={notificationsEnabled ? "notification-button notification-button--enabled" : "notification-button"}
+          type="button"
+          onClick={() => void toggleNotifications()}
+          aria-label={notificationsEnabled ? "Disable visitor sound notifications" : "Enable visitor sound notifications"}
+          aria-pressed={notificationsEnabled}
+          title={notificationsEnabled ? "Visitor sound notifications enabled" : "Enable visitor sound notifications"}
+        >
           🔔
         </button>
 
