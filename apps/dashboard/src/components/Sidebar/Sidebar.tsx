@@ -72,12 +72,17 @@ export function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar__brand">
-        <div className="sidebar__logo">SP</div>
+        <div className="sidebar__logo"><img src="/branding/smartpass360-logo.png" alt="SmartPass360" /></div>
 
         <div>
           <strong>SMARTPASS360</strong>
           <span>Access Intelligence</span>
         </div>
+      </div>
+
+      <div className="sidebar__powered-by" aria-label="Powered by SmartCycle360 Technologies Limited">
+        <span>Powered by</span>
+        <img src="/branding/smartcycle360-logo.png" alt="SmartCycle360 Technologies Limited" />
       </div>
 
       <nav className="sidebar__navigation">
