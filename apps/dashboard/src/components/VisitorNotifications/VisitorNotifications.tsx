@@ -21,7 +21,17 @@ export function VisitorNotifications() {
   useEffect(() => {
     const updateSettings = (event: Event) => {
       const settings = (event as AlertSettingsEvent).detail;
-      setSoundEnabled(Boolean(settings?.enabled));
+      const enabled = Boolean(settings?.enabled);
+      setSoundEnabled(enabled);
+      if (enabled) {
+        try {
+          const context = audioContextRef.current ?? new AudioContext();
+          audioContextRef.current = context;
+          void context.resume();
+        } catch (error) {
+          console.warn("SmartPass360 audio notification could not be enabled.", error);
+        }
+      }
     };
     window.addEventListener("smartpass360:visitor-alert-settings", updateSettings);
     return () => window.removeEventListener("smartpass360:visitor-alert-settings", updateSettings);
