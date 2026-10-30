@@ -680,7 +680,7 @@ visitorRouter.get("/search", requireBuilding, async (request, response, next) =>
             { visitor: { phone: { contains: query, mode: "insensitive" } } },
             { visitor: { email: { contains: query, mode: "insensitive" } } },
             { visitor: { idType: { contains: query, mode: "insensitive" } } },
-            { visitor: { idNumberEncrypted: { equals: query } } },
+            { visitor: { idNumberEncrypted: { contains: query, mode: "insensitive" } } },
             { visitor: { company: { contains: query, mode: "insensitive" } } },
             { visitor: { vehicleNumber: { contains: query, mode: "insensitive" } } },
             { destinationOffice: { contains: query, mode: "insensitive" } },
