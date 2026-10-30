@@ -708,19 +708,6 @@ visitorRouter.get("/search", requireBuilding, async (request, response, next) =>
         orderBy: { name: "asc" },
         take: 50
       }),
-      prisma.organization.findMany({
-        where: {
-          isActive: true,
-          siteOrganizations: { some: { siteId, isActive: true } },
-          OR: [
-            { name: { contains: query, mode: "insensitive" } },
-            { code: { contains: query, mode: "insensitive" } }
-          ]
-        },
-        select: { id: true, name: true, code: true, createdAt: true, updatedAt: true },
-        orderBy: { name: "asc" },
-        take: 50
-      }),
       prisma.permanentPass.findMany({
         where: {
           organization: {
