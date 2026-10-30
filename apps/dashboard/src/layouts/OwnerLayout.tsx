@@ -14,9 +14,10 @@ export function OwnerLayout() {
     <div className="owner-shell">
       <aside className="owner-sidebar">
         <div className="owner-sidebar__brand">
-          <div className="owner-sidebar__logo">SP</div>
+          <div className="owner-sidebar__logo"><img src="/branding/smartpass360-logo.png" alt="SmartPass360" /></div>
           <div><strong>SmartPass360</strong><span>SmartCycle Owner</span></div>
         </div>
+        <div className="owner-sidebar__powered-by"><span>Powered by</span><img src="/branding/smartcycle360-logo.png" alt="SmartCycle360 Technologies Limited" /></div>
         <nav className="owner-sidebar__nav">
           {items.map((item) => (
             <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => isActive ? "owner-sidebar__link active" : "owner-sidebar__link"}>
