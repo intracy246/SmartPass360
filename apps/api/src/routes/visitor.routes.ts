@@ -671,7 +671,7 @@ visitorRouter.get("/search", requireBuilding, async (request, response, next) =>
     const query = parsed.data.q;
     const normalizedPlate = query.toUpperCase().replace(/[^A-Z0-9]/g, "");
 
-    const [visits, permanentPasses] = await Promise.all([
+    const [visits, permanentPasses, organizations] = await Promise.all([
       prisma.visitRequest.findMany({
         where: {
           siteId,
@@ -693,6 +693,19 @@ visitorRouter.get("/search", requireBuilding, async (request, response, next) =>
         },
         include: visitInclude,
         orderBy: { createdAt: "desc" },
+        take: 50
+      }),
+      prisma.organization.findMany({
+        where: {
+          isActive: true,
+          siteOrganizations: { some: { siteId, isActive: true } },
+          OR: [
+            { name: { contains: query, mode: "insensitive" } },
+            { code: { contains: query, mode: "insensitive" } }
+          ]
+        },
+        select: { id: true, name: true, code: true, createdAt: true, updatedAt: true },
+        orderBy: { name: "asc" },
         take: 50
       }),
       prisma.permanentPass.findMany({
@@ -767,7 +780,24 @@ visitorRouter.get("/search", requireBuilding, async (request, response, next) =>
       lastActivityAt: pass.lastActivityAt
     }));
 
-    const combined = [...visitorResults, ...permanentResults]
+    const organizationResults = organizations.map((organization) => ({
+      id: organization.id,
+      recordType: "ORGANIZATION" as const,
+      fullName: organization.name,
+      phone: null,
+      company: null,
+      vehicleNumber: null,
+      organizationName: organization.name,
+      department: null,
+      hostName: null,
+      purpose: organization.code ? `Organization code: ${organization.code}` : "Organization",
+      passNumber: null,
+      status: "ACTIVE",
+      createdAt: organization.createdAt,
+      lastActivityAt: organization.updatedAt
+    }));
+
+    const combined = [...visitorResults, ...permanentResults, ...organizationResults]
       .sort((left, right) => right.createdAt.getTime() - left.createdAt.getTime());
 
     response.setHeader("Cache-Control", "no-store");
