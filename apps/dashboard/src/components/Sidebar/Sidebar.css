@@ -177,6 +177,8 @@
   font-size: 18px;
 }
 
+.sidebar__mobile-signout{display:none;width:100%;margin-top:10px;padding:12px 16px;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:rgba(255,90,110,.11);color:#ffc0ca;font:inherit;font-weight:800;cursor:pointer}
+
 .sidebar__footer {
   flex: 0 0 auto;
   margin-top: auto;
@@ -299,6 +301,8 @@
   .sidebar__footer {
     display: none;
   }
+
+  .sidebar__mobile-signout{display:block}
 }
 
 @media (max-width: 620px) {

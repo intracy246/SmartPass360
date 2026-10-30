@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Header.css";
 
 export function Header() {
   const [time, setTime] = useState(new Date());
+  const navigate = useNavigate();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -18,9 +20,7 @@ export function Header() {
       <div className="header-left">
 
         <div className="search-box">
-          <input
-            placeholder="Search visitors, passes, organizations..."
-          />
+          <button className="search-box__trigger" type="button" onClick={() => navigate("/search")} aria-label="Open Intelligent Search"><span className="search-box__icon">⌕</span><span>Search people, phones, companies, departments, passes…</span></button>
         </div>
 
       </div>

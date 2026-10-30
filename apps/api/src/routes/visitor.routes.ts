@@ -652,6 +652,135 @@ visitorRouter.post("/self-service/status", publicStatusRateLimit, async (request
   }
 });
 
+
+const intelligentSearchSchema = z.object({
+  q: z.string().trim().min(2).max(120)
+});
+
+visitorRouter.get("/search", requireBuilding, async (request, response, next) => {
+  try {
+    const parsed = intelligentSearchSchema.safeParse({ q: request.query.q });
+    if (!parsed.success) {
+      return response.status(400).json({
+        error: { code: "VALIDATION_ERROR", message: "Enter at least 2 characters to search." }
+      });
+    }
+
+    const user = response.locals.authUser as AuthUser;
+    const siteId = user.siteId!;
+    const query = parsed.data.q;
+    const normalizedPlate = query.toUpperCase().replace(/[^A-Z0-9]/g, "");
+
+    const [visits, permanentPasses] = await Promise.all([
+      prisma.visitRequest.findMany({
+        where: {
+          siteId,
+          OR: [
+            { visitor: { fullName: { contains: query, mode: "insensitive" } } },
+            { visitor: { phone: { contains: query, mode: "insensitive" } } },
+            { visitor: { email: { contains: query, mode: "insensitive" } } },
+            { visitor: { idType: { contains: query, mode: "insensitive" } } },
+            { visitor: { idNumberEncrypted: { equals: query } } },
+            { visitor: { company: { contains: query, mode: "insensitive" } } },
+            { visitor: { vehicleNumber: { contains: query, mode: "insensitive" } } },
+            { destinationOffice: { contains: query, mode: "insensitive" } },
+            { hostNameSnapshot: { contains: query, mode: "insensitive" } },
+            { purpose: { contains: query, mode: "insensitive" } },
+            { organization: { name: { contains: query, mode: "insensitive" } } },
+            { organization: { code: { contains: query, mode: "insensitive" } } },
+            { pass: { is: { passNumber: { contains: query, mode: "insensitive" } } } }
+          ]
+        },
+        include: visitInclude,
+        orderBy: { createdAt: "desc" },
+        take: 50
+      }),
+      prisma.permanentPass.findMany({
+        where: {
+          organization: {
+            siteOrganizations: { some: { siteId, isActive: true } }
+          },
+          OR: [
+            { fullName: { contains: query, mode: "insensitive" } },
+            { staffNumber: { contains: query, mode: "insensitive" } },
+            { department: { contains: query, mode: "insensitive" } },
+            { phone: { contains: query, mode: "insensitive" } },
+            { email: { contains: query, mode: "insensitive" } },
+            { passNumber: { contains: query, mode: "insensitive" } },
+            { position: { contains: query, mode: "insensitive" } },
+            { organization: { name: { contains: query, mode: "insensitive" } } },
+            { organization: { code: { contains: query, mode: "insensitive" } } },
+            ...(normalizedPlate
+              ? [{
+                  authorizedVehicles: {
+                    some: {
+                      normalizedPlateNumber: { contains: normalizedPlate }
+                    }
+                  }
+                }]
+              : [])
+          ]
+        },
+        include: {
+          organization: { select: { name: true } },
+          authorizedVehicles: {
+            where: { isActive: true },
+            take: 5
+          }
+        },
+        orderBy: { createdAt: "desc" },
+        take: 50
+      })
+    ]);
+
+    const visitorResults = visits.map((visit) => ({
+      id: visit.id,
+      recordType: "VISITOR" as const,
+      fullName: visit.visitor.fullName,
+      phone: visit.visitor.phone,
+      company: visit.visitor.company,
+      vehicleNumber: visit.visitor.vehicleNumber,
+      organizationName: visit.organization.name,
+      department: visit.destinationOffice,
+      hostName: visit.hostNameSnapshot,
+      purpose: visit.purpose,
+      passNumber: visit.pass?.passNumber ?? null,
+      status: visit.status,
+      createdAt: visit.createdAt,
+      lastActivityAt: visit.checkedOutAt ?? visit.checkedInAt ?? visit.updatedAt
+    }));
+
+    const permanentResults = permanentPasses.map((pass) => ({
+      id: pass.id,
+      recordType: "PERMANENT_PASS" as const,
+      fullName: pass.fullName,
+      phone: pass.phone,
+      company: null,
+      vehicleNumber: pass.authorizedVehicles[0]?.plateNumber ?? null,
+      organizationName: pass.organization.name,
+      department: pass.department,
+      hostName: pass.position,
+      purpose: null,
+      passNumber: pass.passNumber,
+      status: pass.status,
+      createdAt: pass.createdAt,
+      lastActivityAt: pass.lastActivityAt
+    }));
+
+    const combined = [...visitorResults, ...permanentResults]
+      .sort((left, right) => right.createdAt.getTime() - left.createdAt.getTime());
+
+    response.setHeader("Cache-Control", "no-store");
+    return response.json({
+      success: true,
+      data: combined.slice(0, 100),
+      meta: { total: Math.min(combined.length, 100), query }
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 visitorRouter.get("/report", requireBuilding, async (request, response, next) => {
   try {
     const user = response.locals.authUser as AuthUser;

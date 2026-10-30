@@ -24,6 +24,7 @@ import { KiosksPage } from "../pages/kiosks/KiosksPage";
 import { VehiclesPage } from "../pages/vehicles/VehiclesPage";
 import { OperationsPage } from "../pages/operations/OperationsPage";
 import { ReportsPage } from "../pages/reports/ReportsPage";
+import { IntelligentSearchPage } from "../pages/search/IntelligentSearchPage";
 
 function EmptyModule({
   title
@@ -76,6 +77,7 @@ export function AppRouter() {
       <Route element={<RequireBuilding><DashboardLayout /></RequireBuilding>}>
         <Route index element={<DashboardPage />} />
         <Route path="operations" element={<OperationsPage />} />
+        <Route path="search" element={<IntelligentSearchPage />} />
 
         <Route
   path="visitors"

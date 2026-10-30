@@ -25,6 +25,7 @@ export function OwnerLayout() {
             </NavLink>
           ))}
         </nav>
+        <button className="owner-sidebar__mobile-signout" type="button" onClick={() => { clearSession(); navigate("/login", { replace: true }); }}>Sign out</button>
         <div className="owner-sidebar__footer">
           <span>Platform administration</span>
           <button type="button" onClick={() => { clearSession(); navigate("/login", { replace: true }); }}>Sign out</button>
