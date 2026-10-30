@@ -678,6 +678,8 @@ visitorRouter.get("/search", requireBuilding, async (request, response, next) =>
           OR: [
             { visitor: { fullName: { contains: query, mode: "insensitive" } } },
             { visitor: { phone: { contains: query, mode: "insensitive" } } },
+            { visitor: { email: { contains: query, mode: "insensitive" } } },
+            { visitor: { idType: { contains: query, mode: "insensitive" } } },
             { visitor: { idNumberEncrypted: { equals: query } } },
             { visitor: { company: { contains: query, mode: "insensitive" } } },
             { visitor: { vehicleNumber: { contains: query, mode: "insensitive" } } },
@@ -685,6 +687,7 @@ visitorRouter.get("/search", requireBuilding, async (request, response, next) =>
             { hostNameSnapshot: { contains: query, mode: "insensitive" } },
             { purpose: { contains: query, mode: "insensitive" } },
             { organization: { name: { contains: query, mode: "insensitive" } } },
+            { organization: { code: { contains: query, mode: "insensitive" } } },
             { pass: { is: { passNumber: { contains: query, mode: "insensitive" } } } }
           ]
         },
@@ -706,6 +709,7 @@ visitorRouter.get("/search", requireBuilding, async (request, response, next) =>
             { passNumber: { contains: query, mode: "insensitive" } },
             { position: { contains: query, mode: "insensitive" } },
             { organization: { name: { contains: query, mode: "insensitive" } } },
+            { organization: { code: { contains: query, mode: "insensitive" } } },
             ...(normalizedPlate
               ? [{
                   authorizedVehicles: {
