@@ -45,7 +45,7 @@ export function IntelligentSearchPage() {
         {records.map((record: IntelligentSearchResult) => (
           <article className="intelligent-search__card" key={record.recordType + record.id}>
             <div className="intelligent-search__cardtop">
-              <div><h2>{record.fullName}</h2><span>{record.recordType === "VISITOR" ? "Visitor record" : "Permanent pass holder"}</span></div>
+              <div><h2>{record.fullName}</h2><span>{record.recordType === "VISITOR" ? "Visitor record" : record.recordType === "ORGANIZATION" ? "Organization record" : "Permanent pass holder"}</span></div>
               <strong>{record.status.replaceAll("_", " ")}</strong>
             </div>
             <div className="intelligent-search__grid">
