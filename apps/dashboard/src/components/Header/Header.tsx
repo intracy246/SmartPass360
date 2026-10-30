@@ -9,11 +9,17 @@ export function Header() {
 
   async function toggleNotifications() {
     const next = !notificationsEnabled;
-    if (next && "Notification" in window && Notification.permission === "default") {
-      await Notification.requestPermission();
-    }
+    // Dispatch first, synchronously within the button click, so the notification
+    // component can unlock Web Audio before the browser's autoplay gate closes.
     window.dispatchEvent(new CustomEvent("smartpass360:visitor-alert-settings", { detail: { enabled: next } }));
     setNotificationsEnabled(next);
+    if (next && "Notification" in window && Notification.permission === "default") {
+      try {
+        await Notification.requestPermission();
+      } catch {
+        // In-page alert and sound remain available if browser notifications are denied.
+      }
+    }
   }
 
   useEffect(() => {
