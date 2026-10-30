@@ -29,6 +29,25 @@ function formatDate(value?: string | null) {
 
 export function OperationsPage() {
   const queryClient = useQueryClient();
+  const [issuedTicket, setIssuedTicket] = useState<IssuedVisitorTicket | null>(null);
+  const [ticketError, setTicketError] = useState<string | null>(null);
+  const [ticketBusy, setTicketBusy] = useState(false);
+
+  const visitorsQuery = useQuery({
+    queryKey: ["visitor-operations"],
+    queryFn: getVisitorOperations,
+    refetchInterval: 3000
+  });
+  const vehicleRequestsQuery = useQuery({
+    queryKey: ["vehicle-access-requests"],
+    queryFn: getVehicleRequests,
+    refetchInterval: 3000
+  });
+  const vehiclesQuery = useQuery({
+    queryKey: ["vehicles"],
+    queryFn: getVehicles,
+    refetchInterval: 5000
+  });
 
   const refresh = async () => {
     await Promise.all([
@@ -57,10 +76,12 @@ export function OperationsPage() {
         setIssuedTicket(result.pass);
         setTicketError(null);
         try {
-          await printVisitorPass(result.pass, variables.printWindow);
-        } catch (error) {
-          setTicketError(error instanceof Error ? error.message : "Pass issued, but printing failed. Use Print ticket below.");
-        }
+          await printVisitorPass({
+            ...result.pass,
+            departmentOrOffice: result.pass.departmentOrOffice ?? undefined,
+            hostName: result.pass.hostName ?? undefined,
+            purpose: result.pass.purpose ?? undefined
+          }, variables.printWindow);
       }
       await refresh();
     },
@@ -137,7 +158,7 @@ export function OperationsPage() {
             <button type="button" disabled={ticketBusy} onClick={async () => {
               setTicketBusy(true);
               setTicketError(null);
-              try { await printVisitorPass(issuedTicket); }
+              try { await printVisitorPass({ ...issuedTicket, departmentOrOffice: issuedTicket.departmentOrOffice ?? undefined, hostName: issuedTicket.hostName ?? undefined, purpose: issuedTicket.purpose ?? undefined }); }
               catch (error) { setTicketError(error instanceof Error ? error.message : "Unable to print ticket."); }
               finally { setTicketBusy(false); }
             }}>Print ticket</button>
