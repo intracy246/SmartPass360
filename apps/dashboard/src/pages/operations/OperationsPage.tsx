@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
-  approveVisitor,
+  approveAndIssueVisitorPass,
   checkOutVisitor,
   denyVisitor,
   getVisitorOperations
@@ -14,8 +15,12 @@ import {
 } from "../../api/vehicle-access-api";
 import { GlassButton } from "../../components/Buttons/GlassButton";
 import { GlassCard } from "../../components/Cards/GlassCard";
+import { printVisitorPass } from "../../utils/visitor-pass-print";
+import { downloadVisitorPassImage } from "../../utils/visitor-pass-image";
 
 import "./OperationsPage.css";
+
+type IssuedVisitorTicket = import("../../api/visitor-api").IssuedVisitorTicket;
 
 function formatDate(value?: string | null) {
   if (!value) return "—";
@@ -25,6 +30,9 @@ function formatDate(value?: string | null) {
 
 export function OperationsPage() {
   const queryClient = useQueryClient();
+  const [issuedTicket, setIssuedTicket] = useState<IssuedVisitorTicket | null>(null);
+  const [ticketError, setTicketError] = useState<string | null>(null);
+  const [ticketBusy, setTicketBusy] = useState(false);
 
   const visitorsQuery = useQuery({
     queryKey: ["visitor-operations"],
@@ -53,10 +61,54 @@ export function OperationsPage() {
   };
 
   const visitorReview = useMutation({
-    mutationFn: ({ visitId, decision }: { visitId: string; decision: "APPROVE" | "DENY" }) =>
-      decision === "APPROVE" ? approveVisitor(visitId) : denyVisitor(visitId),
-    onSuccess: refresh
+    mutationFn: async (variables:
+      | { visitId: string; decision: "APPROVE"; printWindow: Window }
+      | { visitId: string; decision: "DENY" }
+    ) => {
+      if (variables.decision === "APPROVE") {
+        const response = await approveAndIssueVisitorPass(variables.visitId);
+        return { decision: "APPROVE" as const, pass: response.data.pass };
+      }
+      await denyVisitor(variables.visitId);
+      return { decision: "DENY" as const };
+    },
+    onSuccess: async (result, variables) => {
+      if (result.decision === "APPROVE" && variables.decision === "APPROVE") {
+        setIssuedTicket(result.pass);
+        setTicketError(null);
+        try {
+          await printVisitorPass({
+            ...result.pass,
+            departmentOrOffice: result.pass.departmentOrOffice ?? undefined,
+            hostName: result.pass.hostName ?? undefined,
+            purpose: result.pass.purpose ?? undefined
+          }, variables.printWindow);
+        } catch (error) {
+          setTicketError(error instanceof Error ? error.message : "Pass issued, but automatic printing failed. Use Print ticket below.");
+        }
+      }
+      await refresh();
+    },
+    onError: (_error, variables) => {
+      if (variables.decision === "APPROVE" && !variables.printWindow.closed) {
+        variables.printWindow.close();
+      }
+    }
   });
+
+  function approveVisitorAndPrint(visitId: string) {
+    setTicketError(null);
+    const printWindow = window.open("", "_blank", "width=420,height=720");
+    if (!printWindow) {
+      setTicketError("The pass was not approved because the browser blocked the print window. Allow pop-ups for SmartPass360, then try again.");
+      return;
+    }
+    printWindow.document.open();
+    printWindow.document.write("<!doctype html><html><head><title>SmartPass360</title></head><body style='font-family:Arial,sans-serif;padding:24px;color:#173f37'><h2>SmartPass360</h2><p>Approving the visit and preparing its printable access pass…</p></body></html>");
+    printWindow.document.close();
+    visitorReview.mutate({ visitId, decision: "APPROVE", printWindow });
+  }
+
   const visitorCheckout = useMutation({
     mutationFn: checkOutVisitor,
     onSuccess: refresh
@@ -97,6 +149,35 @@ export function OperationsPage() {
       </header>
 
       {actionError ? <div className="operations-page__error">{actionError}</div> : null}
+      {issuedTicket ? (
+        <section className="operations-page__issued-ticket" aria-label="Issued visitor ticket">
+          <div className="operations-page__issued-ticket-copy">
+            <span>PASS ISSUED · VALID FOR 24 HOURS</span>
+            <h3>{issuedTicket.fullName}</h3>
+            <p>{issuedTicket.organizationName} · {issuedTicket.passNumber}</p>
+            <p>Valid until {new Date(issuedTicket.validUntil).toLocaleString("en-GB", { timeZone: "Africa/Dar_es_Salaam" })}</p>
+          </div>
+          <img src={issuedTicket.qrValue} alt="Visitor pass QR code" />
+          <div className="operations-page__ticket-actions">
+            <button type="button" disabled={ticketBusy} onClick={async () => {
+              setTicketBusy(true);
+              setTicketError(null);
+              try { await printVisitorPass({ ...issuedTicket, departmentOrOffice: issuedTicket.departmentOrOffice ?? undefined, hostName: issuedTicket.hostName ?? undefined, purpose: issuedTicket.purpose ?? undefined }); }
+              catch (error) { setTicketError(error instanceof Error ? error.message : "Unable to print ticket."); }
+              finally { setTicketBusy(false); }
+            }}>Print ticket</button>
+            <button type="button" disabled={ticketBusy} onClick={async () => {
+              setTicketBusy(true);
+              setTicketError(null);
+              try { await downloadVisitorPassImage(issuedTicket); }
+              catch (error) { setTicketError(error instanceof Error ? error.message : "Unable to download ticket."); }
+              finally { setTicketBusy(false); }
+            }}>Download PNG</button>
+            <button type="button" disabled={ticketBusy} onClick={() => setIssuedTicket(null)}>Close</button>
+          </div>
+        </section>
+      ) : null}
+      {ticketError ? <div className="operations-page__error" role="alert">{ticketError}</div> : null}
 
       <section className="operations-page__metrics">
         <GlassCard title="Visitors waiting" subtitle="Kiosk registrations awaiting review" accent="violet">
@@ -127,7 +208,7 @@ export function OperationsPage() {
             <td>{visit.vehicleNumber ?? "—"}</td>
             <td>{formatDate(visit.registeredAt)}</td>
             <td><div className="operations-page__actions">
-              <GlassButton type="button" disabled={visitorReview.isPending} onClick={() => visitorReview.mutate({ visitId: visit.id, decision: "APPROVE" })}>Approve Visitor</GlassButton>
+              <GlassButton type="button" disabled={visitorReview.isPending} onClick={() => approveVisitorAndPrint(visit.id)}>Approve & Print Pass</GlassButton>
               <GlassButton type="button" variant="secondary" disabled={visitorReview.isPending} onClick={() => visitorReview.mutate({ visitId: visit.id, decision: "DENY" })}>Deny</GlassButton>
             </div></td>
           </tr>)}</tbody>

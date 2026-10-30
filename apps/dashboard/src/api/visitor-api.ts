@@ -95,3 +95,24 @@ export function searchPeople(query: string) {
     meta: { total: number; query: string };
   }>(`/visitors/search?q=${encodeURIComponent(query)}`);
 }
+
+
+export type IssuedVisitorTicket = {
+  passNumber: string;
+  qrValue: string;
+  fullName: string;
+  organizationName: string;
+  departmentOrOffice?: string | null;
+  hostName?: string | null;
+  purpose?: string | null;
+  issuedAt: string;
+  validFrom: string;
+  validUntil: string;
+};
+
+export function approveAndIssueVisitorPass(visitId: string) {
+  return apiRequest<{ success: boolean; data: { pass: IssuedVisitorTicket } }>(
+    `/visitors/${encodeURIComponent(visitId)}/approve-and-issue`,
+    { method: "POST" }
+  );
+}
