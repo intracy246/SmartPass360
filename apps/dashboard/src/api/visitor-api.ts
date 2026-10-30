@@ -69,3 +69,29 @@ export function checkOutVisitor(visitId: string) {
     { method: "POST" }
   );
 }
+
+
+export type IntelligentSearchResult = {
+  id: string;
+  recordType: "VISITOR" | "PERMANENT_PASS";
+  fullName: string;
+  phone: string | null;
+  company: string | null;
+  vehicleNumber: string | null;
+  organizationName: string | null;
+  department: string | null;
+  hostName: string | null;
+  purpose: string | null;
+  passNumber: string | null;
+  status: string;
+  createdAt: string;
+  lastActivityAt: string | null;
+};
+
+export function searchPeople(query: string) {
+  return apiRequest<{
+    success: boolean;
+    data: IntelligentSearchResult[];
+    meta: { total: number; query: string };
+  }>(`/visitors/search?q=${encodeURIComponent(query)}`);
+}
