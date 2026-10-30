@@ -83,6 +83,9 @@ export function OperationsPage() {
             hostName: result.pass.hostName ?? undefined,
             purpose: result.pass.purpose ?? undefined
           }, variables.printWindow);
+        } catch (error) {
+          setTicketError(error instanceof Error ? error.message : "Pass issued, but automatic printing failed. Use Print ticket below.");
+        }
       }
       await refresh();
     },
@@ -205,7 +208,7 @@ export function OperationsPage() {
             <td>{visit.vehicleNumber ?? "—"}</td>
             <td>{formatDate(visit.registeredAt)}</td>
             <td><div className="operations-page__actions">
-              <GlassButton type="button" disabled={visitorReview.isPending} onClick={() => approveVisitorAndPrint(visit.id)}>Approve Visitor</GlassButton>
+              <GlassButton type="button" disabled={visitorReview.isPending} onClick={() => approveVisitorAndPrint(visit.id)}>Approve & Print Pass</GlassButton>
               <GlassButton type="button" variant="secondary" disabled={visitorReview.isPending} onClick={() => visitorReview.mutate({ visitId: visit.id, decision: "DENY" })}>Deny</GlassButton>
             </div></td>
           </tr>)}</tbody>
