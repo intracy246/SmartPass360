@@ -20,6 +20,11 @@ const navigationItems = [
     symbol: "◎"
   },
   {
+    label: "Intelligent Search",
+    path: "/search",
+    symbol: "⌕"
+  },
+  {
     label: "Passes",
     path: "/passes",
     symbol: "◇"
@@ -110,6 +115,8 @@ export function Sidebar() {
           </NavLink>
         ))}
       </nav>
+
+      <button className="sidebar__mobile-signout" type="button" onClick={() => { clearSession(); navigate("/login", { replace: true }); }}>Sign out</button>
 
       <div className="sidebar__footer">
         <div className="sidebar__system-dot" />
