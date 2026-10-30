@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
@@ -41,110 +40,7 @@ function formatDate(value?: string | null) {
 
 export function OperationsPage() {
   const queryClient = useQueryClient();
-  const [notificationEnabled, setNotificationEnabled] = useState(false);
-  const [visitorNotice, setVisitorNotice] = useState<string | null>(null);
-  const [issuedTicket, setIssuedTicket] = useState<IssuedVisitorTicket | null>(null);
-  const [ticketError, setTicketError] = useState<string | null>(null);
-  const [ticketBusy, setTicketBusy] = useState(false);
-  const previousPendingIds = useRef<Set<string> | null>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
-
-  const visitorsQuery = useQuery({
-    queryKey: ["visitor-operations"],
-    queryFn: getVisitorOperations,
-    refetchInterval: 2500,
-    refetchIntervalInBackground: true
-  });
-  const vehicleRequestsQuery = useQuery({
-    queryKey: ["vehicle-access-requests"],
-    queryFn: getVehicleRequests,
-    refetchInterval: 3000
-  });
-  const vehiclesQuery = useQuery({
-    queryKey: ["vehicles"],
-    queryFn: getVehicles,
-    refetchInterval: 5000
-  });
-
-  useEffect(() => {
-    const pending = visitorsQuery.data?.data.pending ?? [];
-    if (visitorsQuery.isError || visitorsQuery.isPending) return;
-
-    const currentIds = new Set(pending.map((visit) => visit.id));
-    const previousIds = previousPendingIds.current;
-
-    // Establish a baseline at page load. Only newly observed visit IDs trigger an alert.
-    if (previousIds) {
-      const arrivals = pending.filter((visit) => !previousIds.has(visit.id));
-      if (arrivals.length > 0) {
-        const names = arrivals.slice(0, 3).map((visit) => visit.fullName).join(", ");
-        setVisitorNotice(
-          `${arrivals.length} new visitor${arrivals.length === 1 ? "" : "s"} waiting for approval${names ? `: ${names}` : ""}`
-        );
-
-        if (notificationEnabled) {
-          try {
-            const context = audioContextRef.current ?? new AudioContext();
-            audioContextRef.current = context;
-            if (context.state === "suspended") await context.resume();
-
-            const startAt = context.currentTime;
-            [0, 0.24, 0.48].forEach((offset, index) => {
-              const oscillator = context.createOscillator();
-              const gain = context.createGain();
-              oscillator.type = "sine";
-              oscillator.frequency.value = index === 1 ? 1046 : 880;
-              gain.gain.setValueAtTime(0.0001, startAt + offset);
-              gain.gain.exponentialRampToValueAtTime(0.16, startAt + offset + 0.02);
-              gain.gain.exponentialRampToValueAtTime(0.0001, startAt + offset + 0.18);
-              oscillator.connect(gain);
-              gain.connect(context.destination);
-              oscillator.start(startAt + offset);
-              oscillator.stop(startAt + offset + 0.2);
-            });
-          } catch (error) {
-            console.warn("SmartPass360 notification sound could not play.", error);
-          }
-
-          if ("Notification" in window && Notification.permission === "granted") {
-            new Notification("SmartPass360 · Visitor waiting", {
-              body: arrivals.length === 1
-                ? `${arrivals[0].fullName} is waiting for approval.`
-                : `${arrivals.length} visitors are waiting for approval.`,
-              icon: "/favicon.svg"
-            });
-          }
-        }
-      } else if (pending.length === 0) {
-        setVisitorNotice(null);
-      }
-    }
-
-    previousPendingIds.current = currentIds;
-  }, [visitorsQuery.data?.data.pending, visitorsQuery.isError, visitorsQuery.isPending, notificationEnabled]);
-
-  async function enableVisitorAlerts() {
-    try {
-      if ("Notification" in window && Notification.permission === "default") {
-        await Notification.requestPermission();
-      }
-      const context = audioContextRef.current ?? new AudioContext();
-      audioContextRef.current = context;
-      await context.resume();
-
-      // Brief silent oscillator unlocks audio playback within this explicit user gesture.
-      const oscillator = context.createOscillator();
-      const gain = context.createGain();
-      gain.gain.value = 0.0001;
-      oscillator.connect(gain);
-      gain.connect(context.destination);
-      oscillator.start();
-      oscillator.stop(context.currentTime + 0.02);
-      setNotificationEnabled(true);
-    } catch {
-      setNotificationEnabled(true);
-    }
-  }
+  const queryClient = useQueryClient();
 
   const refresh = async () => {
     await Promise.all([
@@ -157,27 +53,48 @@ export function OperationsPage() {
   };
 
   const visitorReview = useMutation({
-    mutationFn: ({ visitId, decision }: { visitId: string; decision: "APPROVE" | "DENY" }) =>
-      decision === "APPROVE" ? approveAndIssueVisitorPass(visitId) : denyVisitor(visitId),
-    onSuccess: async (response, variables) => {
+    mutationFn: async (variables:
+      | { visitId: string; decision: "APPROVE"; printWindow: Window }
+      | { visitId: string; decision: "DENY" }
+    ) => {
       if (variables.decision === "APPROVE") {
-        const pass = response.data.pass;
-        setIssuedTicket(pass);
+        const response = await approveAndIssueVisitorPass(variables.visitId);
+        return { decision: "APPROVE" as const, pass: response.data.pass };
+      }
+      await denyVisitor(variables.visitId);
+      return { decision: "DENY" as const };
+    },
+    onSuccess: async (result, variables) => {
+      if (result.decision === "APPROVE" && variables.decision === "APPROVE") {
+        setIssuedTicket(result.pass);
         setTicketError(null);
-        const printWindow = window.open("", "_blank", "width=420,height=720");
-        if (printWindow) {
-          try {
-            await printVisitorPass(pass, printWindow);
-          } catch (error) {
-            setTicketError(error instanceof Error ? error.message : "Pass issued, but printing failed. Use Print ticket below.");
-          }
-        } else {
-          setTicketError("Pass issued successfully, but the browser blocked the print window. Allow pop-ups, then use Print ticket below.");
+        try {
+          await printVisitorPass(result.pass, variables.printWindow);
+        } catch (error) {
+          setTicketError(error instanceof Error ? error.message : "Pass issued, but printing failed. Use Print ticket below.");
         }
       }
       await refresh();
+    },
+    onError: (_error, variables) => {
+      if (variables.decision === "APPROVE" && !variables.printWindow.closed) {
+        variables.printWindow.close();
+      }
     }
   });
+
+  function approveVisitorAndPrint(visitId: string) {
+    setTicketError(null);
+    const printWindow = window.open("", "_blank", "width=420,height=720");
+    if (!printWindow) {
+      setTicketError("The pass was not approved because the browser blocked the print window. Allow pop-ups for SmartPass360, then try again.");
+      return;
+    }
+    printWindow.document.open();
+    printWindow.document.write("<!doctype html><html><head><title>SmartPass360</title></head><body style='font-family:Arial,sans-serif;padding:24px;color:#173f37'><h2>SmartPass360</h2><p>Approving the visit and preparing its printable access pass…</p></body></html>");
+    printWindow.document.close();
+    visitorReview.mutate({ visitId, decision: "APPROVE", printWindow });
+  }
   const visitorCheckout = useMutation({
     mutationFn: checkOutVisitor,
     onSuccess: refresh
@@ -214,29 +131,10 @@ export function OperationsPage() {
           <h1>Live Operations</h1>
           <p>One real-time workspace for visitor approvals, vehicle arrivals and occupancy inside this building.</p>
         </div>
-        <div className="operations-page__header-actions">
-        <button
-          type="button"
-          className={notificationEnabled ? "operations-page__alert-toggle is-enabled" : "operations-page__alert-toggle"}
-          onClick={() => void enableVisitorAlerts()}
-        >
-          {notificationEnabled ? "🔔 Alerts enabled" : "🔔 Enable sound alerts"}
-        </button>
         <div className="operations-page__live"><span /> LIVE</div>
-      </div>
       </header>
 
       {actionError ? <div className="operations-page__error">{actionError}</div> : null}
-      {visitorNotice ? (
-        <div className="operations-page__visitor-notice" role="status">
-          <span className="operations-page__visitor-notice-icon">🔔</span>
-          <div>
-            <strong>Visitor approval required</strong>
-            <span>{visitorNotice}</span>
-          </div>
-          <button type="button" onClick={() => setVisitorNotice(null)} aria-label="Dismiss notification">×</button>
-        </div>
-      ) : null}
       {issuedTicket ? (
         <section className="operations-page__issued-ticket" aria-label="Issued visitor ticket">
           <div className="operations-page__issued-ticket-copy">
@@ -296,7 +194,7 @@ export function OperationsPage() {
             <td>{visit.vehicleNumber ?? "—"}</td>
             <td>{formatDate(visit.registeredAt)}</td>
             <td><div className="operations-page__actions">
-              <GlassButton type="button" disabled={visitorReview.isPending} onClick={() => visitorReview.mutate({ visitId: visit.id, decision: "APPROVE" })}>Approve Visitor</GlassButton>
+              <GlassButton type="button" disabled={visitorReview.isPending} onClick={() => approveVisitorAndPrint(visit.id)}>Approve Visitor</GlassButton>
               <GlassButton type="button" variant="secondary" disabled={visitorReview.isPending} onClick={() => visitorReview.mutate({ visitId: visit.id, decision: "DENY" })}>Deny</GlassButton>
             </div></td>
           </tr>)}</tbody>
