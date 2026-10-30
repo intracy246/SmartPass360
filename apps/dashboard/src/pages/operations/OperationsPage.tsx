@@ -29,7 +29,6 @@ function formatDate(value?: string | null) {
 
 export function OperationsPage() {
   const queryClient = useQueryClient();
-  const queryClient = useQueryClient();
 
   const refresh = async () => {
     await Promise.all([
