@@ -136,6 +136,7 @@ export function VisitorsPage() {
         organizationName: organizationName ?? "Organization",
         pass: response.data.pass
       });
+      setForm(initialFormState);
       setErrorMessage(null);
       setSubmitted(false);
       await queryClient.invalidateQueries({ queryKey: ["visitor-queue"] });
@@ -380,6 +381,8 @@ export function VisitorsPage() {
                   inputProps={{
                     value: form.identificationNumber,
                     disabled: form.identificationType === "NONE",
+                    autoComplete: "off",
+                    name: "visitor-identification-number",
                     placeholder:
                       form.identificationType === "NONE"
                         ? "Not required"
@@ -404,6 +407,8 @@ export function VisitorsPage() {
                   hint="Optional"
                   inputProps={{
                     value: form.vehicleRegistrationNumber,
+                    autoComplete: "off",
+                    name: "visitor-vehicle-registration-number",
                     placeholder: "T 123 ABC",
                     onChange: (event) =>
                       updateField("vehicleRegistrationNumber", event.target.value)
