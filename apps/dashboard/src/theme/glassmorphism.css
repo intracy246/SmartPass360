@@ -15,17 +15,17 @@
   --sp-accent: #66baff;
 }
 :root[data-theme="light"] {
-  /* V18-inspired light theme: warm smoked glass, not a white dashboard. */
+  /* V18: transparent canvas with translucent frosted-glass surfaces. */
   color-scheme: dark;
-  --sp-bg: #51463f;
-  --sp-text: #f8f5f1;
-  --sp-muted: #d0c5bb;
-  --sp-glass: rgba(75, 65, 59, .56);
-  --sp-glass-strong: rgba(54, 48, 45, .76);
-  --sp-glass-soft: rgba(255, 255, 255, .10);
-  --sp-glass-border: rgba(255, 244, 230, .22);
-  --sp-shadow: 0 18px 50px rgba(20, 14, 11, .22);
-  --sp-field: rgba(38, 34, 32, .30);
+  --sp-bg: transparent;
+  --sp-text: #f8f9fc;
+  --sp-muted: rgba(248, 249, 252, .70);
+  --sp-glass: rgba(255, 255, 255, .14);
+  --sp-glass-strong: rgba(255, 255, 255, .20);
+  --sp-glass-soft: rgba(255, 255, 255, .08);
+  --sp-glass-border: rgba(255, 255, 255, .25);
+  --sp-shadow: 0 18px 50px rgba(0, 0, 0, .16);
+  --sp-field: rgba(255, 255, 255, .10);
   --sp-accent: #8bc8ff;
 }
 html, body, #root { min-height: 100%; }
@@ -41,12 +41,10 @@ body {
   transition: color .25s ease, background .25s ease;
 }
 :root[data-theme="light"] body {
-  background:
-    radial-gradient(ellipse at 12% 12%, rgba(194, 151, 111, .34), transparent 36%),
-    radial-gradient(ellipse at 84% 18%, rgba(106, 126, 153, .30), transparent 34%),
-    radial-gradient(ellipse at 68% 88%, rgba(119, 103, 91, .38), transparent 32%),
-    linear-gradient(135deg, #3e3937 0%, #62564e 48%, #394653 100%) !important;
-  background-attachment: fixed !important;
+  /* No painted page backdrop: let the environment show through the glass. */
+  background: transparent !important;
+  background-color: transparent !important;
+  background-attachment: initial !important;
 }
 .dashboard-layout, .dashboard-layout__content, .owner-layout, main {
   background-color: transparent;
@@ -79,7 +77,7 @@ body {
 :root[data-theme="light"] .owner-shell,
 :root[data-theme="light"] .owner-sidebar {
   color: var(--sp-text);
-  background: rgba(55, 49, 46, .58) !important;
+  background: rgba(255, 255, 255, .10) !important;
   border-color: var(--sp-glass-border) !important;
   -webkit-backdrop-filter: blur(28px) saturate(145%);
   backdrop-filter: blur(28px) saturate(145%);
@@ -112,7 +110,7 @@ body {
 :root[data-theme="light"] tbody,
 :root[data-theme="light"] tr { background: transparent; }
 :root[data-theme="light"] tr { border-color: rgba(90,115,150,.18); }
-:root[data-theme="light"] .search-box__trigger:hover { background: rgba(255,255,255,.7) !important; }
+:root[data-theme="light"] .search-box__trigger:hover { background: rgba(255,255,255,.20) !important; }
 :root[data-theme="light"] .sidebar a,
 :root[data-theme="light"] .sidebar button,
 :root[data-theme="light"] .owner-sidebar a,
@@ -193,9 +191,9 @@ body {
 :root[data-theme="light"] .owner-shell__content [class*="card"],
 :root[data-theme="light"] .owner-shell__content [class*="panel"] {
   color: var(--sp-text);
-  background: rgba(75, 65, 59, .48) !important;
-  border: 1px solid rgba(255,244,230,.20) !important;
-  box-shadow: 0 16px 42px rgba(20,14,11,.18);
+  background: rgba(255, 255, 255, .13) !important;
+  border: 1px solid rgba(255,255,255,.24) !important;
+  box-shadow: 0 16px 42px rgba(0,0,0,.14);
   -webkit-backdrop-filter: blur(26px) saturate(150%);
   backdrop-filter: blur(26px) saturate(150%);
 }
@@ -203,8 +201,8 @@ body {
 :root[data-theme="light"] .dashboard-layout__content select,
 :root[data-theme="light"] .dashboard-layout__content textarea {
   color: #fff !important;
-  background: rgba(34,30,28,.34) !important;
-  border-color: rgba(255,244,230,.20) !important;
+  background: rgba(255,255,255,.10) !important;
+  border-color: rgba(255,255,255,.22) !important;
 }
 :root[data-theme="light"] .dashboard-layout__content table,
 :root[data-theme="light"] .dashboard-layout__content tbody,
