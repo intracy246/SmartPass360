@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { clearSession } from "../auth/session";
 import "./OwnerLayout.css";
+import { useTheme } from "../theme/ThemeProvider";
 
 const items = [
   { to: "/owner", label: "Overview", end: true },
@@ -10,6 +11,7 @@ const items = [
 
 export function OwnerLayout() {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   return (
     <div className="owner-shell">
       <aside className="owner-sidebar">
@@ -31,7 +33,7 @@ export function OwnerLayout() {
           <button type="button" onClick={() => { clearSession(); navigate("/login", { replace: true }); }}>Sign out</button>
         </div>
       </aside>
-      <section className="owner-shell__content"><Outlet /></section>
+      <section className="owner-shell__content"><button className="theme-toggle owner-theme-toggle" type="button" onClick={toggleTheme} aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"} aria-pressed={theme === "light"} title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}><span className="theme-toggle__icon" aria-hidden="true">{theme === "dark" ? "☀" : "☾"}</span><span>{theme === "dark" ? "Light" : "Dark"}</span></button><Outlet /></section>
     </div>
   );
 }
