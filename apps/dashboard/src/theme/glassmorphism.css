@@ -15,17 +15,18 @@
   --sp-accent: #66baff;
 }
 :root[data-theme="light"] {
-  color-scheme: light;
-  --sp-bg: #e8eef7;
-  --sp-text: #17243a;
-  --sp-muted: #64748b;
-  --sp-glass: rgba(255, 255, 255, .48);
-  --sp-glass-strong: rgba(255, 255, 255, .68);
-  --sp-glass-soft: rgba(255, 255, 255, .30);
-  --sp-glass-border: rgba(255, 255, 255, .76);
-  --sp-shadow: 0 18px 50px rgba(41, 62, 91, .13);
-  --sp-field: rgba(255, 255, 255, .46);
-  --sp-accent: #176bc2;
+  /* V18-inspired light theme: warm smoked glass, not a white dashboard. */
+  color-scheme: dark;
+  --sp-bg: #51463f;
+  --sp-text: #f8f5f1;
+  --sp-muted: #d0c5bb;
+  --sp-glass: rgba(75, 65, 59, .56);
+  --sp-glass-strong: rgba(54, 48, 45, .76);
+  --sp-glass-soft: rgba(255, 255, 255, .10);
+  --sp-glass-border: rgba(255, 244, 230, .22);
+  --sp-shadow: 0 18px 50px rgba(20, 14, 11, .22);
+  --sp-field: rgba(38, 34, 32, .30);
+  --sp-accent: #8bc8ff;
 }
 html, body, #root { min-height: 100%; }
 html { background: var(--sp-bg); transition: background-color .25s ease, color .25s ease; }
@@ -41,10 +42,11 @@ body {
 }
 :root[data-theme="light"] body {
   background:
-    radial-gradient(ellipse at 10% 8%, rgba(255,255,255,.95), transparent 34%),
-    radial-gradient(ellipse at 88% 14%, rgba(153,190,235,.40), transparent 32%),
-    radial-gradient(ellipse at 72% 88%, rgba(178,220,224,.42), transparent 30%),
-    linear-gradient(145deg, #eaf0f8, #dce6f2) !important;
+    radial-gradient(ellipse at 12% 12%, rgba(194, 151, 111, .34), transparent 36%),
+    radial-gradient(ellipse at 84% 18%, rgba(106, 126, 153, .30), transparent 34%),
+    radial-gradient(ellipse at 68% 88%, rgba(119, 103, 91, .38), transparent 32%),
+    linear-gradient(135deg, #3e3937 0%, #62564e 48%, #394653 100%) !important;
+  background-attachment: fixed !important;
 }
 .dashboard-layout, .dashboard-layout__content, .owner-layout, main {
   background-color: transparent;
@@ -73,8 +75,14 @@ body {
   backdrop-filter: blur(24px) saturate(155%);
 }
 :root[data-theme="light"] .header,
-:root[data-theme="light"] .sidebar {
-  background: rgba(255,255,255,.38) !important;
+:root[data-theme="light"] .sidebar,
+:root[data-theme="light"] .owner-shell,
+:root[data-theme="light"] .owner-sidebar {
+  color: var(--sp-text);
+  background: rgba(55, 49, 46, .58) !important;
+  border-color: var(--sp-glass-border) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(145%);
+  backdrop-filter: blur(28px) saturate(145%);
 }
 :root[data-theme="light"] input:not([type="checkbox"]):not([type="radio"]),
 :root[data-theme="light"] select,
@@ -85,7 +93,7 @@ body {
   border-color: rgba(105,130,165,.24) !important;
 }
 :root[data-theme="light"] input::placeholder,
-:root[data-theme="light"] textarea::placeholder { color: #718096 !important; }
+:root[data-theme="light"] textarea::placeholder { color: rgba(248,245,241,.62) !important; }
 :root[data-theme="light"] h1,
 :root[data-theme="light"] h2,
 :root[data-theme="light"] h3,
@@ -106,12 +114,15 @@ body {
 :root[data-theme="light"] tr { border-color: rgba(90,115,150,.18); }
 :root[data-theme="light"] .search-box__trigger:hover { background: rgba(255,255,255,.7) !important; }
 :root[data-theme="light"] .sidebar a,
-:root[data-theme="light"] .sidebar button { color: #33445e; }
+:root[data-theme="light"] .sidebar button,
+:root[data-theme="light"] .owner-sidebar a,
+:root[data-theme="light"] .owner-sidebar button { color: #f8f5f1; }
 :root[data-theme="light"] .sidebar a.active,
-:root[data-theme="light"] .sidebar a[aria-current="page"] { background: rgba(54,126,204,.13); color: #155da8; }
+:root[data-theme="light"] .sidebar a[aria-current="page"],
+:root[data-theme="light"] .owner-sidebar a.active { background: rgba(255,255,255,.14); color: #fff; }
 :root[data-theme="light"] .notification-button,
 :root[data-theme="light"] .theme-toggle { color: #fff; }
-:root[data-theme="light"] .header-info strong { color: #26364d; }
+:root[data-theme="light"] .header-info strong { color: #fff; }
 :root[data-theme="light"] .online-dot { box-shadow: 0 0 12px rgba(16,185,129,.45); }
 .theme-toggle {
   display: inline-flex;
@@ -157,16 +168,52 @@ body {
 }
 :root[data-theme="light"] .dashboard-layout__content [class*="text-white"],
 :root[data-theme="light"] .dashboard-layout__content [class*="white-text"] {
-  color: #23334b !important;
+  color: #fff !important;
 }
 :root[data-theme="light"] .dashboard-layout__content [class*="muted"],
 :root[data-theme="light"] .dashboard-layout__content [class*="subtitle"],
 :root[data-theme="light"] .dashboard-layout__content [class*="description"] {
-  color: #64748b;
+  color: var(--sp-muted);
 }
 :root[data-theme="light"] .dashboard-layout__content button:not(.notification-button):not(.theme-toggle):not([class*="primary"]):not([class*="danger"]) {
   border-color: rgba(105,130,165,.25);
 }
 :root[data-theme="light"] .dashboard-layout__content hr {
   border-color: rgba(90,115,150,.18);
+}
+
+
+/* Warm, translucent V18-style glass across page-specific surfaces. */
+:root[data-theme="light"] .dashboard-layout__content [class*="card"],
+:root[data-theme="light"] .dashboard-layout__content [class*="panel"],
+:root[data-theme="light"] .dashboard-layout__content [class*="surface"],
+:root[data-theme="light"] .dashboard-layout__content [class*="drawer"],
+:root[data-theme="light"] .dashboard-layout__content [class*="modal"],
+:root[data-theme="light"] .dashboard-layout__content [class*="container"],
+:root[data-theme="light"] .owner-shell__content [class*="card"],
+:root[data-theme="light"] .owner-shell__content [class*="panel"] {
+  color: var(--sp-text);
+  background: rgba(75, 65, 59, .48) !important;
+  border: 1px solid rgba(255,244,230,.20) !important;
+  box-shadow: 0 16px 42px rgba(20,14,11,.18);
+  -webkit-backdrop-filter: blur(26px) saturate(150%);
+  backdrop-filter: blur(26px) saturate(150%);
+}
+:root[data-theme="light"] .dashboard-layout__content input,
+:root[data-theme="light"] .dashboard-layout__content select,
+:root[data-theme="light"] .dashboard-layout__content textarea {
+  color: #fff !important;
+  background: rgba(34,30,28,.34) !important;
+  border-color: rgba(255,244,230,.20) !important;
+}
+:root[data-theme="light"] .dashboard-layout__content table,
+:root[data-theme="light"] .dashboard-layout__content tbody,
+:root[data-theme="light"] .dashboard-layout__content tr,
+:root[data-theme="light"] .dashboard-layout__content td,
+:root[data-theme="light"] .dashboard-layout__content th {
+  background: transparent !important;
+  color: inherit;
+}
+:root[data-theme="light"] .owner-shell__content {
+  color: var(--sp-text);
 }
