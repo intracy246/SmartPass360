@@ -194,3 +194,130 @@ body {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+
+/* V18 glass coverage for operational pages that use bespoke page-level CSS.
+   Restrict surfaces to structural wrappers; never style labels, text spans or cells as cards. */
+:root[data-theme="light"] .access-page__live,
+:root[data-theme="light"] .permanent-gate-scanner,
+:root[data-theme="light"] .permanent-gate-scanner__form,
+:root[data-theme="light"] .permanent-gate-decision,
+:root[data-theme="light"] .access-result__decision,
+:root[data-theme="light"] .access-events-table-wrapper,
+:root[data-theme="light"] .reports-page__filters,
+:root[data-theme="light"] .reports-page__range,
+:root[data-theme="light"] .reports-page__building,
+:root[data-theme="light"] .reports-page__metric,
+:root[data-theme="light"] .reports-page__section,
+:root[data-theme="light"] .reports-page__table-wrap,
+:root[data-theme="light"] .reports-page__export-note,
+:root[data-theme="light"] .visitors-page__jump-links,
+:root[data-theme="light"] .visitor-form__footer,
+:root[data-theme="light"] .kiosks-page__notice,
+:root[data-theme="light"] .kiosks-page__empty,
+:root[data-theme="light"] .kiosks-list,
+:root[data-theme="light"] .kiosk-modal__card,
+:root[data-theme="light"] .kiosk-drawer__panel,
+:root[data-theme="light"] .kiosk-detail-grid > div,
+:root[data-theme="light"] .kiosk-public-qr {
+  color: rgba(255,255,255,.96) !important;
+  background: rgba(255,255,255,.13) !important;
+  border: 1px solid rgba(255,255,255,.34) !important;
+  box-shadow: var(--sp-shadow);
+  -webkit-backdrop-filter: blur(30px) saturate(165%);
+  backdrop-filter: blur(30px) saturate(165%);
+}
+:root[data-theme="light"] .permanent-gate-scanner__header h2,
+:root[data-theme="light"] .permanent-gate-scanner__header p,
+:root[data-theme="light"] .permanent-gate-scanner__header > div:first-child > span,
+:root[data-theme="light"] .permanent-gate-scanner__form label > span,
+:root[data-theme="light"] .permanent-gate-decision > h2,
+:root[data-theme="light"] .permanent-gate-decision__person strong,
+:root[data-theme="light"] .permanent-gate-decision__person span,
+:root[data-theme="light"] .access-decision strong,
+:root[data-theme="light"] .access-decision p,
+:root[data-theme="light"] .access-result__decision h2,
+:root[data-theme="light"] .access-result__decision p,
+:root[data-theme="light"] .access-result__details strong,
+:root[data-theme="light"] .access-result__details span,
+:root[data-theme="light"] .access-events-table th,
+:root[data-theme="light"] .access-events-table td,
+:root[data-theme="light"] .reports-page__filters label > span,
+:root[data-theme="light"] .reports-page__range > span,
+:root[data-theme="light"] .reports-page__building > span,
+:root[data-theme="light"] .reports-page__range strong,
+:root[data-theme="light"] .reports-page__building strong,
+:root[data-theme="light"] .reports-page__metric span,
+:root[data-theme="light"] .reports-page__metric strong,
+:root[data-theme="light"] .reports-page__metric small,
+:root[data-theme="light"] .reports-page__section-heading h2,
+:root[data-theme="light"] .reports-page__section-heading p,
+:root[data-theme="light"] .reports-page td,
+:root[data-theme="light"] .reports-page th,
+:root[data-theme="light"] .reports-page td strong,
+:root[data-theme="light"] .reports-page td small,
+:root[data-theme="light"] .visitors-page__header h1,
+:root[data-theme="light"] .visitors-page__header p,
+:root[data-theme="light"] .visitors-page__registration-heading h2,
+:root[data-theme="light"] .visitors-page__registration-heading p,
+:root[data-theme="light"] .visitor-form__message,
+:root[data-theme="light"] .kiosks-page,
+:root[data-theme="light"] .kiosks-page__header span,
+:root[data-theme="light"] .kiosks-page__empty,
+:root[data-theme="light"] .kiosks-list__head,
+:root[data-theme="light"] .kiosks-list__row,
+:root[data-theme="light"] .kiosk-modal label,
+:root[data-theme="light"] .kiosk-modal__title p,
+:root[data-theme="light"] .kiosk-detail-grid span,
+:root[data-theme="light"] .kiosk-public-qr__heading h3,
+:root[data-theme="light"] .kiosk-public-qr__heading span,
+:root[data-theme="light"] .kiosk-public-qr__link {
+  color: rgba(255,255,255,.95) !important;
+}
+:root[data-theme="light"] .access-field input,
+:root[data-theme="light"] .access-field select,
+:root[data-theme="light"] .permanent-gate-scanner__form input,
+:root[data-theme="light"] .reports-page__filters select,
+:root[data-theme="light"] .kiosk-modal input,
+:root[data-theme="light"] .kiosk-modal select,
+:root[data-theme="light"] .kiosks-page .kiosk-public-qr__link input {
+  color: #fff !important;
+  background: rgba(255,255,255,.12) !important;
+  border: 1px solid rgba(255,255,255,.28) !important;
+}
+:root[data-theme="light"] .access-field input::placeholder,
+:root[data-theme="light"] .permanent-gate-scanner__form input::placeholder {
+  color: rgba(255,255,255,.65) !important;
+}
+:root[data-theme="light"] .kiosks-list__head,
+:root[data-theme="light"] .reports-page th,
+:root[data-theme="light"] .access-events-table th {
+  background: rgba(255,255,255,.12) !important;
+}
+:root[data-theme="light"] .kiosks-list__row,
+:root[data-theme="light"] .reports-page td,
+:root[data-theme="light"] .access-events-table td {
+  border-color: rgba(255,255,255,.16) !important;
+}
+:root[data-theme="light"] .kiosk-drawer__backdrop,
+:root[data-theme="light"] .kiosk-modal {
+  background: rgba(9,16,27,.36) !important;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+:root[data-theme="light"] .kiosk-public-qr__image,
+:root[data-theme="light"] .pass-drawer__qr {
+  background: #fff !important;
+  color: #334155 !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+:root[data-theme="light"] .pass-drawer__panel {
+  background: rgba(255,255,255,.16) !important;
+  border-color: rgba(255,255,255,.38) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(165%);
+  backdrop-filter: blur(32px) saturate(165%);
+}
+:root[data-theme="light"] .pass-drawer__panel :is(h2,h3,p,strong,span) {
+  color: rgba(255,255,255,.95);
+}
