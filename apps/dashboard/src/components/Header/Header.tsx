@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../theme/ThemeProvider";
 import "./Header.css";
 
 export function Header() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [time, setTime] = useState(new Date());
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
 
   async function toggleNotifications() {
     const next = !notificationsEnabled;
-    // Dispatch first, synchronously within the button click, so the notification
-    // component can unlock Web Audio before the browser's autoplay gate closes.
     window.dispatchEvent(new CustomEvent("smartpass360:visitor-alert-settings", { detail: { enabled: next } }));
     setNotificationsEnabled(next);
     if (next && "Notification" in window && Notification.permission === "default") {
@@ -23,64 +23,46 @@ export function Header() {
   }
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTime(new Date());
-    }, 1000);
-
+    const interval = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
 
   return (
     <header className="header">
-
       <div className="header-left">
-
         <div className="search-box">
-          <button className="search-box__trigger" type="button" onClick={() => navigate("/search")} aria-label="Open Intelligent Search"><span className="search-box__icon">⌕</span><span>Search people, phones, companies, departments, passes…</span></button>
+          <button className="search-box__trigger" type="button" onClick={() => navigate("/search")} aria-label="Open Intelligent Search">
+            <span className="search-box__icon">⌕</span>
+            <span>Search people, phones, companies, departments, passes…</span>
+          </button>
         </div>
-
       </div>
 
       <div className="header-right">
-
         <div className="header-info">
-
-          <span className="label">
-            Organization
-          </span>
-
-          <strong>
-            —
-          </strong>
-
+          <span className="label">Organization</span>
+          <strong>—</strong>
         </div>
-
         <div className="header-info">
-
-          <span className="label">
-            Today
-          </span>
-
-          <strong>
-            {time.toLocaleDateString()}
-          </strong>
-
+          <span className="label">Today</span>
+          <strong>{time.toLocaleDateString()}</strong>
         </div>
-
         <div className="header-info">
-
-          <span className="label">
-            Time
-          </span>
-
-          <strong>
-            {time.toLocaleTimeString()}
-          </strong>
-
+          <span className="label">Time</span>
+          <strong>{time.toLocaleTimeString()}</strong>
         </div>
-
-        <div className="online-dot"/>
-
+        <div className="online-dot" />
+        <button
+          className="theme-toggle"
+          type="button"
+          onClick={toggleTheme}
+          aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          aria-pressed={theme === "light"}
+          title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+        >
+          <span className="theme-toggle__icon" aria-hidden="true">{theme === "dark" ? "☀" : "☾"}</span>
+          <span>{theme === "dark" ? "Light" : "Dark"}</span>
+        </button>
         <button
           className={notificationsEnabled ? "notification-button notification-button--enabled" : "notification-button"}
           type="button"
@@ -91,17 +73,8 @@ export function Header() {
         >
           🔔
         </button>
-
-        <div className="profile">
-
-          <div className="avatar">
-            SP
-          </div>
-
-        </div>
-
+        <div className="profile"><div className="avatar">SP</div></div>
       </div>
-
     </header>
   );
 }
