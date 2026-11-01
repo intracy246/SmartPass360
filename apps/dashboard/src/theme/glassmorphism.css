@@ -321,3 +321,148 @@ body {
 :root[data-theme="light"] .pass-drawer__panel :is(h2,h3,p,strong,span) {
   color: rgba(255,255,255,.95);
 }
+
+
+/* Complete light-mode glass pass: Reception, Access Control and Platform Owner.
+   These selectors intentionally target containers only, not arbitrary text or form children. */
+:root[data-theme="light"] .visitors-page .glass-card,
+:root[data-theme="light"] .visitors-page .visitor-form__footer,
+:root[data-theme="light"] .visitors-page .visitor-form__alert,
+:root[data-theme="light"] .access-page .glass-card,
+:root[data-theme="light"] .access-page .access-validation,
+:root[data-theme="light"] .access-page .access-decision,
+:root[data-theme="light"] .access-page .access-result__details > div,
+:root[data-theme="light"] .access-page .access-events-table-wrapper,
+:root[data-theme="light"] .owner-page .owner-stats article,
+:root[data-theme="light"] .owner-page .owner-panel,
+:root[data-theme="light"] .owner-page .owner-building,
+:root[data-theme="light"] .owner-page .owner-message,
+:root[data-theme="light"] .owner-page .owner-empty,
+:root[data-theme="light"] .owner-page .owner-note,
+:root[data-theme="light"] .owner-modal__card,
+:root[data-theme="light"] .owner-buildings-list,
+:root[data-theme="light"] .owner-buildings-message,
+:root[data-theme="light"] .owner-buildings-empty,
+:root[data-theme="light"] .owner-buildings-note,
+:root[data-theme="light"] .owner-building-drawer__panel,
+:root[data-theme="light"] .owner-building-detail-grid > div,
+:root[data-theme="light"] .owner-building-org-list > div,
+:root[data-theme="light"] .owner-buildings-modal__card,
+:root[data-theme="light"] .owner-org-panel,
+:root[data-theme="light"] .owner-org-row:not(.owner-org-row--head),
+:root[data-theme="light"] .owner-org-empty {
+  color: rgba(255,255,255,.96) !important;
+  background: rgba(255,255,255,.14) !important;
+  border: 1px solid rgba(255,255,255,.34) !important;
+  box-shadow: var(--sp-shadow);
+  -webkit-backdrop-filter: blur(30px) saturate(165%);
+  backdrop-filter: blur(30px) saturate(165%);
+}
+:root[data-theme="light"] .owner-shell,
+:root[data-theme="light"] .owner-shell__content {
+  background: transparent !important;
+}
+:root[data-theme="light"] .owner-sidebar {
+  background: rgba(255,255,255,.12) !important;
+  border-color: rgba(255,255,255,.32) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(165%);
+  backdrop-filter: blur(30px) saturate(165%);
+}
+:root[data-theme="light"] .owner-sidebar__link,
+:root[data-theme="light"] .owner-sidebar__brand,
+:root[data-theme="light"] .owner-sidebar__brand span,
+:root[data-theme="light"] .owner-sidebar__powered-by,
+:root[data-theme="light"] .owner-sidebar__footer,
+:root[data-theme="light"] .owner-header h1,
+:root[data-theme="light"] .owner-header span,
+:root[data-theme="light"] .owner-panel__title h2,
+:root[data-theme="light"] .owner-panel__title p,
+:root[data-theme="light"] .owner-stats span,
+:root[data-theme="light"] .owner-stats strong,
+:root[data-theme="light"] .owner-building h3,
+:root[data-theme="light"] .owner-building p,
+:root[data-theme="light"] .owner-building dt,
+:root[data-theme="light"] .owner-building dd,
+:root[data-theme="light"] .owner-buildings-page,
+:root[data-theme="light"] .owner-buildings-page header span,
+:root[data-theme="light"] .owner-buildings-page h1,
+:root[data-theme="light"] .owner-building-drawer__title h2,
+:root[data-theme="light"] .owner-building-drawer__title span,
+:root[data-theme="light"] .owner-building-detail-grid span,
+:root[data-theme="light"] .owner-building-org-list span,
+:root[data-theme="light"] .owner-org-page,
+:root[data-theme="light"] .owner-org-page h1,
+:root[data-theme="light"] .owner-org-page header span,
+:root[data-theme="light"] .owner-org-row,
+:root[data-theme="light"] .owner-org-row small,
+:root[data-theme="light"] .owner-buildings-list__head,
+:root[data-theme="light"] .owner-buildings-row,
+:root[data-theme="light"] .owner-buildings-main small,
+:root[data-theme="light"] .owner-form-grid label,
+:root[data-theme="light"] .owner-buildings-form-grid label {
+  color: rgba(255,255,255,.96) !important;
+}
+:root[data-theme="light"] .owner-stats article,
+:root[data-theme="light"] .owner-building,
+:root[data-theme="light"] .owner-buildings-row,
+:root[data-theme="light"] .owner-org-row:not(.owner-org-row--head),
+:root[data-theme="light"] .owner-building-detail-grid > div,
+:root[data-theme="light"] .owner-building-org-list > div {
+  background: rgba(255,255,255,.12) !important;
+}
+:root[data-theme="light"] .owner-buildings-list__head,
+:root[data-theme="light"] .owner-org-row--head {
+  background: rgba(255,255,255,.09) !important;
+  color: rgba(255,255,255,.82) !important;
+}
+:root[data-theme="light"] .owner-form-grid input,
+:root[data-theme="light"] .owner-form-grid textarea,
+:root[data-theme="light"] .owner-form-grid select,
+:root[data-theme="light"] .owner-buildings-form-grid input,
+:root[data-theme="light"] .owner-buildings-form-grid textarea,
+:root[data-theme="light"] .owner-buildings-form-grid select,
+:root[data-theme="light"] .owner-org-toolbar input,
+:root[data-theme="light"] .owner-org-toolbar select,
+:root[data-theme="light"] .visitor-form input,
+:root[data-theme="light"] .visitor-form select,
+:root[data-theme="light"] .visitor-form textarea,
+:root[data-theme="light"] .access-page input,
+:root[data-theme="light"] .access-page select,
+:root[data-theme="light"] .access-page textarea {
+  color: #fff !important;
+  background: rgba(255,255,255,.13) !important;
+  border: 1px solid rgba(255,255,255,.30) !important;
+}
+:root[data-theme="light"] .owner-modal,
+:root[data-theme="light"] .owner-buildings-modal,
+:root[data-theme="light"] .owner-building-drawer__backdrop {
+  background: rgba(8,15,26,.38) !important;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+:root[data-theme="light"] .owner-message,
+:root[data-theme="light"] .owner-empty,
+:root[data-theme="light"] .owner-note,
+:root[data-theme="light"] .owner-buildings-message,
+:root[data-theme="light"] .owner-buildings-empty,
+:root[data-theme="light"] .owner-buildings-note {
+  background: rgba(255,255,255,.12) !important;
+  color: rgba(255,255,255,.95) !important;
+}
+:root[data-theme="light"] .owner-page button.secondary,
+:root[data-theme="light"] .owner-buildings-page button.secondary,
+:root[data-theme="light"] .owner-sidebar__footer button {
+  background: rgba(255,255,255,.16) !important;
+  border: 1px solid rgba(255,255,255,.30) !important;
+  color: #fff !important;
+}
+:root[data-theme="light"] .owner-buildings-list__head,
+:root[data-theme="light"] .owner-buildings-row,
+:root[data-theme="light"] .owner-org-row,
+:root[data-theme="light"] .owner-org-panel {
+  border-color: rgba(255,255,255,.24) !important;
+}
+:root[data-theme="light"] .access-page__workspace > *,
+:root[data-theme="light"] .visitors-page__workspace > * {
+  min-width: 0;
+}
