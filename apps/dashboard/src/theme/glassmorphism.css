@@ -144,3 +144,29 @@ body {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+/* Apply the same frosted surface treatment to page-specific card/panel naming
+   conventions without changing their DOM structure or layout. */
+:root[data-theme="light"] .dashboard-layout__content [class*="card"],
+:root[data-theme="light"] .dashboard-layout__content [class*="panel"],
+:root[data-theme="light"] .dashboard-layout__content [class*="surface"],
+:root[data-theme="light"] .dashboard-layout__content [class*="drawer"],
+:root[data-theme="light"] .dashboard-layout__content [class*="modal"],
+:root[data-theme="light"] .dashboard-layout__content [class*="container"] {
+  border-color: rgba(255,255,255,.68);
+}
+:root[data-theme="light"] .dashboard-layout__content [class*="text-white"],
+:root[data-theme="light"] .dashboard-layout__content [class*="white-text"] {
+  color: #23334b !important;
+}
+:root[data-theme="light"] .dashboard-layout__content [class*="muted"],
+:root[data-theme="light"] .dashboard-layout__content [class*="subtitle"],
+:root[data-theme="light"] .dashboard-layout__content [class*="description"] {
+  color: #64748b;
+}
+:root[data-theme="light"] .dashboard-layout__content button:not(.notification-button):not(.theme-toggle):not([class*="primary"]):not([class*="danger"]) {
+  border-color: rgba(105,130,165,.25);
+}
+:root[data-theme="light"] .dashboard-layout__content hr {
+  border-color: rgba(90,115,150,.18);
+}
