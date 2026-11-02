@@ -394,10 +394,7 @@ ownerRouter.post("/me/change-password", requireBuilding, async (request, respons
     }
 
     const user = response.locals.authUser as AuthUser;
-    if (user.scope !== "BUILDING" || !user.siteId || user.mustChangePassword || user.guardSessionId) {
-      return response.status(403).json({ error: { code: "BUILDING_LOGIN_REQUIRED", message: "Sign in with building credentials before identifying the guard." } });
-    }
-    const site = await prisma.site.findUnique({ where: { id: user.siteId } });
+    const site = await prisma.site.findUnique({ where: { id: user.siteId! } });
 
     if (!site?.adminPasswordHash) {
       return response.status(404).json({ error: { code: "BUILDING_NOT_FOUND", message: "Building account not found." } });
@@ -457,7 +454,10 @@ ownerRouter.post("/identify-guard", requireAuth, async (request, response, next)
     }
 
     const user = response.locals.authUser as AuthUser;
-    const site = await prisma.site.findUnique({ where: { id: user.siteId! } });
+    if (user.scope !== "BUILDING" || !user.siteId || user.mustChangePassword || user.guardSessionId) {
+      return response.status(403).json({ error: { code: "BUILDING_LOGIN_REQUIRED", message: "Sign in with building credentials before identifying the guard." } });
+    }
+    const site = await prisma.site.findUnique({ where: { id: user.siteId } });
     if (!site || !site.isActive || site.status !== "ACTIVE") {
       return response.status(403).json({ error: { code: "BUILDING_INACTIVE", message: "This building account is not active." } });
     }
