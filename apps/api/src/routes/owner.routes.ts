@@ -420,7 +420,9 @@ ownerRouter.post("/me/change-password", requireBuilding, async (request, respons
       scope: "BUILDING",
       siteId: updated.id,
       username: updated.adminUsername!,
-      mustChangePassword: false
+      mustChangePassword: false,
+      guardName: user.guardName,
+      guardSessionId: user.guardSessionId
     };
 
     return response.status(200).json({
@@ -429,6 +431,112 @@ ownerRouter.post("/me/change-password", requireBuilding, async (request, respons
         token: signAuthToken(refreshed),
         user: refreshed
       }
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+
+// Shared building credentials identify the individual guard for each working session.
+const identifyGuardSchema = z.object({
+  fullName: z.string().trim().min(2).max(120)
+});
+
+ownerRouter.post("/identify-guard", requireBuilding, async (request, response, next) => {
+  try {
+    const parsed = identifyGuardSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return response.status(400).json({
+        error: { code: "VALIDATION_ERROR", message: "Enter the guard's full name.", details: parsed.error.flatten() }
+      });
+    }
+
+    const user = response.locals.authUser as AuthUser;
+    const site = await prisma.site.findUnique({ where: { id: user.siteId! } });
+    if (!site || !site.isActive || site.status !== "ACTIVE") {
+      return response.status(403).json({ error: { code: "BUILDING_INACTIVE", message: "This building account is not active." } });
+    }
+
+    const session = await prisma.guardSession.create({
+      data: {
+        siteId: site.id,
+        username: user.username,
+        guardName: parsed.data.fullName,
+        userAgent: typeof request.headers["user-agent"] === "string" ? request.headers["user-agent"].slice(0, 500) : null
+      }
+    });
+
+    const identifiedUser: AuthUser = {
+      ...user,
+      guardName: session.guardName,
+      guardSessionId: session.id,
+      mustChangePassword: false
+    };
+
+    return response.status(200).json({
+      success: true,
+      data: { token: signAuthToken(identifiedUser), user: identifiedUser }
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+ownerRouter.post("/guard-sessions/heartbeat", requireBuilding, async (_request, response, next) => {
+  try {
+    const user = response.locals.authUser as AuthUser;
+    if (!user.guardSessionId) {
+      return response.status(409).json({ error: { code: "GUARD_SESSION_REQUIRED", message: "Guard identity is required." } });
+    }
+    const result = await prisma.guardSession.updateMany({
+      where: { id: user.guardSessionId, siteId: user.siteId!, loggedOutAt: null },
+      data: { lastSeenAt: new Date() }
+    });
+    if (result.count !== 1) {
+      return response.status(401).json({ error: { code: "GUARD_SESSION_ENDED", message: "This guard session has ended. Sign in again." } });
+    }
+    return response.status(200).json({ success: true, data: { lastSeenAt: new Date().toISOString() } });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+ownerRouter.post("/logout", requireBuilding, async (_request, response, next) => {
+  try {
+    const user = response.locals.authUser as AuthUser;
+    if (user.guardSessionId) {
+      await prisma.guardSession.updateMany({
+        where: { id: user.guardSessionId, siteId: user.siteId!, loggedOutAt: null },
+        data: { loggedOutAt: new Date(), lastSeenAt: new Date() }
+      });
+    }
+    return response.status(200).json({ success: true, data: { loggedOut: true } });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+ownerRouter.get("/guard-sessions", requireBuilding, async (_request, response, next) => {
+  try {
+    const user = response.locals.authUser as AuthUser;
+    const sessions = await prisma.guardSession.findMany({
+      where: { siteId: user.siteId! },
+      orderBy: { loginAt: "desc" },
+      take: 100
+    });
+    const onlineAfter = Date.now() - 90_000;
+    return response.status(200).json({
+      success: true,
+      data: sessions.map((session) => ({
+        id: session.id,
+        guardName: session.guardName,
+        username: session.username,
+        loginAt: session.loginAt,
+        lastSeenAt: session.lastSeenAt,
+        loggedOutAt: session.loggedOutAt,
+        isOnline: !session.loggedOutAt && session.lastSeenAt.getTime() >= onlineAfter
+      }))
     });
   } catch (error) {
     return next(error);

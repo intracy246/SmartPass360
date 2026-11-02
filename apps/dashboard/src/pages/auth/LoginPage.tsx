@@ -24,7 +24,7 @@ export function LoginPage() {
         navigate("/change-password", { replace: true });
         return;
       }
-      navigate("/", { replace: true });
+      navigate("/identify", { replace: true });
     },
     onError: (error) => {
       setMessage(error instanceof ApiError ? error.message : "Login service is unavailable.");
