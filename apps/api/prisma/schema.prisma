@@ -612,3 +612,22 @@ model VehicleAccessEvent {
   @@index([siteId, normalizedPlateNumber, occurredAt])
   @@map("vehicle_access_events")
 }
+
+
+model GuardSession {
+  id          String    @id @default(uuid()) @db.Uuid
+  siteId      String    @map("site_id") @db.Uuid
+  username    String
+  guardName   String    @map("guard_name")
+  loginAt     DateTime  @default(now()) @map("login_at")
+  lastSeenAt  DateTime  @default(now()) @map("last_seen_at")
+  loggedOutAt DateTime? @map("logged_out_at")
+  userAgent   String?   @map("user_agent")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([siteId, loggedOutAt, lastSeenAt])
+  @@index([siteId, loginAt])
+  @@map("guard_sessions")
+}
