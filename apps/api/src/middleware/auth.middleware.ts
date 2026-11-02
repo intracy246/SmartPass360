@@ -9,6 +9,8 @@ export type AuthUser = {
   siteId?: string;
   username: string;
   mustChangePassword?: boolean;
+  guardName?: string;
+  guardSessionId?: string;
 };
 
 function encode(value: string) {
