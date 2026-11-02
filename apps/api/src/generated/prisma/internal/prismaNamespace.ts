@@ -413,7 +413,8 @@ export const ModelName = {
   AuthorizedVehicle: 'AuthorizedVehicle',
   GateAccessDevice: 'GateAccessDevice',
   VehicleAccessRequest: 'VehicleAccessRequest',
-  VehicleAccessEvent: 'VehicleAccessEvent'
+  VehicleAccessEvent: 'VehicleAccessEvent',
+  GuardSession: 'GuardSession'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -429,7 +430,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "organization" | "site" | "siteOrganization" | "kiosk" | "department" | "host" | "visitor" | "visitRequest" | "visitorPass" | "gate" | "accessEvent" | "permanentPass" | "permanentPassAccessEvent" | "authorizedVehicle" | "gateAccessDevice" | "vehicleAccessRequest" | "vehicleAccessEvent"
+    modelProps: "organization" | "site" | "siteOrganization" | "kiosk" | "department" | "host" | "visitor" | "visitRequest" | "visitorPass" | "gate" | "accessEvent" | "permanentPass" | "permanentPassAccessEvent" | "authorizedVehicle" | "gateAccessDevice" | "vehicleAccessRequest" | "vehicleAccessEvent" | "guardSession"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1691,6 +1692,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    GuardSession: {
+      payload: Prisma.$GuardSessionPayload<ExtArgs>
+      fields: Prisma.GuardSessionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.GuardSessionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GuardSessionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.GuardSessionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GuardSessionPayload>
+        }
+        findFirst: {
+          args: Prisma.GuardSessionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GuardSessionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.GuardSessionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GuardSessionPayload>
+        }
+        findMany: {
+          args: Prisma.GuardSessionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GuardSessionPayload>[]
+        }
+        create: {
+          args: Prisma.GuardSessionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GuardSessionPayload>
+        }
+        createMany: {
+          args: Prisma.GuardSessionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.GuardSessionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GuardSessionPayload>[]
+        }
+        delete: {
+          args: Prisma.GuardSessionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GuardSessionPayload>
+        }
+        update: {
+          args: Prisma.GuardSessionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GuardSessionPayload>
+        }
+        deleteMany: {
+          args: Prisma.GuardSessionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.GuardSessionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.GuardSessionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GuardSessionPayload>[]
+        }
+        upsert: {
+          args: Prisma.GuardSessionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GuardSessionPayload>
+        }
+        aggregate: {
+          args: Prisma.GuardSessionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGuardSession>
+        }
+        groupBy: {
+          args: Prisma.GuardSessionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GuardSessionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.GuardSessionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GuardSessionCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2059,6 +2134,21 @@ export const VehicleAccessEventScalarFieldEnum = {
 } as const
 
 export type VehicleAccessEventScalarFieldEnum = (typeof VehicleAccessEventScalarFieldEnum)[keyof typeof VehicleAccessEventScalarFieldEnum]
+
+
+export const GuardSessionScalarFieldEnum = {
+  id: 'id',
+  siteId: 'siteId',
+  username: 'username',
+  guardName: 'guardName',
+  loginAt: 'loginAt',
+  lastSeenAt: 'lastSeenAt',
+  loggedOutAt: 'loggedOutAt',
+  userAgent: 'userAgent',
+  createdAt: 'createdAt'
+} as const
+
+export type GuardSessionScalarFieldEnum = (typeof GuardSessionScalarFieldEnum)[keyof typeof GuardSessionScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2562,6 +2652,7 @@ export type GlobalOmitConfig = {
   gateAccessDevice?: Prisma.GateAccessDeviceOmit
   vehicleAccessRequest?: Prisma.VehicleAccessRequestOmit
   vehicleAccessEvent?: Prisma.VehicleAccessEventOmit
+  guardSession?: Prisma.GuardSessionOmit
 }
 
 /* Types for Logging */

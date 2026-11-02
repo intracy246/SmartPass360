@@ -102,3 +102,8 @@ export type VehicleAccessRequest = Prisma.VehicleAccessRequestModel
  * 
  */
 export type VehicleAccessEvent = Prisma.VehicleAccessEventModel
+/**
+ * Model GuardSession
+ * 
+ */
+export type GuardSession = Prisma.GuardSessionModel
