@@ -7,9 +7,11 @@ import { getVisitorOperations } from "../../api/visitor-api";
 import "./Header.css";
 
 const READ_KEY = "smartpass360.notifications.read";
-
 function readIds(key: string): string[] {
-  try { return JSON.parse(window.localStorage.getItem(key) ?? "[]") as string[]; } catch { return []; }
+  try {
+    const value: unknown = JSON.parse(window.localStorage.getItem(key) ?? "[]");
+    return Array.isArray(value) ? value.filter((id): id is string => typeof id === "string") : [];
+  } catch { return []; }
 }
 
 export function Header() {
@@ -27,22 +29,27 @@ export function Header() {
   const initials = (user?.guardName ?? "SP").trim().split(/\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase() ?? "").join("") || "SP";
 
   useEffect(() => {
-    const interval = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(interval);
+    const interval = window.setInterval(() => setTime(new Date()), 1000);
+    return () => window.clearInterval(interval);
   }, []);
 
-  function markRead(id: string) {
-    const next = [...new Set([...readNotificationIds, id])];
+  // A new guard session gets its own read-state; load it when the active identity changes.
+  useEffect(() => setReadNotificationIds(readIds(readKey)), [readKey]);
+
+  function persistRead(ids: string[]) {
+    const next = [...new Set(ids)].slice(-500);
     setReadNotificationIds(next);
-    window.localStorage.setItem(readKey, JSON.stringify(next.slice(-500)));
+    window.localStorage.setItem(readKey, JSON.stringify(next));
+  }
+
+  function markRead(id: string) {
+    persistRead([...readNotificationIds, id]);
     setNotificationsOpen(false);
     navigate("/operations");
   }
 
   function markAllRead() {
-    const next = [...new Set([...readNotificationIds, ...pending.map((visit) => visit.id)])];
-    setReadNotificationIds(next);
-    window.localStorage.setItem(readKey, JSON.stringify(next.slice(-500)));
+    persistRead([...readNotificationIds, ...pending.map((visit) => visit.id)]);
   }
 
   function toggleSound() {
@@ -59,8 +66,7 @@ export function Header() {
       <div className="header-left">
         <div className="search-box">
           <button className="search-box__trigger" type="button" onClick={() => navigate("/search")} aria-label="Open Intelligent Search">
-            <span className="search-box__icon">⌕</span>
-            <span>Search people, phones, companies, departments, passes…</span>
+            <span className="search-box__icon">⌕</span><span>Search people, phones, companies, departments, passes…</span>
           </button>
         </div>
       </div>
@@ -78,13 +84,14 @@ export function Header() {
           </button>
           {notificationsOpen && <section className="notification-popover" aria-label="Notifications">
             <div className="notification-popover__header"><div><strong>Notifications</strong><span>{unreadCount} unread · {pending.length} require action</span></div><button type="button" onClick={() => setNotificationsOpen(false)} aria-label="Close notifications">×</button></div>
-            <div className="notification-popover__filters"><span>Requires action</span><button type="button" onClick={markAllRead} disabled={pending.length === 0}>Mark all read</button></div>
-            {operations.isError && <p className="notification-popover__empty">Notifications could not be loaded.</p>}
-            {!operations.isError && pending.length === 0 && <p className="notification-popover__empty">You are all caught up. No visitor approvals are waiting.</p>}
+            <div className="notification-popover__filters"><span>Visitor approvals</span><button type="button" onClick={markAllRead} disabled={pending.length === 0}>Mark all read</button></div>
+            {operations.isPending && <p className="notification-popover__empty">Loading notifications…</p>}
+            {operations.isError && <p className="notification-popover__empty">Notifications could not be loaded. Retry from Live Operations.</p>}
+            {!operations.isPending && !operations.isError && pending.length === 0 && <p className="notification-popover__empty">You are all caught up. No visitor approvals are waiting.</p>}
             <div className="notification-popover__list">{pending.map((visit) => {
               const unread = !readNotificationIds.includes(visit.id);
               return <button className={unread ? "notification-item unread" : "notification-item"} type="button" key={visit.id} onClick={() => markRead(visit.id)}>
-                <span className="notification-item__dot"/><span className="notification-item__content"><strong>{visit.fullName}</strong><small>{visit.organization.name} · {visit.purpose || "Visitor registration"}</small><em>Waiting for Security approval</em></span><span className="notification-item__arrow">›</span>
+                <span className="notification-item__dot"/><span className="notification-item__content"><strong>{visit.fullName}</strong><small>{visit.organization?.name ?? "Organization not specified"} · {visit.purpose || "Visitor registration"}</small><em>Waiting for Security approval</em></span><span className="notification-item__arrow">›</span>
               </button>;
             })}</div>
             <div className="notification-popover__footer"><button type="button" onClick={toggleSound}>{soundEnabled ? "Disable sound alerts" : "Enable sound alerts"}</button><button type="button" onClick={() => { setNotificationsOpen(false); navigate("/operations"); }}>Open Live Operations</button></div>
