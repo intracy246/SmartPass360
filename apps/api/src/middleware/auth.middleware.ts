@@ -9,6 +9,8 @@ export type AuthUser = {
   siteId?: string;
   username: string;
   mustChangePassword?: boolean;
+  guardName?: string;
+  guardSessionId?: string;
 };
 
 function encode(value: string) {
@@ -67,6 +69,18 @@ export function requireAuth(request: Request, response: Response, next: NextFunc
   const user = readAuthUser(request);
   if (!user) {
     response.status(401).json({ error: { code: "UNAUTHORIZED", message: "Authentication required." } });
+    return;
+  }
+  response.locals.authUser = user;
+  next();
+}
+
+export function requireBuildingLogin(request: Request, response: Response, next: NextFunction) {
+  const user = readAuthUser(request);
+  if (!user || user.scope !== "BUILDING" || !user.siteId || user.mustChangePassword || user.guardSessionId) {
+    response.status(403).json({
+      error: { code: "BUILDING_LOGIN_REQUIRED", message: "Sign in with building credentials before identifying the guard." }
+    });
     return;
   }
   response.locals.authUser = user;

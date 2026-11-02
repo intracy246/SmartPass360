@@ -25,27 +25,8 @@ import { VehiclesPage } from "../pages/vehicles/VehiclesPage";
 import { OperationsPage } from "../pages/operations/OperationsPage";
 import { ReportsPage } from "../pages/reports/ReportsPage";
 import { IntelligentSearchPage } from "../pages/search/IntelligentSearchPage";
-
-function EmptyModule({
-  title
-}: {
-  title: string;
-}) {
-  return (
-    <div
-      style={{
-        padding: "32px",
-        color: "#F8F8FF"
-      }}
-    >
-      <h1>{title}</h1>
-      <p style={{ color: "#8FA0B8" }}>
-        This module will display real data from the
-        SMARTPASS360 API. No mock data is being used.
-      </p>
-    </div>
-  );
-}
+import { GuardIdentityPage } from "../pages/auth/GuardIdentityPage";
+import { UsersPage } from "../pages/users/UsersPage";
 
 function RequireBuilding({ children }: { children: ReactNode }) {
   const token = getToken();
@@ -53,6 +34,7 @@ function RequireBuilding({ children }: { children: ReactNode }) {
   if (!token || !user) return <Navigate to="/login" replace />;
   if (user.scope === "OWNER") return <Navigate to="/owner" replace />;
   if (user.mustChangePassword) return <Navigate to="/change-password" replace />;
+  if (user.scope === "BUILDING" && !user.guardSessionId) return <Navigate to="/identify" replace />;
   return <>{children}</>;
 }
 
@@ -69,6 +51,7 @@ export function AppRouter() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/change-password" element={<ChangePasswordPage />} />
+      <Route path="/identify" element={<GuardIdentityPage />} />
       <Route element={<RequireOwner><OwnerLayout /></RequireOwner>}>
         <Route path="/owner" element={<OwnerDashboardPage />} />
         <Route path="/owner/buildings" element={<OwnerBuildingsPage />} />
@@ -104,10 +87,7 @@ export function AppRouter() {
         <Route path="kiosks" element={<KiosksPage />} />
         <Route path="vehicles" element={<VehiclesPage />} />
 
-        <Route
-          path="users"
-          element={<EmptyModule title="Users" />}
-        />
+        <Route path="users" element={<UsersPage />} />
 
         <Route path="reports" element={<ReportsPage />} />
 

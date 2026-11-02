@@ -67,7 +67,8 @@ export const ModelName = {
   AuthorizedVehicle: 'AuthorizedVehicle',
   GateAccessDevice: 'GateAccessDevice',
   VehicleAccessRequest: 'VehicleAccessRequest',
-  VehicleAccessEvent: 'VehicleAccessEvent'
+  VehicleAccessEvent: 'VehicleAccessEvent',
+  GuardSession: 'GuardSession'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -415,6 +416,21 @@ export const VehicleAccessEventScalarFieldEnum = {
 } as const
 
 export type VehicleAccessEventScalarFieldEnum = (typeof VehicleAccessEventScalarFieldEnum)[keyof typeof VehicleAccessEventScalarFieldEnum]
+
+
+export const GuardSessionScalarFieldEnum = {
+  id: 'id',
+  siteId: 'siteId',
+  username: 'username',
+  guardName: 'guardName',
+  loginAt: 'loginAt',
+  lastSeenAt: 'lastSeenAt',
+  loggedOutAt: 'loggedOutAt',
+  userAgent: 'userAgent',
+  createdAt: 'createdAt'
+} as const
+
+export type GuardSessionScalarFieldEnum = (typeof GuardSessionScalarFieldEnum)[keyof typeof GuardSessionScalarFieldEnum]
 
 
 export const SortOrder = {

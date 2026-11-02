@@ -17,7 +17,7 @@ export function ChangePasswordPage() {
     mutationFn: () => changeBuildingPassword(currentPassword, newPassword),
     onSuccess: (response) => {
       saveSession(response.data.token, response.data.user);
-      navigate("/", { replace: true });
+      navigate("/identify", { replace: true });
     },
     onError: (error) => setMessage(error instanceof ApiError ? error.message : "Could not change password.")
   });
