@@ -25,6 +25,8 @@ import { VehiclesPage } from "../pages/vehicles/VehiclesPage";
 import { OperationsPage } from "../pages/operations/OperationsPage";
 import { ReportsPage } from "../pages/reports/ReportsPage";
 import { IntelligentSearchPage } from "../pages/search/IntelligentSearchPage";
+import { GuardIdentityPage } from "../pages/auth/GuardIdentityPage";
+import { UsersPage } from "../pages/users/UsersPage";
 
 function EmptyModule({
   title
@@ -69,6 +71,7 @@ export function AppRouter() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/change-password" element={<ChangePasswordPage />} />
+      <Route path="/identify" element={<GuardIdentityPage />} />
       <Route element={<RequireOwner><OwnerLayout /></RequireOwner>}>
         <Route path="/owner" element={<OwnerDashboardPage />} />
         <Route path="/owner/buildings" element={<OwnerBuildingsPage />} />
