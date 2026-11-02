@@ -2,6 +2,7 @@ import type { AuthUser } from "../api/auth-api";
 
 const TOKEN_KEY = "smartpass360.token";
 const USER_KEY = "smartpass360.user";
+const BUILDING_KEY = "smartpass360.building";
 
 export function getToken() {
   return window.localStorage.getItem(TOKEN_KEY);
@@ -16,11 +17,14 @@ export function getStoredUser(): AuthUser | null {
 export function saveSession(token: string, user: AuthUser) {
   window.localStorage.setItem(TOKEN_KEY, token);
   window.localStorage.setItem(USER_KEY, JSON.stringify(user));
+  if (user.scope === "BUILDING") window.localStorage.setItem(BUILDING_KEY, user.siteId ?? "");
+  else window.localStorage.removeItem(BUILDING_KEY);
 }
 
 export function clearSession() {
   window.localStorage.removeItem(TOKEN_KEY);
   window.localStorage.removeItem(USER_KEY);
+  window.localStorage.removeItem(BUILDING_KEY);
 }
 
 export async function signOutSession() {
@@ -31,7 +35,8 @@ export async function signOutSession() {
       await logoutGuardSession();
     }
   } catch {
-    // Local sign-out must still complete if the network is unavailable.
+    // Always clear the local session even when the API is unreachable.
+  } finally {
+    clearSession();
   }
-  clearSession();
 }
