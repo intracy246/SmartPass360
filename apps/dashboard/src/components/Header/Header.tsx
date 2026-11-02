@@ -8,18 +8,19 @@ import "./Header.css";
 
 const READ_KEY = "smartpass360.notifications.read";
 
-function readIds(): string[] {
-  try { return JSON.parse(window.localStorage.getItem(READ_KEY) ?? "[]") as string[]; } catch { return []; }
+function readIds(key: string): string[] {
+  try { return JSON.parse(window.localStorage.getItem(key) ?? "[]") as string[]; } catch { return []; }
 }
 
 export function Header() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(false);
-  const [readNotificationIds, setReadNotificationIds] = useState<string[]>(readIds);
+  const user = getStoredUser();
+  const readKey = user?.guardSessionId ? `${READ_KEY}.${user.guardSessionId}` : READ_KEY;
+  const [readNotificationIds, setReadNotificationIds] = useState<string[]>(() => readIds(readKey));
   const [time, setTime] = useState(new Date());
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
-  const user = getStoredUser();
   const operations = useQuery({ queryKey: ["visitor-operations"], queryFn: getVisitorOperations, refetchInterval: 5000 });
   const pending = operations.data?.data.pending ?? [];
   const unreadCount = useMemo(() => pending.filter((visit) => !readNotificationIds.includes(visit.id)).length, [pending, readNotificationIds]);
@@ -33,7 +34,7 @@ export function Header() {
   function markRead(id: string) {
     const next = [...new Set([...readNotificationIds, id])];
     setReadNotificationIds(next);
-    window.localStorage.setItem(READ_KEY, JSON.stringify(next.slice(-500)));
+    window.localStorage.setItem(readKey, JSON.stringify(next.slice(-500)));
     setNotificationsOpen(false);
     navigate("/operations");
   }
@@ -41,7 +42,7 @@ export function Header() {
   function markAllRead() {
     const next = [...new Set([...readNotificationIds, ...pending.map((visit) => visit.id)])];
     setReadNotificationIds(next);
-    window.localStorage.setItem(READ_KEY, JSON.stringify(next.slice(-500)));
+    window.localStorage.setItem(readKey, JSON.stringify(next.slice(-500)));
   }
 
   function toggleSound() {
