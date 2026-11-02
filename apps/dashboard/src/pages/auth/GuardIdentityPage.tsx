@@ -34,10 +34,10 @@ export function GuardIdentityPage() {
     <main className="login-page">
       <form className="login-card" onSubmit={submit}>
         <div className="login-brand"><span>SP</span><div><strong>SMARTPASS360</strong><small>Security shift identification</small></div></div>
-        <div><p>GUARD IDENTIFICATION</p><h1>Who is on duty?</h1><span>Enter your full name. Building username and password are shared by the security team; this name identifies your current session.</span></div>
-        <label><span>Full name</span><input value={fullName} onChange={(event) => setFullName(event.target.value)} autoComplete="name" placeholder="e.g. Musa Abdallah" minLength={2} maxLength={120} required autoFocus /></label>
-        {message && <div className="login-message">{message}</div>}
-        <button type="submit" disabled={mutation.isPending}>{mutation.isPending ? "Starting session..." : "Continue to dashboard"}</button>
+        <div><p>GUARD IDENTIFICATION</p><h1>Who is on duty?</h1><span>Enter your full name for this shift. The shared building account identifies the site; your name identifies this working session.</span></div>
+        <label><span>Guard full name</span><input value={fullName} onChange={(event) => setFullName(event.target.value)} autoComplete="name" placeholder="Enter your full name" minLength={2} maxLength={120} required autoFocus /></label>
+        {message && <div className="login-message" role="alert">{message}</div>}
+        <button type="submit" disabled={mutation.isPending || fullName.trim().length < 2}>{mutation.isPending ? "Starting session..." : "Continue to dashboard"}</button>
       </form>
     </main>
   );
