@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { clearSession } from "../../auth/session";
+import { signOutSession } from "../../auth/session";
 
 import "./Sidebar.css";
 
@@ -116,7 +116,7 @@ export function Sidebar() {
         ))}
       </nav>
 
-      <button className="sidebar__mobile-signout" type="button" onClick={() => { clearSession(); navigate("/login", { replace: true }); }}>Sign out</button>
+      <button className="sidebar__mobile-signout" type="button" onClick={() => { void signOutSession().finally(() => navigate("/login", { replace: true })); }}>Sign out</button>
 
       <div className="sidebar__footer">
         <div className="sidebar__system-dot" />
@@ -129,8 +129,7 @@ export function Sidebar() {
         <button
           type="button"
           onClick={() => {
-            clearSession();
-            navigate("/login", { replace: true });
+            void signOutSession().finally(() => navigate("/login", { replace: true }));
           }}
           style={{
             marginLeft: "auto",
