@@ -23,7 +23,7 @@ export function Header() {
   const operations = useQuery({ queryKey: ["visitor-operations"], queryFn: getVisitorOperations, refetchInterval: 5000 });
   const pending = operations.data?.data.pending ?? [];
   const unreadCount = useMemo(() => pending.filter((visit) => !readNotificationIds.includes(visit.id)).length, [pending, readNotificationIds]);
-  const initials = (user?.guardName ?? "SP").trim().split(/\\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase() ?? "").join("") || "SP";
+  const initials = (user?.guardName ?? "SP").trim().split(/\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase() ?? "").join("") || "SP";
 
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
