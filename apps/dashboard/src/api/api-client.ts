@@ -42,7 +42,7 @@ export async function apiRequest<T>(endpoint: string, options: RequestOptions = 
   const responseBody = contentType?.includes("application/json") ? await response.json() : await response.text();
   if (!response.ok) {
     // Do not preserve an invalid local bearer token after the API rejects it.
-    if (!isLogin && (response.status === 401 || (response.status === 403 && normalizedEndpoint === "/auth/identify-guard"))) {
+    if (response.status === 401 || (response.status === 403 && normalizedEndpoint === "/auth/identify-guard")) {
       clearStaleSession();
     }
     const message = typeof responseBody === "object" && responseBody !== null && "error" in responseBody
