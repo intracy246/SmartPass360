@@ -546,3 +546,19 @@ ownerRouter.get("/guard-sessions", requireBuilding, async (_request, response, n
     return next(error);
   }
 });
+
+// Compact audit view: shift identity, sign-in and sign-out timestamps only.
+ownerRouter.get("/guard-shift-logs", requireBuilding, async (_request, response, next) => {
+  try {
+    const user = response.locals.authUser as AuthUser;
+    const sessions = await prisma.guardSession.findMany({
+      where: { siteId: user.siteId! },
+      select: { id: true, guardName: true, loginAt: true, loggedOutAt: true },
+      orderBy: { loginAt: "desc" },
+      take: 200
+    });
+    return response.status(200).json({ success: true, data: sessions });
+  } catch (error) {
+    return next(error);
+  }
+});
