@@ -5,7 +5,7 @@ import { z } from "zod";
 
 import { env } from "../config/env.js";
 import { prisma } from "../lib/prisma.js";
-import { requireBuilding, requireOwner, signAuthToken, type AuthUser } from "../middleware/auth.middleware.js";
+import { requireAuth, requireBuilding, requireOwner, signAuthToken, type AuthUser } from "../middleware/auth.middleware.js";
 import { loginRateLimit } from "../middleware/login-rate-limit.middleware.js";
 
 export const ownerRouter = Router();
@@ -394,7 +394,10 @@ ownerRouter.post("/me/change-password", requireBuilding, async (request, respons
     }
 
     const user = response.locals.authUser as AuthUser;
-    const site = await prisma.site.findUnique({ where: { id: user.siteId! } });
+    if (user.scope !== "BUILDING" || !user.siteId || user.mustChangePassword || user.guardSessionId) {
+      return response.status(403).json({ error: { code: "BUILDING_LOGIN_REQUIRED", message: "Sign in with building credentials before identifying the guard." } });
+    }
+    const site = await prisma.site.findUnique({ where: { id: user.siteId } });
 
     if (!site?.adminPasswordHash) {
       return response.status(404).json({ error: { code: "BUILDING_NOT_FOUND", message: "Building account not found." } });
@@ -438,12 +441,13 @@ ownerRouter.post("/me/change-password", requireBuilding, async (request, respons
 });
 
 
-// Shared building credentials identify the individual guard for each working session.
+// Guard identity is a second step after credential login. This route deliberately
+// accepts only an authenticated BUILDING token without a guard session.
 const identifyGuardSchema = z.object({
   fullName: z.string().trim().min(2).max(120)
 });
 
-ownerRouter.post("/identify-guard", requireBuilding, async (request, response, next) => {
+ownerRouter.post("/identify-guard", requireAuth, async (request, response, next) => {
   try {
     const parsed = identifyGuardSchema.safeParse(request.body);
     if (!parsed.success) {
