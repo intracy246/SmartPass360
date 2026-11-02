@@ -502,7 +502,7 @@ ownerRouter.post("/guard-sessions/heartbeat", requireBuilding, async (_request, 
   }
 });
 
-ownerRouter.post("/logout", requireBuilding, async (request, response, next) => {
+ownerRouter.post("/logout", requireBuilding, async (_request, response, next) => {
   try {
     const user = response.locals.authUser as AuthUser;
     if (user.guardSessionId) {
