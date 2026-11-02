@@ -39,3 +39,13 @@ export function heartbeatGuardSession() {
 export function logoutGuardSession() {
   return apiRequest<{ success: boolean; data: { loggedOut: boolean } }>("/auth/logout", { method: "POST" });
 }
+
+export type GuardShiftLog = {
+  id: string;
+  guardName: string;
+  loginAt: string;
+  loggedOutAt: string | null;
+};
+export function getGuardShiftLogs() {
+  return apiRequest<{ success: boolean; data: GuardShiftLog[] }>("/auth/guard-shift-logs");
+}
