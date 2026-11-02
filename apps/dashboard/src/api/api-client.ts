@@ -13,24 +13,38 @@ export class ApiError extends Error {
 
 type RequestOptions = Omit<RequestInit, "body"> & { body?: unknown };
 
+const TOKEN_KEY = "smartpass360.token";
+const USER_KEY = "smartpass360.user";
+const BUILDING_KEY = "smartpass360.building";
+
+function clearStaleSession() {
+  window.localStorage.removeItem(TOKEN_KEY);
+  window.localStorage.removeItem(USER_KEY);
+  window.localStorage.removeItem(BUILDING_KEY);
+}
+
 export async function apiRequest<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
   const normalizedEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
-  const token = window.localStorage.getItem("smartpass360.token");
   const method = options.method?.toUpperCase() ?? "GET";
-  // Login and credential recovery must not carry a stale role/session token.
-  const isPublicAuthRequest = method === "POST" && ["/auth/login", "/auth/owner/login"].includes(normalizedEndpoint);
+  const isLogin = method === "POST" && normalizedEndpoint === "/auth/login";
+  const token = isLogin ? null : window.localStorage.getItem(TOKEN_KEY);
+  const headers = new Headers(options.headers);
+  headers.set("Content-Type", "application/json");
+  if (token) headers.set("Authorization", `Bearer ${token}`);
+  else headers.delete("Authorization");
+
   const response = await fetch(`${environment.apiBaseUrl}${normalizedEndpoint}`, {
     ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(!isPublicAuthRequest && token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options.headers
-    },
+    headers,
     body: options.body === undefined ? undefined : JSON.stringify(options.body)
   });
   const contentType = response.headers.get("content-type");
   const responseBody = contentType?.includes("application/json") ? await response.json() : await response.text();
   if (!response.ok) {
+    // Do not preserve an invalid local bearer token after the API rejects it.
+    if (!isLogin && (response.status === 401 || (response.status === 403 && normalizedEndpoint === "/auth/identify-guard"))) {
+      clearStaleSession();
+    }
     const message = typeof responseBody === "object" && responseBody !== null && "error" in responseBody
       ? extractErrorMessage(responseBody)
       : `Request failed with status ${response.status}`;
