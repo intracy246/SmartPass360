@@ -55,6 +55,7 @@ function RequireBuilding({ children }: { children: ReactNode }) {
   if (!token || !user) return <Navigate to="/login" replace />;
   if (user.scope === "OWNER") return <Navigate to="/owner" replace />;
   if (user.mustChangePassword) return <Navigate to="/change-password" replace />;
+  if (user.scope === "BUILDING" && !user.guardSessionId) return <Navigate to="/identify" replace />;
   return <>{children}</>;
 }
 
@@ -107,10 +108,7 @@ export function AppRouter() {
         <Route path="kiosks" element={<KiosksPage />} />
         <Route path="vehicles" element={<VehiclesPage />} />
 
-        <Route
-          path="users"
-          element={<EmptyModule title="Users" />}
-        />
+        <Route path="users" element={<UsersPage />} />
 
         <Route path="reports" element={<ReportsPage />} />
 
