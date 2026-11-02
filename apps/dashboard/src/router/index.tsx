@@ -28,27 +28,6 @@ import { IntelligentSearchPage } from "../pages/search/IntelligentSearchPage";
 import { GuardIdentityPage } from "../pages/auth/GuardIdentityPage";
 import { UsersPage } from "../pages/users/UsersPage";
 
-function EmptyModule({
-  title
-}: {
-  title: string;
-}) {
-  return (
-    <div
-      style={{
-        padding: "32px",
-        color: "#F8F8FF"
-      }}
-    >
-      <h1>{title}</h1>
-      <p style={{ color: "#8FA0B8" }}>
-        This module will display real data from the
-        SMARTPASS360 API. No mock data is being used.
-      </p>
-    </div>
-  );
-}
-
 function RequireBuilding({ children }: { children: ReactNode }) {
   const token = getToken();
   const user = getStoredUser();
