@@ -22,3 +22,16 @@ export function clearSession() {
   window.localStorage.removeItem(TOKEN_KEY);
   window.localStorage.removeItem(USER_KEY);
 }
+
+export async function signOutSession() {
+  try {
+    const user = getStoredUser();
+    if (user?.scope === "BUILDING" && user.guardSessionId) {
+      const { logoutGuardSession } = await import("../api/auth-api");
+      await logoutGuardSession();
+    }
+  } catch {
+    // Local sign-out must still complete if the network is unavailable.
+  }
+  clearSession();
+}
