@@ -130,6 +130,7 @@ model Site {
   gateAccessDevices     GateAccessDevice[]
   vehicleAccessRequests VehicleAccessRequest[]
   vehicleAccessEvents   VehicleAccessEvent[]
+  guardSessions         GuardSession[]
 
   @@index([isActive])
   @@index([status])
