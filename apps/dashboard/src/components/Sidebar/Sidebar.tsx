@@ -20,6 +20,11 @@ const navigationItems = [
     symbol: "◎"
   },
   {
+    label: "Vehicles",
+    path: "/vehicles",
+    symbol: "▤"
+  },
+  {
     label: "Intelligent Search",
     path: "/search",
     symbol: "⌕"
@@ -48,11 +53,6 @@ const navigationItems = [
     label: "Kiosks",
     path: "/kiosks",
     symbol: "▣"
-  },
-  {
-    label: "Vehicles",
-    path: "/vehicles",
-    symbol: "▤"
   },
   {
     label: "Users",
