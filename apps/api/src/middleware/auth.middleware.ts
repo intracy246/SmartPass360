@@ -75,6 +75,18 @@ export function requireAuth(request: Request, response: Response, next: NextFunc
   next();
 }
 
+export function requireBuildingLogin(request: Request, response: Response, next: NextFunction) {
+  const user = readAuthUser(request);
+  if (!user || user.scope !== "BUILDING" || !user.siteId || user.mustChangePassword || user.guardSessionId) {
+    response.status(403).json({
+      error: { code: "BUILDING_LOGIN_REQUIRED", message: "Sign in with building credentials before identifying the guard." }
+    });
+    return;
+  }
+  response.locals.authUser = user;
+  next();
+}
+
 export function requireOwner(request: Request, response: Response, next: NextFunction) {
   const user = readAuthUser(request);
   if (!user || user.scope !== "OWNER") {
