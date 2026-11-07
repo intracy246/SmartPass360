@@ -284,13 +284,16 @@
 }
 
 .passes-table__menu {
-  width: 38px;
+  width: auto;
+  min-width: 56px;
   height: 38px;
+  padding: 0 12px;
   border: 1px solid rgba(248, 248, 255, 0.09);
   border-radius: 13px;
   background: rgba(255, 255, 255, 0.035);
   color: #c7d2e2;
-  font-size: 18px;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
 }
 
