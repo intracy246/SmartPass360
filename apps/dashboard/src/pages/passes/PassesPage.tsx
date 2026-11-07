@@ -57,7 +57,7 @@ function formatDateTime(
   value?: string | null
 ) {
   if (!value) {
-    return "Ã¢â‚¬â€";
+    return "—";
   }
 
   const parsedDate = new Date(value);
@@ -578,7 +578,7 @@ export function PassesPage() {
               visitorPasses.length === 0 && (
                 <div className="passes-state">
                   <div className="passes-state__icon">
-                    Ã¢â€”â€¡
+                    ◇
                   </div>
 
                   <strong>
@@ -724,7 +724,7 @@ export function PassesPage() {
                                     );
                                   }}
                                 >
-                                  Ã¢â€¹Â¯
+                                  View
                                 </button>
                               </td>
                             </tr>
@@ -987,7 +987,7 @@ export function PassesPage() {
                 0 && (
                 <div className="passes-state">
                   <div className="passes-state__icon">
-                    Ã¢â€”â€¡
+                    ◇
                   </div>
 
                   <strong>
