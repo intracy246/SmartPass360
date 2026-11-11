@@ -56,6 +56,7 @@ export const ModelName = {
   SiteOrganization: 'SiteOrganization',
   Kiosk: 'Kiosk',
   Department: 'Department',
+  PurposeOption: 'PurposeOption',
   Host: 'Host',
   Visitor: 'Visitor',
   VisitRequest: 'VisitRequest',
@@ -171,6 +172,18 @@ export const DepartmentScalarFieldEnum = {
 } as const
 
 export type DepartmentScalarFieldEnum = (typeof DepartmentScalarFieldEnum)[keyof typeof DepartmentScalarFieldEnum]
+
+
+export const PurposeOptionScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  name: 'name',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PurposeOptionScalarFieldEnum = (typeof PurposeOptionScalarFieldEnum)[keyof typeof PurposeOptionScalarFieldEnum]
 
 
 export const HostScalarFieldEnum = {

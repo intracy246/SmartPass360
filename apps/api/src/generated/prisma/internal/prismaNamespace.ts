@@ -402,6 +402,7 @@ export const ModelName = {
   SiteOrganization: 'SiteOrganization',
   Kiosk: 'Kiosk',
   Department: 'Department',
+  PurposeOption: 'PurposeOption',
   Host: 'Host',
   Visitor: 'Visitor',
   VisitRequest: 'VisitRequest',
@@ -430,7 +431,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "organization" | "site" | "siteOrganization" | "kiosk" | "department" | "host" | "visitor" | "visitRequest" | "visitorPass" | "gate" | "accessEvent" | "permanentPass" | "permanentPassAccessEvent" | "authorizedVehicle" | "gateAccessDevice" | "vehicleAccessRequest" | "vehicleAccessEvent" | "guardSession"
+    modelProps: "organization" | "site" | "siteOrganization" | "kiosk" | "department" | "purposeOption" | "host" | "visitor" | "visitRequest" | "visitorPass" | "gate" | "accessEvent" | "permanentPass" | "permanentPassAccessEvent" | "authorizedVehicle" | "gateAccessDevice" | "vehicleAccessRequest" | "vehicleAccessEvent" | "guardSession"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -801,6 +802,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.DepartmentCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.DepartmentCountAggregateOutputType> | number
+        }
+      }
+    }
+    PurposeOption: {
+      payload: Prisma.$PurposeOptionPayload<ExtArgs>
+      fields: Prisma.PurposeOptionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PurposeOptionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurposeOptionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PurposeOptionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurposeOptionPayload>
+        }
+        findFirst: {
+          args: Prisma.PurposeOptionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurposeOptionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PurposeOptionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurposeOptionPayload>
+        }
+        findMany: {
+          args: Prisma.PurposeOptionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurposeOptionPayload>[]
+        }
+        create: {
+          args: Prisma.PurposeOptionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurposeOptionPayload>
+        }
+        createMany: {
+          args: Prisma.PurposeOptionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PurposeOptionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurposeOptionPayload>[]
+        }
+        delete: {
+          args: Prisma.PurposeOptionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurposeOptionPayload>
+        }
+        update: {
+          args: Prisma.PurposeOptionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurposeOptionPayload>
+        }
+        deleteMany: {
+          args: Prisma.PurposeOptionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PurposeOptionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PurposeOptionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurposeOptionPayload>[]
+        }
+        upsert: {
+          args: Prisma.PurposeOptionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurposeOptionPayload>
+        }
+        aggregate: {
+          args: Prisma.PurposeOptionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePurposeOption>
+        }
+        groupBy: {
+          args: Prisma.PurposeOptionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PurposeOptionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PurposeOptionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PurposeOptionCountAggregateOutputType> | number
         }
       }
     }
@@ -1891,6 +1966,18 @@ export const DepartmentScalarFieldEnum = {
 export type DepartmentScalarFieldEnum = (typeof DepartmentScalarFieldEnum)[keyof typeof DepartmentScalarFieldEnum]
 
 
+export const PurposeOptionScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  name: 'name',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PurposeOptionScalarFieldEnum = (typeof PurposeOptionScalarFieldEnum)[keyof typeof PurposeOptionScalarFieldEnum]
+
+
 export const HostScalarFieldEnum = {
   id: 'id',
   organizationId: 'organizationId',
@@ -2640,6 +2727,7 @@ export type GlobalOmitConfig = {
   siteOrganization?: Prisma.SiteOrganizationOmit
   kiosk?: Prisma.KioskOmit
   department?: Prisma.DepartmentOmit
+  purposeOption?: Prisma.PurposeOptionOmit
   host?: Prisma.HostOmit
   visitor?: Prisma.VisitorOmit
   visitRequest?: Prisma.VisitRequestOmit

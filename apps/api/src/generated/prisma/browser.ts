@@ -43,6 +43,11 @@ export type Kiosk = Prisma.KioskModel
  */
 export type Department = Prisma.DepartmentModel
 /**
+ * Model PurposeOption
+ * 
+ */
+export type PurposeOption = Prisma.PurposeOptionModel
+/**
  * Model Host
  * 
  */
