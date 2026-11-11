@@ -21,3 +21,7 @@ export function addOrganizationPurpose(organizationId: string, name: string) {
 export function deleteOrganizationPurpose(organizationId: string, purposeId: string) {
   return apiRequest<{ success: boolean }>(`/organizations/${encodeURIComponent(organizationId)}/purposes/${encodeURIComponent(purposeId)}`, { method: "DELETE" });
 }
+
+export function updateOrganizationLogo(organizationId: string, logoUrl: string | null) {
+  return apiRequest<{ success: boolean; data: Organization }>(`/organizations/${encodeURIComponent(organizationId)}/profile`, { method: "PATCH", body: { logoUrl } });
+}
