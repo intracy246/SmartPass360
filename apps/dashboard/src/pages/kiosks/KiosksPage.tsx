@@ -136,7 +136,7 @@ export function KiosksPage() {
           <article key={kiosk.id} className="kiosks-list__row">
             <div className="kiosks-list__main">
               <strong>{kiosk.name}</strong>
-              <small>{kiosk.code} · {kiosk.site.name}</small>
+              <small>{kiosk.code} · {kiosk.site?.name ?? "Building"}</small>
             </div>
             <span>{kiosk.location || "—"}</span>
             <span className={kiosk.isActive ? "status active" : "status"}>
@@ -173,7 +173,7 @@ export function KiosksPage() {
             <div className="kiosk-detail-grid">
               <div><span>Code</span><strong>{viewing.code}</strong></div>
               <div><span>Status</span><strong>{viewing.isActive ? "ACTIVE" : "INACTIVE"}</strong></div>
-              <div><span>Building</span><strong>{viewing.site.name}</strong></div>
+              <div><span>Building</span><strong>{viewing.site?.name ?? "Building"}</strong></div>
               <div><span>Location</span><strong>{viewing.location || "—"}</strong></div>
               <div className="wide"><span>Activation code</span><strong>{viewing.activationCode}</strong></div>
               <div className="wide"><span>Device</span><strong>{viewing.deviceId || "Not activated"}</strong></div>
