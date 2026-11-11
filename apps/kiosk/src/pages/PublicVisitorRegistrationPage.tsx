@@ -235,8 +235,8 @@ export function PublicVisitorRegistrationPage() {
 
   const config = configQuery.data?.data;
   const organizations = (config?.organizations ?? []).filter((organization) => organization.isActive);
-  const departmentsQuery = useQuery({ queryKey: ["public-org-departments", form.organizationId], queryFn: () => apiRequest<{ success: boolean; data: { id: string; name: string }[] }>(`/organizations/${encodeURIComponent(form.organizationId)}/departments`), enabled: Boolean(form.organizationId) });
-  const purposesQuery = useQuery({ queryKey: ["public-org-purposes", form.organizationId], queryFn: () => apiRequest<{ success: boolean; data: { id: string; name: string }[] }>(`/organizations/${encodeURIComponent(form.organizationId)}/purposes`), enabled: Boolean(form.organizationId) });
+  const departmentsQuery = useQuery({ queryKey: ["public-org-departments", form.organizationId], queryFn: () => apiRequest<{ success: boolean; data: { id: string; name: string }[] }>(`/kiosks/public/${encodeURIComponent(kioskId)}/organizations/${encodeURIComponent(form.organizationId)}/departments`), enabled: Boolean(form.organizationId) });
+  const purposesQuery = useQuery({ queryKey: ["public-org-purposes", form.organizationId], queryFn: () => apiRequest<{ success: boolean; data: { id: string; name: string }[] }>(`/kiosks/public/${encodeURIComponent(kioskId)}/organizations/${encodeURIComponent(form.organizationId)}/purposes`), enabled: Boolean(form.organizationId) });
   const status = statusQuery.data?.data;
   const isRejected = status?.status === "REJECTED";
   const isIssued = status?.status === "PASS_ISSUED" && Boolean(status.qrValue && status.pass);
