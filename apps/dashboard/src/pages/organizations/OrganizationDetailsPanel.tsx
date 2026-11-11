@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Organization } from "../../types/organization";
 import { ApiError } from "../../api/api-client";
+import "./OrganizationDetailsPanel.css";
 import { addOrganizationDepartment, addOrganizationPurpose, deleteOrganizationDepartment, deleteOrganizationPurpose, getOrganizationDepartments, getOrganizationPurposes } from "../../api/organization-catalog-api";
 
 type Props = { organization: Organization; onClose: () => void };
