@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Organization } from "../../types/organization";
 import { ApiError } from "../../api/api-client";
 import "./OrganizationDetailsPanel.css";
-import { addOrganizationDepartment, addOrganizationPurpose, deleteOrganizationDepartment, deleteOrganizationPurpose, getOrganizationDepartments, getOrganizationPurposes } from "../../api/organization-catalog-api";
+import { addOrganizationDepartment, addOrganizationPurpose, deleteOrganizationDepartment, deleteOrganizationPurpose, getOrganizationDepartments, getOrganizationPurposes, updateOrganizationLogo } from "../../api/organization-catalog-api";
 
 type Props = { organization: Organization; onClose: () => void };
 
@@ -16,6 +16,7 @@ export function OrganizationDetailsPanel({ organization, onClose }: Props) {
   const departments = useQuery({ queryKey: ["organization-departments", organization.id], queryFn: () => getOrganizationDepartments(organization.id) });
   const purposes = useQuery({ queryKey: ["organization-purposes", organization.id], queryFn: () => getOrganizationPurposes(organization.id) });
   const refresh = async () => { await client.invalidateQueries({ queryKey: ["organization-departments", organization.id] }); await client.invalidateQueries({ queryKey: ["organization-purposes", organization.id] }); };
+  const saveLogo = useMutation({ mutationFn: () => updateOrganizationLogo(organization.id, logoUrl.trim() || null), onSuccess: async () => { setMessage("Organization picture updated."); await client.invalidateQueries({ queryKey: ["organizations"] }); }, onError: e => setMessage(e instanceof ApiError ? e.message : "Could not update organization picture.") });
   const addDepartment = useMutation({ mutationFn: (name: string) => addOrganizationDepartment(organization.id, name), onSuccess: async () => { setDepartmentName(""); setMessage("Department added."); await refresh(); }, onError: e => setMessage(e instanceof ApiError ? e.message : "Could not add department.") });
   const removeDepartment = useMutation({ mutationFn: (id: string) => deleteOrganizationDepartment(organization.id, id), onSuccess: refresh, onError: () => setMessage("Could not delete department.") });
   const addPurpose = useMutation({ mutationFn: (name: string) => addOrganizationPurpose(organization.id, name), onSuccess: async () => { setPurposeName(""); setMessage("Purpose added."); await refresh(); }, onError: e => setMessage(e instanceof ApiError ? e.message : "Could not add purpose.") });
@@ -29,7 +30,7 @@ export function OrganizationDetailsPanel({ organization, onClose }: Props) {
       <div className="organization-details__profile">
         <div className="organization-details__logo">{logoUrl ? <img src={logoUrl} alt={organization.name + " logo"} /> : <span>{organization.shortName || organization.code}</span>}</div>
         <div><strong>Organization information</strong><p>{organization.email || "No email"} · {organization.phone || "No phone"}</p><p>{organization.address || "No address"}{organization.city ? ", " + organization.city : ""}{organization.country ? ", " + organization.country : ""}</p>
-        <form className="organization-details__inline-form" onSubmit={e => { e.preventDefault(); setMessage("Logo URL is shown in this panel only until organization profile update is enabled."); }}><label>Organization picture URL<input type="url" value={logoUrl} onChange={e => setLogoUrl(e.target.value)} placeholder="https://..." /></label><small>Image URL preview. Persistent upload/update needs the repository's media-storage endpoint.</small></form></div>
+        <form className="organization-details__inline-form" onSubmit={e => { e.preventDefault(); saveLogo.mutate(); }}><label>Organization picture URL<input type="url" value={logoUrl} onChange={e => setLogoUrl(e.target.value)} placeholder="https://..." /></label><button type="submit" disabled={saveLogo.isPending}>{saveLogo.isPending ? "Saving…" : "Save picture"}</button><small>Use a publicly accessible HTTPS image URL.</small></form></div>
       </div>
       <div className="organization-details__columns">
         <section><h3>Departments</h3><form onSubmit={submitDepartment}><input value={departmentName} onChange={e => setDepartmentName(e.target.value)} placeholder="Department name" maxLength={120} required /><button disabled={addDepartment.isPending}>Add department</button></form>
