@@ -104,7 +104,12 @@ kioskRouter.get("/", requireBuilding, async (_request, response, next) => {
     const kiosks = await prisma.kiosk.findMany({
       where: { siteId: user.siteId! },
       orderBy: { createdAt: "desc" },
-      select: { id: true, siteId: true, name: true, code: true, location: true, isActive: true, deviceId: true, activatedAt: true, lastSeenAt: true, createdAt: true, updatedAt: true }
+      select: {
+        id: true, siteId: true, name: true, code: true, location: true,
+        activationCode: true, isActive: true, deviceId: true, activatedAt: true,
+        lastSeenAt: true, createdAt: true, updatedAt: true,
+        site: { select: { id: true, name: true, code: true } }
+      }
     });
 
     return response.status(200).json({
