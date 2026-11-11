@@ -6,13 +6,13 @@ export type KioskRecord = {
   name: string;
   code: string;
   location?: string | null;
-  activationCode: string;
+  activationCode?: string;
   deviceId?: string | null;
   isActive: boolean;
   activatedAt?: string | null;
   lastSeenAt?: string | null;
   createdAt: string;
-  site: {
+  site?: {
     id: string;
     name: string;
     code: string;
