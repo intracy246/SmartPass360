@@ -26,6 +26,7 @@ import type {
 } from "../../types/organization";
 
 import "./OrganizationsPage.css";
+import { OrganizationDetailsPanel } from "./OrganizationDetailsPanel";
 
 type OrganizationFormState = {
   code: string;
@@ -79,6 +80,7 @@ export function OrganizationsPage() {
 
   const [message, setMessage] =
     useState<string | null>(null);
+  const [openedOrganization, setOpenedOrganization] = useState<import("../../types/organization").Organization | null>(null);
 
   const organizationsQuery = useQuery({
     queryKey: ["organizations", search],
@@ -536,6 +538,7 @@ export function OrganizationsPage() {
                     <button
                       type="button"
                       className="organization-card__button"
+                      onClick={() => setOpenedOrganization(organization)}
                     >
                       Open Organization
                     </button>
@@ -545,6 +548,7 @@ export function OrganizationsPage() {
             </div>
           )}
       </GlassCard>
+      {openedOrganization && <OrganizationDetailsPanel organization={openedOrganization} onClose={() => setOpenedOrganization(null)} />}
     </div>
   );
 }
