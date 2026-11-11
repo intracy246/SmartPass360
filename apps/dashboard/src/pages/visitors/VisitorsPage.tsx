@@ -203,7 +203,7 @@ export function VisitorsPage() {
         form.vehicleRegistrationNumber.trim() || undefined,
       departmentOrOffice: form.departmentOrOffice.trim() || undefined,
       hostName: form.hostName.trim() || undefined,
-      purposeOfVisit: (form.purposeOfVisit === "Others" ? form.otherPurpose : form.purposeOfVisit).trim() || undefined
+      purposeOfVisit: (form.purposeOfVisit === "Others" ? "Others: " + form.otherPurpose : form.purposeOfVisit).trim() || undefined
     };
 
     registrationMutation.mutate(payload);
