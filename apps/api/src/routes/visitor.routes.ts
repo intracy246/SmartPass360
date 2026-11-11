@@ -212,14 +212,14 @@ async function validOrganizationCatalogSelection(organizationId: string, departm
     });
     if (!department) return false;
   }
-  if (purposeName && purposeName !== "Others") {
+  if (purposeName && purposeName !== "Others" && !purposeName.startsWith("Others: ")) {
     const purpose = await prisma.purposeOption.findFirst({
       where: { organizationId, name: purposeName, isActive: true },
       select: { id: true }
     });
     if (!purpose) return false;
   }
-  if (purposeName === "Others" && !purposeName.trim()) return false;
+  if (purposeName?.startsWith("Others: ") && purposeName.slice(8).trim().length < 2) return false;
   return true;
 }
 
