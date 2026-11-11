@@ -243,3 +243,96 @@ organizationRouter.post(
     }
   }
 );
+
+
+const organizationIdSchema = z.string().uuid();
+const catalogNameSchema = z.object({ name: z.string().trim().min(2).max(120) });
+
+async function organizationAvailableToSite(organizationId: string, siteId: string) {
+  return prisma.siteOrganization.findFirst({
+    where: { organizationId, siteId, isActive: true, organization: { isActive: true } },
+    select: { id: true }
+  });
+}
+
+organizationRouter.get("/:organizationId/departments", requireBuilding, async (request, response, next) => {
+  try {
+    const id = organizationIdSchema.safeParse(request.params.organizationId);
+    if (!id.success) return response.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Invalid organization ID." } });
+    const user = response.locals.authUser as AuthUser;
+    if (!await organizationAvailableToSite(id.data, user.siteId!)) return response.status(404).json({ error: { code: "ORGANIZATION_NOT_FOUND", message: "Organization not found." } });
+    const data = await prisma.department.findMany({ where: { organizationId: id.data, isActive: true }, orderBy: { name: "asc" } });
+    return response.json({ success: true, data });
+  } catch (error) { return next(error); }
+});
+
+organizationRouter.post("/:organizationId/departments", requireBuilding, async (request, response, next) => {
+  try {
+    const id = organizationIdSchema.safeParse(request.params.organizationId);
+    const body = catalogNameSchema.safeParse(request.body);
+    if (!id.success || !body.success) return response.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Provide a valid department name." } });
+    const user = response.locals.authUser as AuthUser;
+    if (!await organizationAvailableToSite(id.data, user.siteId!)) return response.status(404).json({ error: { code: "ORGANIZATION_NOT_FOUND", message: "Organization not found." } });
+    const name = body.data.name.trim();
+    const code = name.toUpperCase().replace(/[^A-Z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 50);
+    const duplicate = await prisma.department.findFirst({ where: { organizationId: id.data, name: { equals: name, mode: "insensitive" } } });
+    if (duplicate) return response.status(409).json({ error: { code: "DEPARTMENT_EXISTS", message: "This department already exists." } });
+    const data = await prisma.department.create({ data: { organizationId: id.data, name, code } });
+    return response.status(201).json({ success: true, data });
+  } catch (error) { return next(error); }
+});
+
+organizationRouter.delete("/:organizationId/departments/:departmentId", requireBuilding, async (request, response, next) => {
+  try {
+    const id = organizationIdSchema.safeParse(request.params.organizationId);
+    const departmentId = organizationIdSchema.safeParse(request.params.departmentId);
+    if (!id.success || !departmentId.success) return response.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Invalid department ID." } });
+    const user = response.locals.authUser as AuthUser;
+    if (!await organizationAvailableToSite(id.data, user.siteId!)) return response.status(404).json({ error: { code: "ORGANIZATION_NOT_FOUND", message: "Organization not found." } });
+    const department = await prisma.department.findFirst({ where: { id: departmentId.data, organizationId: id.data, isActive: true }, select: { id: true } });
+    if (!department) return response.status(404).json({ error: { code: "DEPARTMENT_NOT_FOUND", message: "Department not found." } });
+    await prisma.department.update({ where: { id: department.id }, data: { isActive: false } });
+    return response.json({ success: true, data: { id: department.id, isActive: false } });
+  } catch (error) { return next(error); }
+});
+
+organizationRouter.get("/:organizationId/purposes", requireBuilding, async (request, response, next) => {
+  try {
+    const id = organizationIdSchema.safeParse(request.params.organizationId);
+    if (!id.success) return response.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Invalid organization ID." } });
+    const user = response.locals.authUser as AuthUser;
+    if (!await organizationAvailableToSite(id.data, user.siteId!)) return response.status(404).json({ error: { code: "ORGANIZATION_NOT_FOUND", message: "Organization not found." } });
+    const data = await prisma.purposeOption.findMany({ where: { organizationId: id.data, isActive: true }, orderBy: { name: "asc" } });
+    return response.json({ success: true, data: [{ id: "system-others", name: "Others", isSystem: true }, ...data.map(item => ({ ...item, isSystem: false }))] });
+  } catch (error) { return next(error); }
+});
+
+organizationRouter.post("/:organizationId/purposes", requireBuilding, async (request, response, next) => {
+  try {
+    const id = organizationIdSchema.safeParse(request.params.organizationId);
+    const body = catalogNameSchema.safeParse(request.body);
+    if (!id.success || !body.success) return response.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Provide a valid purpose name." } });
+    const user = response.locals.authUser as AuthUser;
+    if (!await organizationAvailableToSite(id.data, user.siteId!)) return response.status(404).json({ error: { code: "ORGANIZATION_NOT_FOUND", message: "Organization not found." } });
+    const name = body.data.name.trim();
+    if (name.toLowerCase() === "others") return response.status(400).json({ error: { code: "RESERVED_PURPOSE", message: "Others is a reserved system option." } });
+    const duplicate = await prisma.purposeOption.findFirst({ where: { organizationId: id.data, name: { equals: name, mode: "insensitive" } } });
+    if (duplicate) return response.status(409).json({ error: { code: "PURPOSE_EXISTS", message: "This purpose already exists." } });
+    const data = await prisma.purposeOption.create({ data: { organizationId: id.data, name } });
+    return response.status(201).json({ success: true, data });
+  } catch (error) { return next(error); }
+});
+
+organizationRouter.delete("/:organizationId/purposes/:purposeId", requireBuilding, async (request, response, next) => {
+  try {
+    const id = organizationIdSchema.safeParse(request.params.organizationId);
+    const purposeId = organizationIdSchema.safeParse(request.params.purposeId);
+    if (!id.success || !purposeId.success) return response.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Invalid purpose ID." } });
+    const user = response.locals.authUser as AuthUser;
+    if (!await organizationAvailableToSite(id.data, user.siteId!)) return response.status(404).json({ error: { code: "ORGANIZATION_NOT_FOUND", message: "Organization not found." } });
+    const purpose = await prisma.purposeOption.findFirst({ where: { id: purposeId.data, organizationId: id.data, isActive: true }, select: { id: true } });
+    if (!purpose) return response.status(404).json({ error: { code: "PURPOSE_NOT_FOUND", message: "Purpose not found." } });
+    await prisma.purposeOption.update({ where: { id: purpose.id }, data: { isActive: false } });
+    return response.json({ success: true, data: { id: purpose.id, isActive: false } });
+  } catch (error) { return next(error); }
+});
