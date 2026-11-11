@@ -3,7 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import QRCode from "qrcode";
 
 import { downloadMobileVisitorTicketImage } from "../utils/visitor-pass-image";
-import { ApiError } from "../api/api-client";
+import { ApiError, apiRequest } from "../api/api-client";
 import {
   getPublicRegistrationConfig,
   getPublicRegistrationStatus,
@@ -30,6 +30,7 @@ type FormState = {
   departmentOrOffice: string;
   hostName: string;
   purposeOfVisit: string;
+  otherPurpose: string;
 };
 
 type SavedRegistration = PublicVisitorRegistrationResult["data"];
@@ -44,7 +45,8 @@ const initialForm: FormState = {
   vehicleRegistrationNumber: "",
   departmentOrOffice: "",
   hostName: "",
-  purposeOfVisit: ""
+  purposeOfVisit: "",
+  otherPurpose: ""
 };
 
 const copy = {
@@ -233,6 +235,8 @@ export function PublicVisitorRegistrationPage() {
 
   const config = configQuery.data?.data;
   const organizations = (config?.organizations ?? []).filter((organization) => organization.isActive);
+  const departmentsQuery = useQuery({ queryKey: ["public-org-departments", form.organizationId], queryFn: () => apiRequest<{ success: boolean; data: { id: string; name: string }[] }>(`/kiosks/public/${encodeURIComponent(kioskId)}/organizations/${encodeURIComponent(form.organizationId)}/departments`), enabled: Boolean(form.organizationId) });
+  const purposesQuery = useQuery({ queryKey: ["public-org-purposes", form.organizationId], queryFn: () => apiRequest<{ success: boolean; data: { id: string; name: string }[] }>(`/kiosks/public/${encodeURIComponent(kioskId)}/organizations/${encodeURIComponent(form.organizationId)}/purposes`), enabled: Boolean(form.organizationId) });
   const status = statusQuery.data?.data;
   const isRejected = status?.status === "REJECTED";
   const isIssued = status?.status === "PASS_ISSUED" && Boolean(status.qrValue && status.pass);
@@ -254,7 +258,7 @@ export function PublicVisitorRegistrationPage() {
   }, [status?.qrValue, isIssued]);
 
   function updateField<K extends keyof FormState>(field: K, value: FormState[K]) {
-    setForm((current) => ({ ...current, [field]: value }));
+    setForm((current) => ({ ...current, [field]: value, ...(field === "organizationId" ? { departmentOrOffice: "", purposeOfVisit: "", otherPurpose: "" } : {}) }));
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -289,7 +293,7 @@ export function PublicVisitorRegistrationPage() {
       vehicleRegistrationNumber: form.vehicleRegistrationNumber.trim() || undefined,
       departmentOrOffice: form.departmentOrOffice.trim() || undefined,
       hostName: form.hostName.trim() || undefined,
-      purposeOfVisit: form.purposeOfVisit.trim() || undefined
+      purposeOfVisit: (form.purposeOfVisit === "Others" ? "Others: " + form.otherPurpose : form.purposeOfVisit).trim() || undefined
     };
     registrationMutation.mutate(payload);
   }
@@ -452,7 +456,10 @@ export function PublicVisitorRegistrationPage() {
 
                 <label className="mobile-registration__field">
                   <span>{t.department}</span>
-                  <input value={form.departmentOrOffice} onChange={(event) => updateField("departmentOrOffice", event.target.value)} maxLength={200} />
+                  <select value={form.departmentOrOffice} onChange={(event) => updateField("departmentOrOffice", event.target.value)} disabled={!form.organizationId || departmentsQuery.isPending || departmentsQuery.isError}>
+                    <option value="">{language === "sw" ? "Chagua idara" : "Select department"}</option>
+                    {(departmentsQuery.data?.data ?? []).map((department) => <option key={department.id} value={department.name}>{department.name}</option>)}
+                  </select>
                 </label>
                 <label className="mobile-registration__field">
                   <span>{t.host}</span>
@@ -460,8 +467,12 @@ export function PublicVisitorRegistrationPage() {
                 </label>
                 <label className="mobile-registration__field">
                   <span>{t.purpose}</span>
-                  <textarea value={form.purposeOfVisit} onChange={(event) => updateField("purposeOfVisit", event.target.value)} maxLength={1000} rows={3} />
+                  <select value={form.purposeOfVisit} onChange={(event) => updateField("purposeOfVisit", event.target.value)} disabled={!form.organizationId || purposesQuery.isPending || purposesQuery.isError}>
+                    <option value="">{language === "sw" ? "Chagua sababu" : "Select purpose"}</option>
+                    {(purposesQuery.data?.data ?? []).map((purpose) => <option key={purpose.id} value={purpose.name}>{purpose.name}</option>)}
+                  </select>
                 </label>
+                {form.purposeOfVisit === "Others" && <label className="mobile-registration__field"><span>{language === "sw" ? "Eleza sababu ya ziara" : "Specify purpose"} *</span><textarea value={form.otherPurpose} onChange={(event) => updateField("otherPurpose", event.target.value)} maxLength={1000} rows={3} required /></label>}
               </section>
 
               <div className="mobile-registration__actions">

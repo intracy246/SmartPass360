@@ -475,3 +475,32 @@ kioskRouter.get("/:kioskId/config", async (request, response, next) => {
   }
 });
 
+
+async function publicKioskOrganization(kioskId: string, organizationId: string) {
+  return prisma.siteOrganization.findFirst({
+    where: { site: { kiosks: { some: { id: kioskId, isActive: true } }, isActive: true, status: "ACTIVE" }, organizationId, isActive: true, organization: { isActive: true } },
+    select: { id: true }
+  });
+}
+
+kioskRouter.get("/public/:kioskId/organizations/:organizationId/departments", async (request, response, next) => {
+  try {
+    const kioskId = z.string().uuid().safeParse(request.params.kioskId);
+    const organizationId = z.string().uuid().safeParse(request.params.organizationId);
+    if (!kioskId.success || !organizationId.success || !await publicKioskOrganization(kioskId.data, organizationId.data)) return response.status(404).json({ error: { code: "ORGANIZATION_NOT_AVAILABLE", message: "Organization is not available for this kiosk." } });
+    const data = await prisma.department.findMany({ where: { organizationId: organizationId.data, isActive: true }, orderBy: { name: "asc" }, select: { id: true, name: true } });
+    response.setHeader("Cache-Control", "no-store");
+    return response.json({ success: true, data });
+  } catch (error) { return next(error); }
+});
+
+kioskRouter.get("/public/:kioskId/organizations/:organizationId/purposes", async (request, response, next) => {
+  try {
+    const kioskId = z.string().uuid().safeParse(request.params.kioskId);
+    const organizationId = z.string().uuid().safeParse(request.params.organizationId);
+    if (!kioskId.success || !organizationId.success || !await publicKioskOrganization(kioskId.data, organizationId.data)) return response.status(404).json({ error: { code: "ORGANIZATION_NOT_AVAILABLE", message: "Organization is not available for this kiosk." } });
+    const items = await prisma.purposeOption.findMany({ where: { organizationId: organizationId.data, isActive: true }, orderBy: { name: "asc" }, select: { id: true, name: true } });
+    response.setHeader("Cache-Control", "no-store");
+    return response.json({ success: true, data: [{ id: "system-others", name: "Others" }, ...items] });
+  } catch (error) { return next(error); }
+});
