@@ -459,14 +459,17 @@ export function VisitorsPage() {
 
                 <FormField
                   label="Department / Office"
-                  hint="Optional"
-                  inputProps={{
+                  hint="Select from the chosen organization"
+                  as="select"
+                  selectProps={{
                     value: form.departmentOrOffice,
-                    placeholder: "Example: ICT Department",
-                    onChange: (event) =>
-                      updateField("departmentOrOffice", event.target.value)
+                    disabled: !form.organizationId || departmentsQuery.isPending || departmentsQuery.isError,
+                    onChange: (event) => updateField("departmentOrOffice", event.target.value)
                   }}
-                />
+                >
+                  <option value="">Select department</option>
+                  {departments.map((department) => <option key={department.id} value={department.name}>{department.name}</option>)}
+                </FormField>
 
                 <FormField
                   label="Person Visiting / Host"
@@ -481,15 +484,28 @@ export function VisitorsPage() {
                 <div className="visitor-form__wide">
                   <FormField
                     label="Purpose of Visit"
-                    hint="Optional"
-                    as="textarea"
-                    textareaProps={{
+                    hint="Select a configured purpose"
+                    as="select"
+                    selectProps={{
                       value: form.purposeOfVisit,
-                      placeholder: "Describe the reason for this visit",
-                      onChange: (event) =>
-                        updateField("purposeOfVisit", event.target.value)
+                      disabled: !form.organizationId || purposesQuery.isPending || purposesQuery.isError,
+                      onChange: (event) => updateField("purposeOfVisit", event.target.value)
                     }}
-                  />
+                  >
+                    <option value="">Select purpose</option>
+                    {purposes.map((purpose) => <option key={purpose.id} value={purpose.name}>{purpose.name}</option>)}
+                  </FormField>
+                  {form.purposeOfVisit === "Others" && (
+                    <FormField
+                      label="Please specify purpose"
+                      required
+                      inputProps={{
+                        value: form.otherPurpose,
+                        placeholder: "Write the visitor's purpose",
+                        onChange: (event) => updateField("otherPurpose", event.target.value)
+                      }}
+                    />
+                  )}
                 </div>
               </div>
             </GlassCard>
