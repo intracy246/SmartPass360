@@ -13,6 +13,7 @@ import { useSearchParams } from "react-router-dom";
 
 import { ApiError } from "../../api/api-client";
 import { getOrganizations } from "../../api/organization-api";
+import { getOrganizationDepartments, getOrganizationPurposes } from "../../api/organization-catalog-api";
 import { registerVisitor } from "../../api/visitor-api";
 import { GlassButton } from "../../components/Buttons/GlassButton";
 import { GlassCard } from "../../components/Cards/GlassCard";
@@ -41,6 +42,7 @@ type VisitorFormState = {
   departmentOrOffice: string;
   hostName: string;
   purposeOfVisit: string;
+  otherPurpose: string;
 };
 
 type IssuedRegistration = VisitorFormState & {
@@ -58,7 +60,8 @@ const initialFormState: VisitorFormState = {
   vehicleRegistrationNumber: "",
   departmentOrOffice: "",
   hostName: "",
-  purposeOfVisit: ""
+  purposeOfVisit: "",
+  otherPurpose: ""
 };
 
 export function VisitorsPage() {
@@ -79,6 +82,11 @@ export function VisitorsPage() {
     () => (organizationsQuery.data?.data ?? []).filter((organization) => organization.isActive),
     [organizationsQuery.data]
   );
+
+  const departmentsQuery = useQuery({ queryKey: ["organization-departments", form.organizationId], queryFn: () => getOrganizationDepartments(form.organizationId), enabled: Boolean(form.organizationId) });
+  const purposesQuery = useQuery({ queryKey: ["organization-purposes", form.organizationId], queryFn: () => getOrganizationPurposes(form.organizationId), enabled: Boolean(form.organizationId) });
+  const departments = departmentsQuery.data?.data ?? [];
+  const purposes = purposesQuery.data?.data ?? [];
 
   const selectedOrganization = organizations.find(
     (organization) => organization.id === form.organizationId
@@ -133,6 +141,7 @@ export function VisitorsPage() {
         departmentOrOffice: variables.departmentOrOffice ?? "",
         hostName: variables.hostName ?? "",
         purposeOfVisit: variables.purposeOfVisit ?? "",
+        otherPurpose: "",
         organizationName: organizationName ?? "Organization",
         pass: response.data.pass
       });
@@ -194,7 +203,7 @@ export function VisitorsPage() {
         form.vehicleRegistrationNumber.trim() || undefined,
       departmentOrOffice: form.departmentOrOffice.trim() || undefined,
       hostName: form.hostName.trim() || undefined,
-      purposeOfVisit: form.purposeOfVisit.trim() || undefined
+      purposeOfVisit: (form.purposeOfVisit === "Others" ? form.otherPurpose : form.purposeOfVisit).trim() || undefined
     };
 
     registrationMutation.mutate(payload);
