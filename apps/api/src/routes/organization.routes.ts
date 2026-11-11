@@ -336,3 +336,15 @@ organizationRouter.delete("/:organizationId/purposes/:purposeId", requireBuildin
     return response.json({ success: true, data: { id: purpose.id, isActive: false } });
   } catch (error) { return next(error); }
 });
+
+organizationRouter.patch("/:organizationId/profile", requireBuilding, async (request, response, next) => {
+  try {
+    const id = organizationIdSchema.safeParse(request.params.organizationId);
+    const body = z.object({ logoUrl: z.string().trim().url().max(1000).nullable() }).safeParse(request.body);
+    if (!id.success || !body.success) return response.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Provide a valid organization image URL." } });
+    const user = response.locals.authUser as AuthUser;
+    if (!await organizationAvailableToSite(id.data, user.siteId!)) return response.status(404).json({ error: { code: "ORGANIZATION_NOT_FOUND", message: "Organization not found." } });
+    const data = await prisma.organization.update({ where: { id: id.data }, data: { logoUrl: body.data.logoUrl } });
+    return response.json({ success: true, data });
+  } catch (error) { return next(error); }
+});
