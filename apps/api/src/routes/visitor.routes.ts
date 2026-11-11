@@ -203,6 +203,26 @@ async function organizationBelongsToSite(siteId: string, organizationId: string)
   return Boolean(link);
 }
 
+
+async function validOrganizationCatalogSelection(organizationId: string, departmentName?: string, purposeName?: string) {
+  if (departmentName) {
+    const department = await prisma.department.findFirst({
+      where: { organizationId, name: departmentName, isActive: true },
+      select: { id: true }
+    });
+    if (!department) return false;
+  }
+  if (purposeName && purposeName !== "Others") {
+    const purpose = await prisma.purposeOption.findFirst({
+      where: { organizationId, name: purposeName, isActive: true },
+      select: { id: true }
+    });
+    if (!purpose) return false;
+  }
+  if (purposeName === "Others" && !purposeName.trim()) return false;
+  return true;
+}
+
 async function createVisit(input: {
   siteId: string;
   kioskId?: string;
@@ -279,6 +299,9 @@ visitorRouter.post("/kiosk-registration", async (request, response, next) => {
         error: { code: "INVALID_ORGANIZATION", message: "Selected organization does not belong to this building." }
       });
     }
+    if (!(await validOrganizationCatalogSelection(parsed.data.organizationId, parsed.data.departmentOrOffice, parsed.data.purposeOfVisit))) {
+      return response.status(400).json({ error: { code: "INVALID_ORGANIZATION_SELECTION", message: "Select a department and purpose configured for this organization." } });
+    }
 
     const receiptToken = crypto.randomBytes(32).toString("base64url");
     const { visitor, visit } = await createVisit({ ...parsed.data, siteId: kiosk.siteId, kioskId: kiosk.id, source: "KIOSK", receiptToken });
@@ -313,6 +336,9 @@ visitorRouter.post("/register", requireBuilding, async (request, response, next)
     }
 
     const user = response.locals.authUser as AuthUser;
+    if (!(await validOrganizationCatalogSelection(parsed.data.organizationId, parsed.data.departmentOrOffice, parsed.data.purposeOfVisit))) {
+      return response.status(400).json({ error: { code: "INVALID_ORGANIZATION_SELECTION", message: "Select a department and purpose configured for this organization." } });
+    }
     const token = crypto.randomBytes(32).toString("base64url");
     const qrValue = await (await import("qrcode")).default.toDataURL(
       visitorPassQrValue(token),
